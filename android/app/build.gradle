@@ -86,6 +86,10 @@ android {
 
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
+    
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 
     namespace 'com.shkwahab.frontend'
     defaultConfig {
