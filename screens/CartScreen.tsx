@@ -103,7 +103,7 @@ const handlePlaceOrder = async () => {
 
     console.log('📦 Sending payload to backend:', payload);
 
-    const response = await fetch('http://192.168.100.11:5000/api/cashfree/create-order', {
+    const response = await fetch('http://expressaid.centralus.cloudapp.azure.com/api/cashfree/create-order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
