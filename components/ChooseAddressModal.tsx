@@ -23,7 +23,7 @@ interface Suggestion {
 const GOOGLE_API_KEY = 'AIzaSyBt6vwj4W_smVmNXDPwHQLdFBVpHQgM78c'; // <-- Replace with your actual key if needed
 
 // Use backend proxy for Places API
-const BACKEND_BASE_URL = 'http://192.168.100.11:5000'; // Use Android emulator localhost
+const BACKEND_BASE_URL = 'http://expressaid.centralus.cloudapp.azure.com:5000'; // Azure backend URL
 
 const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClose, onAddNew, onSelect }) => {
   const navigation = useNavigation();

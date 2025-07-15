@@ -41,7 +41,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
   const [languageModalVisible, setLanguageModalVisible] = React.useState(false);
   const [locationPermissionPermanentlyDenied, setLocationPermissionPermanentlyDenied] = React.useState(false);
   const [howItWorksVisible, setHowItWorksVisible] = React.useState(false);
-  const [howItWorksTab, setHowItWorksTab] = React.useState<'Nursing' | 'Caregiving' | 'Equipments'>('Nursing');
+  const [howItWorksTab, setHowItWorksTab] = React.useState<'nursing' | 'caregiving' | 'equipments'>('nursing');
   
   // Optimize cart polling with better state management
   const setCartRef = React.useRef(setCart);
@@ -645,118 +645,199 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
         <TouchableOpacity onPress={openDrawer} style={styles.menuBtn}>
           <Ionicons name="menu" size={28} color="#222" />
         </TouchableOpacity>
-        <TouchableOpacity style={{ backgroundColor: '#fff', borderRadius: 20, padding: 8, elevation: 4 }} onPress={() => setHowItWorksVisible(true)}>
+        <TouchableOpacity 
+          style={{ backgroundColor: '#fff', borderRadius: 20, padding: 8, elevation: 4 }} 
+          onPress={() => {
+            console.log('Light bulb pressed! Setting modal to visible');
+            setHowItWorksVisible(true);
+          }}
+        >
           <MaterialCommunityIcons name="lightbulb-on-outline" size={28} color="#2563eb" />
         </TouchableOpacity>
-        {/* Removed performance/chart button and notification bell */}
       </View>
-      {/* How does it work Modal */}
-      <Modal
-        visible={howItWorksVisible}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setHowItWorksVisible(false)}
-      >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.25)', justifyContent: 'flex-end' }}>
+
+      {/* Custom Overlay Modal */}
+      {howItWorksVisible && (
+        <View style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.6)',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 9999,
+          elevation: 9999,
+        }}>
           <View style={{
-            backgroundColor: '#fff',
-            borderTopLeftRadius: 32,
-            borderTopRightRadius: 32,
-            paddingTop: 12,
-            paddingBottom: 0,
-            width: '100%',
-            minHeight: '70%',
-            maxHeight: '85%',
-            alignItems: 'center',
-            elevation: 12,
+            backgroundColor: '#ffffff',
+            borderRadius: 16,
+            padding: 24,
+            margin: 20,
+            width: '85%',
+            maxWidth: 300,
+            minHeight: 150,
+            elevation: 15,
             shadowColor: '#000',
-            shadowOffset: { width: 0, height: -4 },
-            shadowOpacity: 0.12,
-            shadowRadius: 16,
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.4,
+            shadowRadius: 12,
           }}>
-            {/* Drag indicator */}
-            <View style={{ width: 48, height: 6, borderRadius: 3, backgroundColor: '#e0e0e0', marginBottom: 12 }} />
-            <View style={{ width: '100%', alignItems: 'center', paddingTop: 8, paddingBottom: 12, backgroundColor: '#fff' }}>
-              <Text style={{ fontSize: 28, fontWeight: 'bold', color: '#222', marginBottom: 8 }}>How Expressaid Works</Text>
-            </View>
-            <ScrollView style={{ width: '100%' }} contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 32 }} showsVerticalScrollIndicator={false}>
-              {/* Step 1 */}
-              <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 24 }}>
-                <View style={{ width: 44, alignItems: 'center' }}>
-                  <View style={{ backgroundColor: '#e6f9f0', borderRadius: 22, padding: 8, marginBottom: 2 }}>
-                    <MaterialCommunityIcons name="calendar-plus" size={26} color="#1e824c" />
-                  </View>
-                  <View style={{ width: 2, height: 38, backgroundColor: '#1e824c', marginVertical: 2 }} />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontWeight: 'bold', fontSize: 19, color: '#1e3a5c' }}>Book a Home Nurse</Text>
-                  <Text style={{ color: '#444', fontSize: 16, marginTop: 2, lineHeight: 22 }}>
-                    • Choose your location and required service{"\n"}
-                    • Share your care needs and preferences{"\n"}• Submit your request in seconds
-                  </Text>
-                </View>
-                <View style={{ alignItems: 'center', marginLeft: 8 }}>
-                  <View style={{ backgroundColor: '#e6f9f0', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 4 }}>
-                    <Text style={{ color: '#1e824c', fontWeight: 'bold', fontSize: 17 }}>~5 <Text style={{ fontSize: 13, color: '#888' }}>min</Text></Text>
-                  </View>
-                </View>
-              </View>
-              {/* Step 2 */}
-              <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 24 }}>
-                <View style={{ width: 44, alignItems: 'center' }}>
-                  <View style={{ backgroundColor: '#e6f9f0', borderRadius: 22, padding: 8, marginBottom: 2 }}>
-                    <MaterialCommunityIcons name="account-check-outline" size={26} color="#1e824c" />
-                  </View>
-                  <View style={{ width: 2, height: 38, backgroundColor: '#1e824c', marginVertical: 2 }} />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontWeight: 'bold', fontSize: 19, color: '#1e3a5c' }}>Get Matched with a Nurse</Text>
-                  <Text style={{ color: '#444', fontSize: 16, marginTop: 2, lineHeight: 22 }}>
-                    • We quickly find the best nurse for your needs{"\n"}• Review nurse profile and confirm your choice
-                  </Text>
-                </View>
-                <View style={{ alignItems: 'center', marginLeft: 8 }}>
-                  <View style={{ backgroundColor: '#e6f9f0', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 4 }}>
-                  <Text style={{ color: '#1e824c', fontWeight: 'bold', fontSize: 17 }}>~5 <Text style={{ fontSize: 13, color: '#888' }}>min</Text></Text>
-                  </View>
-                </View>
-              </View>
-              {/* Step 3 */}
-              <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 24 }}>
-                <View style={{ width: 44, alignItems: 'center' }}>
-                  <View style={{ backgroundColor: '#e6f9f0', borderRadius: 22, padding: 8, marginBottom: 2 }}>
-                    <MaterialCommunityIcons name="handshake-outline" size={26} color="#1e824c" />
-                  </View>
-                  <View style={{ width: 2, height: 38, backgroundColor: '#1e824c', marginVertical: 2 }} />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontWeight: 'bold', fontSize: 19, color: '#1e3a5c' }}>Receive Quality Care at Home</Text>
-                  <Text style={{ color: '#444', fontSize: 16, marginTop: 2, lineHeight: 22 }}>
-                    • Your nurse arrives at your location{"\n"}• Care is delivered as per your plan and needs
-                  </Text>
-                </View>
-              </View>
-              {/* Step 4 */}
-              <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8 }}>
-                <View style={{ width: 44, alignItems: 'center' }}>
-                  <View style={{ backgroundColor: '#e6f9f0', borderRadius: 22, padding: 8, marginBottom: 2 }}>
-                    <MaterialCommunityIcons name="currency-inr" size={26} color="#1e824c" />
-                  </View>
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontWeight: 'bold', fontSize: 19, color: '#1e3a5c' }}>Pay Easily & Enjoy Peace of Mind</Text>
-                  <Text style={{ color: '#444', fontSize: 16, marginTop: 2, lineHeight: 22 }}>
-                    • Pay securely when your service starts
-                  </Text>
-                </View>
-              </View>
-              <TouchableOpacity style={{ alignSelf: 'center', marginVertical: 18, marginBottom: 12 }} onPress={() => setHowItWorksVisible(false)}>
-                <Text style={{ color: '#888', fontSize: 18, fontWeight: 'bold' }}>Close</Text>
+            {/* Header */}
+            <View style={{ 
+              flexDirection: 'row', 
+              alignItems: 'center', 
+              justifyContent: 'space-between', 
+              marginBottom: 20 
+            }}>
+              <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#1e824c' }}>How does it work?</Text>
+              <TouchableOpacity onPress={() => setHowItWorksVisible(false)} style={{ padding: 4 }}>
+                <Ionicons name="close" size={24} color="#666" />
               </TouchableOpacity>
+            </View>
+
+            {/* Service Category Tabs */}
+            <View style={{ flexDirection: 'row', marginBottom: 20 }}>
+              <TouchableOpacity
+                style={{
+                  flex: 1,
+                  paddingVertical: 10,
+                  paddingHorizontal: 12,
+                  borderRadius: 20,
+                  backgroundColor: '#d4edda',
+                  borderWidth: 1,
+                  borderColor: '#1e824c',
+                }}
+              >
+                <Text style={{
+                  textAlign: 'center',
+                  fontSize: 13,
+                  fontWeight: '500',
+                  color: '#1e824c',
+                }}>
+                  Nursing
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Steps Content */}
+            <ScrollView style={{ maxHeight: 350 }} showsVerticalScrollIndicator={true}>
+              {[
+                {
+                  id: 1,
+                  title: 'BOOK A SERVICE',
+                  icon: 'calendar-plus',
+                  description: [
+                    'Select a service location',
+                    'Select a service',
+                    'Provide care requirements',
+                    'Review and submit'
+                  ],
+                  time: '5 min'
+                },
+                {
+                  id: 2,
+                  title: 'FINALIZE HEALTHCARE PROFESSIONAL',
+                  icon: 'account-check-outline',
+                  description: [
+                    'We shortlist and share profile of a most suitable healthcare professional',
+                    'You interview and confirm the healthcare professional'
+                  ],
+                  time: '2-8 hrs.'
+                },
+                {
+                  id: 3,
+                  title: 'RECEIVE SERVICE',
+                  icon: 'handshake-outline',
+                  description: [
+                    'We prepare a customized care plan',
+                    'Healthcare professional reports for service at your location'
+                  ]
+                },
+                {
+                  id: 4,
+                  title: 'MAKE PAYMENT',
+                  icon: 'currency-inr',
+                  description: [
+                    'You pay when service starts'
+                  ]
+                }
+              ].map((step, index) => (
+                <View key={step.id} style={{ flexDirection: 'row', marginBottom: 20 }}>
+                  {/* Step Icon */}
+                  <View style={{ alignItems: 'center', marginRight: 12 }}>
+                    <View style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: 22,
+                      backgroundColor: '#fff',
+                      borderWidth: 2,
+                      borderColor: '#1e824c',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      elevation: 2,
+                      shadowColor: '#000',
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: 0.1,
+                      shadowRadius: 4,
+                    }}>
+                      <MaterialCommunityIcons name={step.icon as any} size={22} color="#1e824c" />
+                    </View>
+                    {index < 3 && <View style={{ width: 2, height: 35, backgroundColor: '#1e824c', marginTop: 6 }} />}
+                  </View>
+
+                  {/* Step Content */}
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#1e824c', marginBottom: 8 }}>
+                      {step.title}
+                    </Text>
+                    <View style={{ marginBottom: 8 }}>
+                      {step.description.map((item, idx) => (
+                        <Text key={idx} style={{ fontSize: 13, color: '#495057', lineHeight: 18, marginBottom: 3 }}>
+                          • {item}
+                        </Text>
+                      ))}
+                    </View>
+                    {step.time && (
+                      <View style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        backgroundColor: '#d4edda',
+                        paddingHorizontal: 10,
+                        paddingVertical: 5,
+                        borderRadius: 14,
+                        alignSelf: 'flex-start',
+                      }}>
+                        <MaterialCommunityIcons name="refresh" size={14} color="#1e824c" />
+                        <Text style={{ fontSize: 13, fontWeight: 'bold', color: '#1e824c', marginLeft: 4 }}>
+                          {step.time}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                </View>
+              ))}
             </ScrollView>
+
+            {/* Close Button */}
+            <TouchableOpacity
+              style={{ 
+                backgroundColor: '#1e824c', 
+                borderRadius: 12, 
+                paddingVertical: 12, 
+                paddingHorizontal: 24,
+                alignItems: 'center',
+                marginTop: 16
+              }}
+              onPress={() => setHowItWorksVisible(false)}
+            >
+              <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>Got it!</Text>
+            </TouchableOpacity>
           </View>
         </View>
-      </Modal>
+      )}
+
       {/* View Active Order Bar above the cart bar */}
       <ViewActiveOrderBar navigation={navigation} style={{ height: 40, paddingVertical: 0 }} textStyle={{ fontSize: 14 }} />
       {/* View Cart Bar at the bottom if cart has items */}

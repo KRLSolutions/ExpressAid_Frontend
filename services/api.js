@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import performanceMonitor from '../utils/performanceMonitor';
 
-const API_BASE_URL = 'http://192.168.100.11:5000/api';
+const API_BASE_URL = 'http://expressaid.centralus.cloudapp.azure.com:5000/api';
 
 class ApiService {
   constructor() {

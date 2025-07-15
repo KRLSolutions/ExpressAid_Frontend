@@ -4,7 +4,7 @@ import HomeScreen from '../screens/HomeScreen';
 import SymptomEntryScreen from '../screens/SymptomEntryScreen';
 import CartScreen from '../screens/CartScreen';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { Ionicons, MaterialIcons, Feather, FontAwesome5 } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons, Feather, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import AddAddressScreen from '../screens/AddAddressScreen';
 import { createStackNavigator } from '@react-navigation/stack';
 import SelectAddressScreen from '../screens/SelectAddressScreen';
@@ -22,6 +22,7 @@ import CardEntryScreen from '../screens/CardEntryScreen';
 import UPIIDEntryScreen from '../screens/UPIIDEntryScreen';
 import CashfreePaymentScreen from '../screens/CashfreePaymentScreen';
 import ArticleDetailScreen from '../screens/ArticleDetailScreen';
+import HowItWorksScreen from '../screens/HowItWorksScreen';
 
 type AppStackProps = {
   userData: any;
@@ -48,6 +49,7 @@ function CustomDrawerContent({ navigation, userData, onLogout }: any) {
         <DrawerItem icon={<Feather name="info" size={32} color="#2563eb" />} label="About us" onPress={() => navigation.navigate('AboutUs')} large />
         <DrawerItem icon={<Feather name="headphones" size={32} color="#2563eb" />} label="Support" onPress={() => navigation.navigate('Support')} large />
         <DrawerItem icon={<Feather name="help-circle" size={32} color="#2563eb" />} label="FAQ" onPress={() => navigation.navigate('FAQ')} large />
+        <DrawerItem icon={<MaterialCommunityIcons name="lightbulb-on-outline" size={32} color="#2563eb" />} label="How it works" onPress={() => navigation.navigate('HowItWorks')} large />
       </View>
       {/* Delete Profile and Logout Buttons at the bottom */}
       <View style={{ padding: 24 }}>
@@ -104,6 +106,7 @@ export type AppDrawerParamList = {
   Support: undefined;
   FAQ: undefined;
   DeleteProfile: undefined;
+  HowItWorks: undefined;
   SelectPaymentMethodScreen: { selectedMethod: string; returnTo: string };
   CardEntryScreen: { returnTo: string };
   UPIIDEntryScreen: { returnTo: string };
@@ -152,6 +155,7 @@ const AppStack: React.FC<AppStackProps> = ({ userData, onLogout }) => (
     <Stack.Screen name="SearchingForNurseScreen" component={SearchingForNurseScreen} />
     <Stack.Screen name="NurseAssignedScreen" component={NurseAssignedScreen} />
     <Stack.Screen name="ArticleDetail" component={ArticleDetailScreen} />
+    <Stack.Screen name="HowItWorks" component={HowItWorksScreen} />
   </Stack.Navigator>
 );
 
