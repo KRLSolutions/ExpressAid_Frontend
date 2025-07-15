@@ -23,7 +23,7 @@ interface Suggestion {
 const GOOGLE_API_KEY = 'AIzaSyD...'; // <-- Replace with your actual key if needed
 
 // Use backend proxy for Places API
-const BACKEND_BASE_URL = 'http://expressaid.centralus.cloudapp.azure.com'; // Azure backend URL
+const BACKEND_BASE_URL = 'http://192.168.0.6:5000'; // Change to your backend IP if needed
 
 const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClose, onAddNew, onSelect }) => {
   const navigation = useNavigation();
