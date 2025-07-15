@@ -6,7 +6,19 @@ import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { AppDrawerParamList } from '../navigation/AppStack';
 import { useCart } from '../CartContext';
 import ChooseAddressModal from '../components/ChooseAddressModal';
-// Remove api import and all focus-related imports
+import {
+
+  CFSession,
+  CFThemeBuilder,
+  CFDropCheckoutPayment,
+  CFEnvironment,
+  CFPaymentComponentBuilder,
+  CFPaymentModes,
+  CFErrorResponse
+} from 'cashfree-pg-api-contract';
+import {
+  CFPaymentGatewayService,
+} from 'react-native-cashfree-pg-sdk';
 
 const TAX_RATE = 0.05;
 
@@ -70,67 +82,88 @@ const CartScreen: React.FC = () => {
     setSelectedAddress(address);
     setAddressModalVisible(false);
   };
+const handlePlaceOrder = async () => {
+  if (!selectedAddress) {
+    Alert.alert('Select Address', 'Please select a delivery address before placing the order.');
+    return;
+  }
 
-  const handlePlaceOrder = async () => {
-    if (!selectedAddress) {
-      Alert.alert('Select Address', 'Please select a delivery address before placing the order.');
-      return;
-    }
-    setPlacingOrder(true);
-    try {
-      // Create order details locally
-      const orderDetails = {
-        items: cart.filter(item => item.id !== 'after_hours').map(item => ({
-          productId: item.id,
-          name: item.title,
-          price: item.price,
-          quantity: item.qty,
-          image: item.emoji
-        })),
-        address: {
-          ...selectedAddress,
-          houseNumber: selectedAddress?.houseNumber || '',
-          floor: selectedAddress?.floor || '',
-          block: selectedAddress?.block || '',
-        },
-        total,
-        afterHoursCharge: afterHoursCharge,
-        paymentMethod: paymentMethod || 'phonepe',
-      };
-      
-      console.log('🎯 Order details (local):', JSON.stringify(orderDetails, null, 2));
-      
-      // For now, just show success message (no backend call)
-      setPlacingOrder(false);
-      Alert.alert(
-        'Order Placed Successfully!', 
-        `Your order has been placed locally with total: ₹${total}`,
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              clearCart();
-              navigation.navigate('Home');
-            }
-          }
-        ]
-      );
-      
-    } catch (error: any) {
-      setPlacingOrder(false);
-      Alert.alert('Order Failed', error?.message || 'Could not place order.');
-    }
-  };
+  setPlacingOrder(true);
 
-  const handleSelectPaymentMethod = () => {
-    navigation.navigate('SelectPaymentMethodScreen', {
-      selectedMethod: paymentMethod,
-      returnTo: 'CartScreen',
+  try {
+    const orderAmount = total + afterHoursCharge;
+
+    const payload = {
+      orderAmount,
+      customerId: 'USER_123',
+      customerPhone: selectedAddress?.phoneNumber || '9999999999',
+      customerEmail: selectedAddress?.email || 'guest@example.com',
+      returnUrl: 'https://yourfrontend.com/payment-success',
+    };
+
+    console.log('📦 Sending payload to backend:', payload);
+
+    const response = await fetch('http://192.168.100.11:5000/api/cashfree/create-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
     });
-  };
 
-  // Remove useEffect for route params
-  // Remove the entire useEffect block
+    const data = await response.json();
+    console.log('🎯 Cashfree API Response:', data);
+
+    if (!data.paymentSessionId || !data.orderId) {
+      throw new Error('Payment session ID or Order ID not received.');
+    }
+
+    const session = new CFSession(
+      data.paymentSessionId,
+      data.orderId,
+      CFEnvironment.SANDBOX
+    );
+
+    const theme = new CFThemeBuilder()
+      .setNavigationBarBackgroundColor('#6200EE')
+      .setNavigationBarTextColor('#ffffff')
+      .setButtonBackgroundColor('#6200EE')
+      .setButtonTextColor('#ffffff')
+      .setPrimaryTextColor('#000000')
+      .setSecondaryTextColor('#666666')
+      .build();
+
+    const paymentModes = new CFPaymentComponentBuilder()
+      .add(CFPaymentModes.CARD)
+      .add(CFPaymentModes.UPI)
+      // .add(CFPaymentModes.WALLET)
+      .add(CFPaymentModes.NB)
+      // .add(CFPaymentModes.PAY_LATER)
+      .build();
+
+    const dropPayment = new CFDropCheckoutPayment(session, paymentModes, theme);
+
+    CFPaymentGatewayService.setCallback({
+      onVerify: (orderId) => {
+        console.log('✅ Payment Verified for Order:', orderId);
+        Alert.alert('Success', `Payment successful for order: ${orderId}`);
+        clearCart();
+        navigation.navigate('Home');
+      },
+      onError: (err: CFErrorResponse, orderId) => {
+        console.log('❌ Payment Error:', err.message, orderId);
+        Alert.alert('Payment Failed', err.message || 'Unknown error');
+      },
+    });
+
+    CFPaymentGatewayService.doPayment(dropPayment);
+
+  } catch (error) {
+    console.error('💥 Payment error:', error);
+    Alert.alert('Order Failed', error.message || 'Could not place order.');
+  } finally {
+    setPlacingOrder(false);
+  }
+};
+
 
   if (cart.length === 0) {
     return (
@@ -218,7 +251,7 @@ const CartScreen: React.FC = () => {
         <View style={styles.bottomBarModernUpdatedFixed}>
           <TouchableOpacity
             style={[styles.placeOrderBtn, placingOrder && styles.placeOrderBtnDisabled]}
-            onPress={handlePlaceOrder}
+            onPress={()=>handlePlaceOrder()}
             disabled={placingOrder}
           >
             {placingOrder ? (

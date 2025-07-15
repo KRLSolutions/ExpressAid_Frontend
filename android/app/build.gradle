@@ -87,9 +87,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.expressaid'
+    namespace 'com.shkwahab.frontend'
     defaultConfig {
-        applicationId 'com.expressaid'
+        applicationId 'com.shkwahab.frontend'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

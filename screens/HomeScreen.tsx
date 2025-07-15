@@ -40,10 +40,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
   const [hospitalMapVisible, setHospitalMapVisible] = React.useState(false);
   const [languageModalVisible, setLanguageModalVisible] = React.useState(false);
   const [locationPermissionPermanentlyDenied, setLocationPermissionPermanentlyDenied] = React.useState(false);
-  // 1. Remove all old howItWorksVisible state, modal, and debug code
-  // 2. Add new state for the modal
-  const [showHowItWorksModal, setShowHowItWorksModal] = React.useState(false);
-  // Add state for tab selection
+  const [howItWorksVisible, setHowItWorksVisible] = React.useState(false);
   const [howItWorksTab, setHowItWorksTab] = React.useState<'Nursing' | 'Caregiving' | 'Equipments'>('Nursing');
   
   // Optimize cart polling with better state management
@@ -588,100 +585,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
     transform: [{ translateY: bounce.value * 8 - 4 }],
   }));
 
-  console.log('RENDER HomeScreen, howItWorksVisible:', showHowItWorksModal);
-
-  // Steps data for each tab
-  const howItWorksSteps = {
-    Nursing: [
-      {
-        title: 'Book Instantly',
-        details: [
-          'Choose your location and service',
-          'Tell us your care needs',
-          'Tap to book in seconds',
-        ],
-      },
-      {
-        title: 'Meet Your Nurse',
-        details: [
-          'We match you with a trusted nurse',
-          'You can review and confirm the profile',
-        ],
-      },
-      {
-        title: 'Get Care at Home',
-        details: [
-          'Your nurse arrives at your doorstep',
-          'Relax while we take care of you',
-        ],
-      },
-      {
-        title: 'Easy Payment',
-        details: [
-          'Pay only when your service starts',
-        ],
-      },
-    ],
-    Caregiving: [
-      {
-        title: 'Book a Caregiver',
-        details: [
-          'Select your needs and location',
-          'Book in just a few taps',
-        ],
-      },
-      {
-        title: 'Personalized Match',
-        details: [
-          'We find the best caregiver for you',
-          'You can review and approve',
-        ],
-      },
-      {
-        title: 'Care at Your Home',
-        details: [
-          'Caregiver visits your home',
-          'Support and companionship provided',
-        ],
-      },
-      {
-        title: 'Simple Payment',
-        details: [
-          'Pay when care begins',
-        ],
-      },
-    ],
-    Equipments: [
-      {
-        title: 'Browse Equipments',
-        details: [
-          'See available medical equipment',
-          'Choose what you need',
-        ],
-      },
-      {
-        title: 'Quick Delivery',
-        details: [
-          'We deliver to your doorstep',
-          'Setup and demo included',
-        ],
-      },
-      {
-        title: 'Easy Returns',
-        details: [
-          'Return or extend as needed',
-          'We handle pickup and support',
-        ],
-      },
-      {
-        title: 'Pay Securely',
-        details: [
-          'Pay online or on delivery',
-        ],
-      },
-    ],
-  };
-
   return (
     <View style={{ flex: 1, backgroundColor: 'transparent' }}>
       {/* Fullscreen background image */}
@@ -742,59 +645,118 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
         <TouchableOpacity onPress={openDrawer} style={styles.menuBtn}>
           <Ionicons name="menu" size={28} color="#222" />
         </TouchableOpacity>
-        {/* Removed performance/chart button and notification bell */}
-        {/* In the top bar, update the lightbulb icon handler */}
-        <TouchableOpacity style={{ backgroundColor: '#fff', borderRadius: 20, padding: 8, elevation: 4 }} onPress={() => setShowHowItWorksModal(true)}>
+        <TouchableOpacity style={{ backgroundColor: '#fff', borderRadius: 20, padding: 8, elevation: 4 }} onPress={() => setHowItWorksVisible(true)}>
           <MaterialCommunityIcons name="lightbulb-on-outline" size={28} color="#2563eb" />
         </TouchableOpacity>
+        {/* Removed performance/chart button and notification bell */}
       </View>
-      {showHowItWorksModal && (
-        <View style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.35)', justifyContent: 'flex-end', zIndex: 9999 }}>
-          <View style={{ backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, width: '100%', alignItems: 'center', elevation: 12, shadowColor: '#000', shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.18, shadowRadius: 12 }}>
-            {/* Heading */}
-            <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#2563eb', marginBottom: 18 }}>How The App Works?</Text>
-            {/* Tab Bar - Only Nursing */}
-            <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 16 }}>
-              <TouchableOpacity
-                style={{
-                  paddingVertical: 8,
-                  paddingHorizontal: 18,
-                  borderRadius: 20,
-                  backgroundColor: '#2563eb',
-                  marginHorizontal: 6,
-                }}
-                disabled={true}
-              >
-              </TouchableOpacity>
+      {/* How does it work Modal */}
+      <Modal
+        visible={howItWorksVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setHowItWorksVisible(false)}
+      >
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.25)', justifyContent: 'flex-end' }}>
+          <View style={{
+            backgroundColor: '#fff',
+            borderTopLeftRadius: 32,
+            borderTopRightRadius: 32,
+            paddingTop: 12,
+            paddingBottom: 0,
+            width: '100%',
+            minHeight: '70%',
+            maxHeight: '85%',
+            alignItems: 'center',
+            elevation: 12,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: -4 },
+            shadowOpacity: 0.12,
+            shadowRadius: 16,
+          }}>
+            {/* Drag indicator */}
+            <View style={{ width: 48, height: 6, borderRadius: 3, backgroundColor: '#e0e0e0', marginBottom: 12 }} />
+            <View style={{ width: '100%', alignItems: 'center', paddingTop: 8, paddingBottom: 12, backgroundColor: '#fff' }}>
+              <Text style={{ fontSize: 28, fontWeight: 'bold', color: '#222', marginBottom: 8 }}>How Expressaid Works</Text>
             </View>
-            {/* Stepper/Timeline - Only Nursing Steps */}
-            <View style={{ width: '100%' }}>
-              {howItWorksSteps['Nursing'].map((step, idx) => (
-                <View key={idx} style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 18 }}>
-                  <View style={{ width: 36, alignItems: 'center' }}>
-                    <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: '#2563eb', justifyContent: 'center', alignItems: 'center' }}>
-                      <MaterialCommunityIcons name="check-circle-outline" size={20} color="#fff" />
-                    </View>
-                    {idx < howItWorksSteps['Nursing'].length - 1 && (
-                      <View style={{ width: 2, height: 32, backgroundColor: '#2563eb', marginTop: 2 }} />
-                    )}
+            <ScrollView style={{ width: '100%' }} contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 32 }} showsVerticalScrollIndicator={false}>
+              {/* Step 1 */}
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 24 }}>
+                <View style={{ width: 44, alignItems: 'center' }}>
+                  <View style={{ backgroundColor: '#e6f9f0', borderRadius: 22, padding: 8, marginBottom: 2 }}>
+                    <MaterialCommunityIcons name="calendar-plus" size={26} color="#1e824c" />
                   </View>
-                  <View style={{ flex: 1, marginLeft: 8 }}>
-                    <Text style={{ fontWeight: 'bold', fontSize: 16, color: '#2563eb' }}>{step.title}</Text>
-                    {step.details.map((d, i) => (
-                      <Text key={i} style={{ color: '#374151', fontSize: 14, marginLeft: 8, marginTop: 2 }}>{d}</Text>
-                    ))}
+                  <View style={{ width: 2, height: 38, backgroundColor: '#1e824c', marginVertical: 2 }} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontWeight: 'bold', fontSize: 19, color: '#1e3a5c' }}>Book a Home Nurse</Text>
+                  <Text style={{ color: '#444', fontSize: 16, marginTop: 2, lineHeight: 22 }}>
+                    • Choose your location and required service{"\n"}
+                    • Share your care needs and preferences{"\n"}• Submit your request in seconds
+                  </Text>
+                </View>
+                <View style={{ alignItems: 'center', marginLeft: 8 }}>
+                  <View style={{ backgroundColor: '#e6f9f0', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 4 }}>
+                    <Text style={{ color: '#1e824c', fontWeight: 'bold', fontSize: 17 }}>~5 <Text style={{ fontSize: 13, color: '#888' }}>min</Text></Text>
                   </View>
                 </View>
-              ))}
-            </View>
-            {/* Close Button */}
-            <TouchableOpacity onPress={() => setShowHowItWorksModal(false)} style={{ backgroundColor: '#2563eb', borderRadius: 20, paddingVertical: 10, paddingHorizontal: 32, alignSelf: 'center', marginTop: 8 }}>
-              <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>Close</Text>
-            </TouchableOpacity>
+              </View>
+              {/* Step 2 */}
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 24 }}>
+                <View style={{ width: 44, alignItems: 'center' }}>
+                  <View style={{ backgroundColor: '#e6f9f0', borderRadius: 22, padding: 8, marginBottom: 2 }}>
+                    <MaterialCommunityIcons name="account-check-outline" size={26} color="#1e824c" />
+                  </View>
+                  <View style={{ width: 2, height: 38, backgroundColor: '#1e824c', marginVertical: 2 }} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontWeight: 'bold', fontSize: 19, color: '#1e3a5c' }}>Get Matched with a Nurse</Text>
+                  <Text style={{ color: '#444', fontSize: 16, marginTop: 2, lineHeight: 22 }}>
+                    • We quickly find the best nurse for your needs{"\n"}• Review nurse profile and confirm your choice
+                  </Text>
+                </View>
+                <View style={{ alignItems: 'center', marginLeft: 8 }}>
+                  <View style={{ backgroundColor: '#e6f9f0', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 4 }}>
+                  <Text style={{ color: '#1e824c', fontWeight: 'bold', fontSize: 17 }}>~5 <Text style={{ fontSize: 13, color: '#888' }}>min</Text></Text>
+                  </View>
+                </View>
+              </View>
+              {/* Step 3 */}
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 24 }}>
+                <View style={{ width: 44, alignItems: 'center' }}>
+                  <View style={{ backgroundColor: '#e6f9f0', borderRadius: 22, padding: 8, marginBottom: 2 }}>
+                    <MaterialCommunityIcons name="handshake-outline" size={26} color="#1e824c" />
+                  </View>
+                  <View style={{ width: 2, height: 38, backgroundColor: '#1e824c', marginVertical: 2 }} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontWeight: 'bold', fontSize: 19, color: '#1e3a5c' }}>Receive Quality Care at Home</Text>
+                  <Text style={{ color: '#444', fontSize: 16, marginTop: 2, lineHeight: 22 }}>
+                    • Your nurse arrives at your location{"\n"}• Care is delivered as per your plan and needs
+                  </Text>
+                </View>
+              </View>
+              {/* Step 4 */}
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8 }}>
+                <View style={{ width: 44, alignItems: 'center' }}>
+                  <View style={{ backgroundColor: '#e6f9f0', borderRadius: 22, padding: 8, marginBottom: 2 }}>
+                    <MaterialCommunityIcons name="currency-inr" size={26} color="#1e824c" />
+                  </View>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontWeight: 'bold', fontSize: 19, color: '#1e3a5c' }}>Pay Easily & Enjoy Peace of Mind</Text>
+                  <Text style={{ color: '#444', fontSize: 16, marginTop: 2, lineHeight: 22 }}>
+                    • Pay securely when your service starts
+                  </Text>
+                </View>
+              </View>
+              <TouchableOpacity style={{ alignSelf: 'center', marginVertical: 18, marginBottom: 12 }} onPress={() => setHowItWorksVisible(false)}>
+                <Text style={{ color: '#888', fontSize: 18, fontWeight: 'bold' }}>Close</Text>
+              </TouchableOpacity>
+            </ScrollView>
           </View>
         </View>
-      )}
+      </Modal>
       {/* View Active Order Bar above the cart bar */}
       <ViewActiveOrderBar navigation={navigation} style={{ height: 40, paddingVertical: 0 }} textStyle={{ fontSize: 14 }} />
       {/* View Cart Bar at the bottom if cart has items */}

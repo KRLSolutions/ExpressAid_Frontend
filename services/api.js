@@ -1,10 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import performanceMonitor from '../utils/performanceMonitor';
 
-// Use Azure backend URL for production, localhost for development
-const API_BASE_URL = __DEV__ 
-  ? 'http://expressaid.centralus.cloudapp.azure.com:5000/api'  // Development - Azure VM
-  : 'http://expressaid.centralus.cloudapp.azure.com:5000/api'; // Production - Azure VM
+const API_BASE_URL = 'http://192.168.100.11:5000/api';
 
 class ApiService {
   constructor() {
@@ -151,7 +148,9 @@ class ApiService {
       if (response.status === 401) {
         // Global 401 handler: clear token and user data, reload app
         await AsyncStorage.multiRemove(['userId', 'userToken', 'userData']);
-        if (typeof window !== 'undefined') window.location.reload();
+        if (typeof window !== 'undefined')
+          // future
+          //  window.location.reload();
         throw new Error('Token required');
       }
       

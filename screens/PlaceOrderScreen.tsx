@@ -51,8 +51,8 @@ const PlaceOrderScreen = ({ navigation, route }: { navigation: any, route: any }
   };
 
   const handlePlaceOrder = async () => {
-    Alert.alert('Test', 'Place Order button clicked!');
-    console.log('🚀 Place Order button clicked!');
+    // Alert.alert('Test', 'Place Order button clicked!');
+    // console.log('🚀 Place Order button clicked!');
     console.log('📋 Current state:', {
       selectedPaymentMethod,
       totalAmount,
@@ -242,7 +242,7 @@ const PlaceOrderScreen = ({ navigation, route }: { navigation: any, route: any }
               alignItems: 'center',
               justifyContent: 'center',
             }}
-            onPress={handlePlaceOrder}
+            onPress={()=>handlePlaceOrder()}
             activeOpacity={0.8}
             disabled={loading}
           >

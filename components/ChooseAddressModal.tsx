@@ -20,10 +20,10 @@ interface Suggestion {
 }
 
 // Replace with your actual Google API key
-const GOOGLE_API_KEY = 'AIzaSyD...'; // <-- Replace with your actual key if needed
+const GOOGLE_API_KEY = 'AIzaSyBt6vwj4W_smVmNXDPwHQLdFBVpHQgM78c'; // <-- Replace with your actual key if needed
 
 // Use backend proxy for Places API
-const BACKEND_BASE_URL = 'http://expressaid.centralus.cloudapp.azure.com:5000'; // Azure VM
+const BACKEND_BASE_URL = 'http://192.168.100.11:5000'; // Use Android emulator localhost
 
 const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClose, onAddNew, onSelect }) => {
   const navigation = useNavigation();
@@ -522,6 +522,7 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
               <View style={styles.mapContainer}>
                 <MapView
                   ref={mapRef}
+                  apiKey={GOOGLE_API_KEY}
                   style={styles.map}
                   region={mapRegion}
                   onRegionChangeComplete={handleMapRegionChange}

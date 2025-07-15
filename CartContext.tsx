@@ -220,7 +220,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           console.error('❌ Error saving cart to backend:', error);
         }
       };
-      saveCartToBackend();
+    saveCartToBackend();
     }, 1000); // 1 second debounce instead of immediate save
 
     return () => {
