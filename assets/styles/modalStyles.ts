@@ -1,0 +1,96 @@
+import { StyleSheet } from 'react-native';
+
+export const modalStyles = StyleSheet.create({
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+    padding: 20,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    justifyContent: 'flex-start',
+  },
+  centerText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 12,
+    color: '#222',
+  },
+  cancelButton: {
+    color: '#2563eb',
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'right',
+    marginBottom: 8,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f2f2f2',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+    marginTop: 8,
+  },
+  input: {
+    flex: 1,
+    height: 44,
+    fontSize: 16,
+    color: '#000',
+    backgroundColor: 'transparent',
+    marginLeft: 8,
+  },
+  footerContainer: {
+    marginTop: 12,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderColor: '#eee',
+    backgroundColor: '#fff',
+  },
+  addressText: {
+    fontSize: 15,
+    color: '#333',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  button: {
+    backgroundColor: '#2563eb',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    marginHorizontal: 4,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  zoomButton: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 8,
+    elevation: 2,
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  suggestionItem: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  suggestionText: {
+    fontSize: 16,
+  },
+  suggestionsList: {
+    maxHeight: 150,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+}); 

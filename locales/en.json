@@ -1,0 +1,18 @@
+{
+  "welcome": "Welcome",
+  "book_nurse": "Book a nurse in 10 mins",
+  "search_nurse": "Click to Book in 10 Mins",
+  "view_cart": "View cart",
+  "track_nurse": "Track your nurse",
+  "Select Language": "Select Language",
+  "talk_to_ai_doctor": "Talk to our expert AI doctor",
+  "get_instant_witty_advice": "Get instant, witty health advice 24/7",
+  "chat_now": "Chat now",
+  "location_required": "Location Required",
+  "location_access_message": "We need your location to show hospitals and clinics near you. Please enable location access.",
+  "location_access_permanently_denied": "Location permission is permanently denied. Please enable location access from your device settings.",
+  "open_settings": "Open Settings",
+  "retry": "Retry",
+  "close": "Close",
+  "nearby_hospitals": "Nearby Hospitals"
+} 
