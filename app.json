@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "frontend",
-    "slug": "frontend",
+    "name": "ExpressAid",
+    "slug": "expressaid",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/EA.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/EA.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -17,14 +17,14 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/EA.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.keshavbandu.frontend"
+      "package": "com.keshavbandu.expressaid"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/EA.png"
     },
     "scheme": "expressaid"
   }

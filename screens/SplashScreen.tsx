@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, Animated, Dimensions } from 'react-native';
+import { View, StyleSheet, Text, Animated, Dimensions, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
 
@@ -99,7 +98,11 @@ const SplashScreen = ({ navigation }: any) => {
             },
           ]}
         >
-          <Ionicons name="medical" size={60} color="#fff" />
+          <Image 
+            source={require('../assets/EA.png')} 
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
         </Animated.View>
       </Animated.View>
 
@@ -153,6 +156,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 16,
     elevation: 8,
+  },
+  logoImage: {
+    width: 80,
+    height: 80,
   },
   textContainer: {
     alignItems: 'center',
