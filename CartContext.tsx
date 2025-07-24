@@ -288,7 +288,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     // Count only real service items (not after-hours)
     const serviceCount = cart.filter(i => i.id !== 'after_hours').reduce((sum, i) => sum + i.qty, 0);
     if (hour >= 21 || hour < 7) {
-      return 200 * serviceCount;
+      return 50 * serviceCount;
     }
     return 0;
   };
