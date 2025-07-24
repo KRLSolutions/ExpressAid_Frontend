@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TouchableOpacity, Platform, Alert, TextInput, F
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import MapView, { Marker, Region } from 'react-native-maps';
 
 interface LocationItem {
   place_id: string;
@@ -69,31 +68,19 @@ const SelectAddressScreen = ({ navigation, route }: any) => {
   const searchPlaces = async (query: string) => {
     if (query.length < 3) {
       setSearchResults([]);
-      setShowSearchResults(false);
       return;
     }
 
     try {
-      console.log('Searching for:', query);
-      
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(query)}&types=geocode&key=AIzaSyBt6vwj4W_smVmNXDPwHQLdFBVpHQgM78c`
       );
       const data = await response.json();
-      
-      console.log('Search results:', data);
-      
-      if (data.predictions && data.predictions.length > 0) {
+      if (data.predictions) {
         setSearchResults(data.predictions);
-        setShowSearchResults(true);
-      } else {
-        setSearchResults([]);
-        setShowSearchResults(false);
       }
     } catch (error) {
       console.error('Error searching places:', error);
-      setSearchResults([]);
-      setShowSearchResults(false);
     }
   };
 
@@ -104,53 +91,28 @@ const SelectAddressScreen = ({ navigation, route }: any) => {
 
   const selectSearchResult = async (item: LocationItem) => {
     try {
-      console.log('Selected place:', item.description);
-      
-      // First, get the place details to get coordinates
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${item.place_id}&fields=geometry,formatted_address&key=AIzaSyBt6vwj4W_smVmNXDPwHQLdFBVpHQgM78c`
+        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${item.place_id}&fields=geometry&key=AIzaSyBt6vwj4W_smVmNXDPwHQLdFBVpHQgM78c`
       );
       const data = await response.json();
       
-      console.log('Place details response:', data);
-      
-      if (data.result && data.result.geometry && data.result.geometry.location) {
+      if (data.result && data.result.geometry) {
         const { lat, lng } = data.result.geometry.location;
-        
-        console.log('New coordinates:', lat, lng);
-        
         const region = {
           latitude: lat,
           longitude: lng,
           latitudeDelta: 0.01,
           longitudeDelta: 0.01,
         };
-        
-        // Update location state
         setLocation(region);
-        
-        // Update address with the formatted address from the API
-        const formattedAddress = data.result.formatted_address || item.description;
-        setAddress(formattedAddress);
-        
-        // Animate map to new location
-        if (mapRef.current) {
-          mapRef.current.animateToRegion(region, 1000);
-        }
-        
-        // Clear search
+        mapRef.current?.animateToRegion(region, 1000);
+        setAddress(item.description);
         setSearchQuery('');
         setSearchResults([]);
         setShowSearchResults(false);
-        
-        console.log('Successfully updated location and address');
-      } else {
-        console.error('No geometry found in place details');
-        Alert.alert('Error', 'Could not get location details for this address.');
       }
     } catch (error) {
       console.error('Error getting place details:', error);
-      Alert.alert('Error', 'Failed to get location details. Please try again.');
     }
   };
 
@@ -206,18 +168,10 @@ const SelectAddressScreen = ({ navigation, route }: any) => {
           value={searchQuery}
           onChangeText={(text) => {
             setSearchQuery(text);
-            if (text.length >= 3) {
-              searchPlaces(text);
-            } else {
-              setSearchResults([]);
-              setShowSearchResults(false);
-            }
+            searchPlaces(text);
+            setShowSearchResults(text.length > 0);
           }}
-          onFocus={() => {
-            if (searchQuery.length >= 3) {
-              setShowSearchResults(true);
-            }
-          }}
+          onFocus={() => setShowSearchResults(searchQuery.length > 0)}
         />
         {searchQuery.length > 0 && (
           <TouchableOpacity onPress={() => {

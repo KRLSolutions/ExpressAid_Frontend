@@ -25,7 +25,11 @@ const Navigation = () => {
       if (userId && userToken && storedUserData) {
         try {
           // Verify token is still valid by fetching user data
-          const response = await api.getCurrentUser();
+          const response = await api.request(`/auth/user/${userId}`, {
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          });
 
           if (response.success) {
             setUserData(JSON.parse(storedUserData));

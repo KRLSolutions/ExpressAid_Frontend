@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import MapView, { Region, Marker } from 'react-native-maps';
 import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import * as Location from 'expo-location';
+import { url } from '../../BackendURl';
 
 interface ChooseAddressModalProps {
   visible: boolean;
@@ -23,7 +24,7 @@ interface Suggestion {
 const GOOGLE_API_KEY = 'AIzaSyD...'; // <-- Replace with your actual key if needed
 
 // Use backend proxy for Places API
-const BACKEND_BASE_URL = 'http://expressaid.centralus.cloudapp.azure.com:5000'; // Production - Azure VM
+const BACKEND_BASE_URL = url; // Change to your backend IP if needed
 
 const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClose, onAddNew, onSelect }) => {
   const navigation = useNavigation();
@@ -299,8 +300,10 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
           {/* Map */}
           <View style={styles.mapContainer}>
             <MapView
+
               ref={mapRef}
-              style={styles.map}
+            
+              style={style.map}
               region={mapRegion}
               onRegionChangeComplete={handleMapRegionChange}
               showsUserLocation={true}

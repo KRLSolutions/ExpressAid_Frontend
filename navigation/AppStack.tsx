@@ -21,7 +21,6 @@ import SelectPaymentMethodScreen from '../screens/SelectPaymentMethodScreen';
 import CardEntryScreen from '../screens/CardEntryScreen';
 import UPIIDEntryScreen from '../screens/UPIIDEntryScreen';
 import CashfreePaymentScreen from '../screens/CashfreePaymentScreen';
-import PaymentSuccessScreen from '../screens/PaymentSuccessScreen';
 import ArticleDetailScreen from '../screens/ArticleDetailScreen';
 
 type AppStackProps = {
@@ -168,7 +167,6 @@ export type AppDrawerParamList = {
   CardEntryScreen: { returnTo: string };
   UPIIDEntryScreen: { returnTo: string };
   CashfreePaymentScreen: { paymentSessionId: string };
-  PaymentSuccessScreen: { amount: number; orderId: string };
 };
 
 const Drawer = createDrawerNavigator<AppDrawerParamList>();
@@ -212,7 +210,6 @@ const AppStack: React.FC<AppStackProps> = ({ userData, onLogout }) => (
     <Stack.Screen name="CardEntryScreen" component={CardEntryScreen} />
     <Stack.Screen name="UPIIDEntryScreen" component={UPIIDEntryScreen} />
     <Stack.Screen name="CashfreePaymentScreen" component={CashfreePaymentScreen} />
-    <Stack.Screen name="PaymentSuccessScreen" component={PaymentSuccessScreen} />
     <Stack.Screen name="SearchingForNurseScreen" component={SearchingForNurseScreen} />
     <Stack.Screen name="NurseAssignedScreen" component={NurseAssignedScreen} />
     <Stack.Screen name="ArticleDetail" component={ArticleDetailScreen} />
