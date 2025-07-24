@@ -6,8 +6,20 @@ import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { AppDrawerParamList } from '../navigation/AppStack';
 import { useCart } from '../CartContext';
 import ChooseAddressModal from '../components/ChooseAddressModal';
-import api from '../services/api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+
+  CFSession,
+  CFThemeBuilder,
+  CFDropCheckoutPayment,
+  CFEnvironment,
+  CFPaymentComponentBuilder,
+  CFPaymentModes,
+  CFErrorResponse
+} from 'cashfree-pg-api-contract';
+import {
+  CFPaymentGatewayService,
+} from 'react-native-cashfree-pg-sdk';
+import { url } from '../BackendURl';
 
 const TAX_RATE = 0.05;
 
@@ -18,13 +30,9 @@ function getPaymentIcon(method: string) {
 }
 
 const CartScreen: React.FC = () => {
-  console.log('🎬 CartScreen component rendered!');
-  
   const navigation = useNavigation<DrawerNavigationProp<AppDrawerParamList>>();
   const route = useRoute<RouteProp<AppDrawerParamList, 'Cart'>>();
   const { cart, setCart, clearCart, getAfterHoursCharge } = useCart();
-  
-  console.log('🛒 Cart state:', cart);
   const [addressModalVisible, setAddressModalVisible] = useState(false);
   const [placingOrder, setPlacingOrder] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('phonepe');
@@ -75,98 +83,89 @@ const CartScreen: React.FC = () => {
     setSelectedAddress(address);
     setAddressModalVisible(false);
   };
+const handlePlaceOrder = async () => {
+  if (!selectedAddress) {
+    Alert.alert('Select Address', 'Please select a delivery address before placing the order.');
+    return;
+  }
 
-  const handlePlaceOrder = async () => {
-    console.log('🚀 CartScreen handlePlaceOrder called!');
-    
-    if (!selectedAddress) {
-      Alert.alert('Select Address', 'Please select a delivery address before placing the order.');
-      return;
-    }
-    
-    setPlacingOrder(true);
-    
-    try {
-      // Get user data from AsyncStorage
-      const userDataString = await AsyncStorage.getItem('userData');
-      const userData = userDataString ? JSON.parse(userDataString) : {};
-      
-      // Get user details
-      const userId = userData?.id || userData?._id || 'demoUser';
-      const userPhone = userData?.phoneNumber || '9999999999';
-      const userEmail = userData?.email || 'demo@example.com';
-      
-      console.log('📋 User data:', { userId, userPhone, userEmail });
-      console.log('📋 Payment method:', paymentMethod);
-      console.log('📋 Total amount:', total);
-      
-      // Create order details locally for logging
-      const orderDetails = {
-        items: cart.filter(item => item.id !== 'after_hours').map(item => ({
-          productId: item.id,
-          name: item.title,
-          price: item.price,
-          quantity: item.qty,
-          image: item.emoji
-        })),
-        address: {
-          ...selectedAddress,
-          houseNumber: selectedAddress?.houseNumber || '',
-          floor: selectedAddress?.floor || '',
-          block: selectedAddress?.block || '',
-        },
-        total,
-        afterHoursCharge: afterHoursCharge,
-        paymentMethod: paymentMethod || 'phonepe',
-      };
-      
-      console.log('🎯 Order details (local):', JSON.stringify(orderDetails, null, 2));
-      
-                   // Generate UPI payment URL from backend
-             console.log('💳 Generating UPI payment URL from backend');
-             
-             try {
-               const upiResponse = await api.upiPayment({
-                 orderAmount: total,
-                 customerId: userId,
-                 customerPhone: userPhone,
-                 customerEmail: userEmail,
-                 paymentMethod: paymentMethod || 'phonepe'
-               });
-               
-               console.log('✅ UPI payment URL generated:', upiResponse);
-               
-               // Navigate to payment method selection screen with UPI URL
-               setPlacingOrder(false);
-               navigation.navigate('SelectPaymentMethodScreen', {
-                 returnTo: 'CartScreen',
-                 orderAmount: total,
-                 transactionRef: upiResponse.data.transactionRef,
-                 upiUrl: upiResponse.data.upiUrl
-               });
-               
-             } catch (error) {
-               console.error('❌ Failed to generate UPI payment URL:', error);
-               Alert.alert('Payment Error', 'Could not generate payment URL. Please try again.');
-               setPlacingOrder(false);
-             }
-      
-    } catch (error: any) {
-      console.error('💥 Error in handlePlaceOrder:', error);
-      Alert.alert('Order Failed', error?.message || 'Could not place order.');
-      setPlacingOrder(false);
-    }
-  };
+  setPlacingOrder(true);
 
-  const handleSelectPaymentMethod = () => {
-    navigation.navigate('SelectPaymentMethodScreen', {
-      selectedMethod: paymentMethod,
-      returnTo: 'CartScreen',
+  try {
+    const orderAmount = total + afterHoursCharge;
+
+    const payload = {
+      orderAmount,
+      customerId: 'USER_123',
+      customerPhone: selectedAddress?.phoneNumber || '9999999999',
+      customerEmail: selectedAddress?.email || 'guest@example.com',
+      returnUrl: 'https://yourfrontend.com/payment-success',
+    };
+
+    console.log('📦 Sending payload to backend:', payload);
+
+ const response = await fetch(`${url}/cashfree/create-order`, {
+
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
     });
-  };
 
-  // Remove useEffect for route params
-  // Remove the entire useEffect block
+    const data = await response.json();
+    console.log('🎯 Cashfree API Response:', data);
+
+    if (!data.paymentSessionId || !data.orderId) {
+      throw new Error('Payment session ID or Order ID not received.');
+    }
+
+    const session = new CFSession(
+      data.paymentSessionId,
+      data.orderId,
+      CFEnvironment.SANDBOX
+    );
+
+    const theme = new CFThemeBuilder()
+      .setNavigationBarBackgroundColor('#6200EE')
+      .setNavigationBarTextColor('#ffffff')
+      .setButtonBackgroundColor('#6200EE')
+      .setButtonTextColor('#ffffff')
+      .setPrimaryTextColor('#000000')
+      .setSecondaryTextColor('#666666')
+      .build();
+
+    const paymentModes = new CFPaymentComponentBuilder()
+      .add(CFPaymentModes.CARD)
+      .add(CFPaymentModes.UPI)
+      // .add(CFPaymentModes.WALLET)
+      .add(CFPaymentModes.NB)
+      // .add(CFPaymentModes.PAY_LATER)
+      .build();
+
+    const dropPayment = new CFDropCheckoutPayment(session, paymentModes, theme);
+
+    CFPaymentGatewayService.setCallback({
+      onVerify: (orderId) => {
+        console.log('✅ Payment Verified for Order:', orderId);
+        Alert.alert('Success', `Payment successful for order: ${orderId}`);
+        clearCart();
+        navigation.navigate('Home');
+      },
+      onError: (err: CFErrorResponse, orderId) => {
+        console.log('❌ Payment Error:', err.message, orderId);
+        Alert.alert('Payment Failed', err.message || 'Unknown error');
+      },
+    });
+
+    CFPaymentGatewayService.doPayment(dropPayment);
+
+  } catch (error) {
+    console.error('💥 Payment error:', error);
+    Alert.alert('Order Failed', error.message || 'Could not place order.');
+  } finally {
+    setPlacingOrder(false);
+  }
+};
+
 
   if (cart.length === 0) {
     return (
@@ -254,21 +253,13 @@ const CartScreen: React.FC = () => {
         <View style={styles.bottomBarModernUpdatedFixed}>
           <TouchableOpacity
             style={[styles.placeOrderBtn, placingOrder && styles.placeOrderBtnDisabled]}
-            onPress={() => {
-              console.log('🔘 Place Order button clicked in CartScreen!');
-              console.log('🔍 Button state:', {
-                placingOrder,
-                selectedAddress: !!selectedAddress,
-                cartLength: cart.length
-              });
-              handlePlaceOrder();
-            }}
+            onPress={()=>handlePlaceOrder()}
             disabled={placingOrder}
           >
             {placingOrder ? (
               <ActivityIndicator color="#fff" size="small" />
             ) : (
-              <Text style={styles.placeOrderBtnText}>Pay with UPI - ₹{total}</Text>
+              <Text style={styles.placeOrderBtnText}>Place Order - ₹{total}</Text>
             )}
           </TouchableOpacity>
         </View>

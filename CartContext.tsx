@@ -62,25 +62,14 @@ export const ActiveOrderProvider = ({ children }: { children: ReactNode }) => {
   const refreshCooldown = 5000; // 5 seconds cooldown between refreshes
 
   useEffect(() => {
-    // On mount, fetch from backend only if authenticated
+    // On mount, fetch from backend
     const fetchActive = async () => {
       try {
-        const token = await AsyncStorage.getItem('userToken');
-        if (!token) {
-          console.log('🔐 No token found, skipping active order fetch');
-          return;
-        }
-        
         const res = await apiService.getActiveOrder();
         if (res && res.order) setActiveOrderState(res.order);
         else setActiveOrderState(null);
-      } catch (error) {
-        console.error('❌ Error fetching active order:', error);
-        if (error instanceof Error && error.message && error.message.includes('Token required')) {
-          console.log('🔐 Authentication required, user may need to log in');
-        } else {
-          setActiveOrderState(null);
-        }
+      } catch {
+        setActiveOrderState(null);
       }
     };
     fetchActive();
@@ -112,12 +101,7 @@ export const ActiveOrderProvider = ({ children }: { children: ReactNode }) => {
       else setActiveOrderState(null);
     } catch (error) {
       console.error('❌ Error refreshing active order:', error);
-      // Don't set activeOrder to null on auth errors, just log them
-      if (error instanceof Error && error.message && error.message.includes('Token required')) {
-        console.log('🔐 Authentication required for active order, user may need to log in');
-      } else {
-        setActiveOrderState(null);
-      }
+      setActiveOrderState(null);
     }
   };
 
@@ -236,7 +220,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           console.error('❌ Error saving cart to backend:', error);
         }
       };
-      saveCartToBackend();
+    saveCartToBackend();
     }, 1000); // 1 second debounce instead of immediate save
 
     return () => {

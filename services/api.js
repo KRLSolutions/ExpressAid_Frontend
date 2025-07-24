@@ -1,8 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import performanceMonitor from '../utils/performanceMonitor';
+import { url } from '../BackendURl';
 
-// Use production backend for everything, local only for Cashfree
-const API_BASE_URL = 'http://expressaid.centralus.cloudapp.azure.com:5000/api'; // Production - Azure VM
+const API_BASE_URL = url;
 
 class ApiService {
   constructor() {
@@ -149,7 +149,9 @@ class ApiService {
       if (response.status === 401) {
         // Global 401 handler: clear token and user data, reload app
         await AsyncStorage.multiRemove(['userId', 'userToken', 'userData']);
-        if (typeof window !== 'undefined') window.location.reload();
+        if (typeof window !== 'undefined')
+          // future
+          //  window.location.reload();
         throw new Error('Token required');
       }
       
@@ -188,24 +190,10 @@ class ApiService {
   async sendOTP(phoneNumber) {
     console.log('🔧 Frontend API sendOTP called with phoneNumber:', phoneNumber);
     console.log('🔧 Using frontend API service at:', this.baseURL);
-    console.log('🔧 Full URL will be:', `${this.baseURL}/auth/send-otp`);
-    
-    try {
-      const response = await this.request('/auth/send-otp', {
-        method: 'POST',
-        body: JSON.stringify({ phoneNumber }),
-      });
-      console.log('✅ Frontend OTP API call successful:', response);
-      return response;
-    } catch (error) {
-      console.error('❌ Frontend OTP API call failed:', error);
-      console.error('❌ Error details:', {
-        message: error.message,
-        phoneNumber: phoneNumber,
-        baseURL: this.baseURL
-      });
-      throw error;
-    }
+    return this.request('/auth/send-otp', {
+      method: 'POST',
+      body: JSON.stringify({ phoneNumber }),
+    });
   }
 
   async verifyOTP(phoneNumber, otp) {
@@ -314,99 +302,7 @@ class ApiService {
     return response;
   }
 
-  // Enhanced Cashfree: Create payment session for all UPI apps
-  async createCashfreePaymentSession({ orderAmount, customerId, customerPhone, customerEmail }) {
-    console.log('🎯 createCashfreePaymentSession method called with:', {
-      orderAmount,
-      customerId,
-      customerPhone,
-      customerEmail
-    });
-    
-    // Use production backend for Cashfree
-    const cashfreeUrl = 'http://expressaid.centralus.cloudapp.azure.com:5000/api/cashfree/create-payment-session';
-    
-    const payload = {
-      orderAmount,
-      customerId,
-      customerPhone,
-      customerEmail
-    };
-    
-    console.log('📦 Payment session payload:', payload);
-    console.log('🌐 Using local Cashfree URL:', cashfreeUrl);
-    
-    try {
-      const response = await fetch(cashfreeUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-      
-      const data = await response.json();
-      console.log('✅ Cashfree payment session created:', data);
-      return data;
-    } catch (error) {
-      console.error('❌ Cashfree payment session creation failed:', error);
-      throw error;
-    }
-  }
-
   // Cashfree: Create order and get payment session ID
-  // Generate secure UPI URL from backend
-  async generateUpiUrl({ orderAmount, customerId, customerPhone, customerEmail, paymentMethod }) {
-    console.log('🎯 generateUpiUrl method called with:', {
-      orderAmount,
-      customerId,
-      customerPhone,
-      customerEmail,
-      paymentMethod
-    });
-    
-    const payload = {
-      orderAmount,
-      customerId,
-      customerPhone,
-      customerEmail,
-      paymentMethod: paymentMethod || 'upi'
-    };
-    
-    console.log('📦 UPI URL generation payload:', payload);
-    
-    return this.request('/cashfree/generate-upi-url', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    });
-  }
-
-  // Direct UPI payment - opens UPI app directly
-  async upiPayment({ orderAmount, customerId, customerPhone, customerEmail, paymentMethod }) {
-    console.log('🎯 upiPayment method called with:', {
-      orderAmount,
-      customerId,
-      customerPhone,
-      customerEmail,
-      paymentMethod
-    });
-    
-    const payload = {
-      orderAmount,
-      customerId,
-      customerPhone,
-      customerEmail,
-      paymentMethod: paymentMethod || 'upi'
-    };
-    
-    console.log('📦 Direct UPI payment payload:', payload);
-    
-    return this.request('/upi/payment', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    });
-  }
-
   async createCashfreeOrder({ orderAmount, customerId, customerPhone, customerEmail, returnUrl, paymentMethod }) {
     console.log('🎯 createCashfreeOrder method called with:', {
       orderAmount,
@@ -494,11 +390,6 @@ class ApiService {
   }
 
   async getActiveOrder() {
-    const token = await this.getToken();
-    if (!token) {
-      console.log('⚠️ No token available for getActiveOrder, returning null');
-      return { order: null };
-    }
     return this.request('/orders/active');
   }
 
@@ -529,7 +420,13 @@ class ApiService {
     return response.json();
   }
 
-
+  // Cashfree: Get UPI intent links for a payment session
+  async getUpiSessionLinks(paymentSessionId, paymentMethod) {
+    return this.request('/cashfree/upi-session', {
+      method: 'POST',
+      body: JSON.stringify({ paymentSessionId, paymentMethod }),
+    });
+  }
 }
 
 export default new ApiService(); 

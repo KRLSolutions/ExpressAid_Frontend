@@ -1,4 +1,4 @@
-package com.keshavbandu.frontend
+package com.shkwahab.frontend
 
 import android.app.Application
 import android.content.res.Configuration

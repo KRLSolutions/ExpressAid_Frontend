@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_BASE_URL = 'http://expressaid.centralus.cloudapp.azure.com:5000/api'; // Production - Azure VM
+const API_BASE_URL = 'http://172.25.144.1:5000/api';
 
 class ApiService {
   constructor() {

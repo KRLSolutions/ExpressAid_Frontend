@@ -1,350 +1,273 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-  Linking,
-  ActivityIndicator,
-} from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import api from '../services/api';
+import { View, Text, SectionList, TouchableOpacity, Image, StyleSheet, SectionListData, TextInput } from 'react-native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp } from '@react-navigation/native';
+import { AppDrawerParamList } from '../navigation/AppStack';
+
+type PaymentMethodItem = {
+  key: string;
+  label: string;
+  icon: any;
+  action?: string | null;
+  onPress?: (navigation: any, route: any) => void;
+  disabled?: boolean;
+  error?: string;
+  subtitle?: string;
+};
+
+type SectionType = {
+  title: string;
+  data: PaymentMethodItem[];
+};
+
+const BILL_TOTAL = 290; // You can pass this as a prop/param if needed
 
 const SelectPaymentMethodScreen = ({ navigation, route }: { navigation: any, route: any }) => {
-  const BILL_TOTAL = route.params?.orderAmount || 290; // Get from route params
-  const [loading, setLoading] = useState(false);
-  const [selectedMethod, setSelectedMethod] = useState('');
+  const [showCardFields, setShowCardFields] = useState(false);
+  const [showUpiField, setShowUpiField] = useState(false);
+  const [cardNumber, setCardNumber] = useState('');
+  const [expiry, setExpiry] = useState('');
+  const [cvv, setCvv] = useState('');
+  const [name, setName] = useState('');
+  const [upiId, setUpiId] = useState('');
 
-  // Enhanced payment methods with Cashfree support
+  const validateUpiId = (id: string) => /^[\w.-]+@[\w.-]+$/.test(id);
+
+  const handleCardSubmit = () => {
+    if (!cardNumber || !expiry || !cvv || !name) {
+      alert('Please fill all card fields.');
+      return;
+    }
+    if (route.params?.returnTo === 'CartScreen') {
+      navigation.navigate('MainDrawer', { screen: 'Cart', params: { selectedPaymentMethod: 'card', cardDetails: { cardNumber, expiry, cvv, name } }, merge: true });
+    } else {
+      navigation.navigate({
+        name: route.params?.returnTo || 'PlaceOrderScreen',
+        params: { selectedPaymentMethod: 'card', cardDetails: { cardNumber, expiry, cvv, name } },
+        merge: true,
+      });
+    }
+  };
+
+  const handleUpiSubmit = () => {
+    if (!validateUpiId(upiId)) {
+      alert('Please enter a valid UPI ID (e.g. name@bank).');
+      return;
+    }
+    if (route.params?.returnTo === 'CartScreen') {
+      navigation.navigate('MainDrawer', { screen: 'Cart', params: { selectedPaymentMethod: 'add_upi', upiId }, merge: true });
+    } else {
+      navigation.navigate({
+        name: route.params?.returnTo || 'PlaceOrderScreen',
+        params: { selectedPaymentMethod: 'add_upi', upiId },
+        merge: true,
+      });
+    }
+  };
+
   const paymentSections = [
     {
-      title: 'Recommended - Cashfree Secure',
-      data: [
-        {
-          key: 'cashfree-all',
-          label: 'Cashfree Secure Payment',
-          subtitle: 'All UPI apps, Cards, Net Banking',
-          icon: require('../assets/googlepay.png'),
-          action: 'cashfree',
-          description: 'Secure payment gateway supporting PhonePe, Google Pay, Paytm, BHIM, Cards, Net Banking'
-        }
-      ]
-    },
-    {
-      title: 'Direct UPI Apps',
+      title: 'Recommended',
       data: [
         {
           key: 'phonepe',
           label: 'PhonePe UPI',
-          subtitle: 'Fast & Secure UPI Payments',
           icon: require('../assets/phonepe.png'),
-          action: 'upi',
-          description: 'Pay directly with PhonePe UPI'
+          action: null,
+          onPress: (navigation: any, route: any) => {
+            if (route.params?.returnTo === 'CartScreen') {
+              navigation.navigate('MainDrawer', { screen: 'Cart', params: { selectedPaymentMethod: 'phonepe' }, merge: true });
+            } else {
+              navigation.navigate({
+                name: route.params?.returnTo || 'PlaceOrderScreen',
+                params: { selectedPaymentMethod: 'phonepe' },
+                merge: true,
+              });
+            }
+          },
         },
         {
           key: 'googlepay',
           label: 'Google Pay',
-          subtitle: 'Quick & Easy Payments',
           icon: require('../assets/googlepay.png'),
-          action: 'upi',
-          description: 'Pay directly with Google Pay'
+          action: null,
+          onPress: (navigation: any, route: any) => {
+            if (route.params?.returnTo === 'CartScreen') {
+              navigation.navigate('MainDrawer', { screen: 'Cart', params: { selectedPaymentMethod: 'googlepay' }, merge: true });
+            } else {
+              navigation.navigate({
+                name: route.params?.returnTo || 'PlaceOrderScreen',
+                params: { selectedPaymentMethod: 'googlepay' },
+                merge: true,
+              });
+            }
+          },
         },
+      ],
+    },
+    {
+      title: 'Cards',
+      data: [
         {
-          key: 'paytm',
-          label: 'Paytm UPI',
-          subtitle: 'India\'s Most-loved Payments App',
-          icon: require('../assets/phonepe.png'), // Using phonepe icon as placeholder
-          action: 'upi',
-          description: 'Pay directly with Paytm UPI'
+          key: 'add_card',
+          label: 'Add credit or debit cards',
+          icon: require('../assets/card.png'),
+          action: 'ADD',
+          onPress: () => setShowCardFields((v) => !v),
         },
+      ],
+    },
+    {
+      title: 'Pay by any UPI app',
+      data: [
         {
-          key: 'bhim',
-          label: 'BHIM UPI',
-          subtitle: 'Government UPI App',
-          icon: require('../assets/googlepay.png'), // Using googlepay icon as placeholder
-          action: 'upi',
-          description: 'Pay directly with BHIM UPI'
-        }
-      ]
-    }
+          key: 'add_upi',
+          label: 'Add new UPI ID',
+          icon: require('../assets/googlepay.png'),
+          action: 'ADD',
+          onPress: () => setShowUpiField((v) => !v),
+        },
+      ],
+    },
   ];
 
-  const handlePaymentMethod = async (method: any) => {
-    setSelectedMethod(method.key);
-    setLoading(true);
-
-    try {
-      console.log('🎯 Selected payment method:', method);
-
-      if (method.action === 'cashfree') {
-        // Use Cashfree payment session for all payment methods
-        await handleCashfreePayment();
-      } else if (method.action === 'upi') {
-        // Use direct UPI deep links
-        await handleDirectUpiPayment(method.key);
-      }
-    } catch (error) {
-      console.error('❌ Payment method selection failed:', error);
-      Alert.alert('Payment Error', 'Failed to process payment. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCashfreePayment = async () => {
-    try {
-      console.log('💳 Creating Cashfree payment session...');
-      
-      // Get user details from route params or context
-      const userId = route.params?.userId || 'USER_' + Date.now();
-      const userPhone = route.params?.userPhone || '+919346048610';
-      const userEmail = route.params?.userEmail || 'user@expressaid.com';
-
-      const response = await api.createCashfreePaymentSession({
-        orderAmount: BILL_TOTAL,
-        customerId: userId,
-        customerPhone: userPhone,
-        customerEmail: userEmail
-      });
-
-      console.log('✅ Cashfree payment session created:', response);
-
-      if (response.success && response.data.payment_url) {
-        const paymentUrl = response.data.payment_url;
-        
-        Alert.alert(
-          'Cashfree Payment',
-          'Opening secure payment page. You can pay using any UPI app, card, or net banking.',
-          [
-            {
-              text: 'Cancel',
-              style: 'cancel',
-              onPress: () => setLoading(false)
-            },
-            {
-              text: 'Open Payment',
-              onPress: async () => {
-                try {
-                  const supported = await Linking.canOpenURL(paymentUrl);
-                  if (supported) {
-                    await Linking.openURL(paymentUrl);
-                  } else {
-                    Alert.alert('Error', 'Cannot open payment page. Please try again.');
-                  }
-                } catch (error) {
-                  console.error('❌ Failed to open payment URL:', error);
-                  Alert.alert('Error', 'Failed to open payment page. Please try again.');
-                }
-                setLoading(false);
-              }
-            }
-          ]
-        );
-      } else {
-        throw new Error('Failed to create payment session');
-      }
-    } catch (error) {
-      console.error('❌ Cashfree payment failed:', error);
-      Alert.alert('Payment Error', 'Failed to create payment session. Please try again.');
-    }
-  };
-
-  const handleDirectUpiPayment = async (paymentMethod: string) => {
-    try {
-      console.log('📱 Creating direct UPI payment for:', paymentMethod);
-      
-      // Get user details from route params or context
-      const userId = route.params?.userId || 'USER_' + Date.now();
-      const userPhone = route.params?.userPhone || '+919346048610';
-      const userEmail = route.params?.userEmail || 'user@expressaid.com';
-
-      const response = await api.generateUpiUrl({
-        orderAmount: BILL_TOTAL,
-        customerId: userId,
-        customerPhone: userPhone,
-        customerEmail: userEmail,
-        paymentMethod: paymentMethod
-      });
-
-      console.log('✅ UPI URL generated:', response);
-
-      if (response.success && response.data.upiUrl) {
-        const upiUrl = response.data.upiUrl;
-        
-        try {
-          console.log('🔗 Attempting to open UPI app...');
-          const supported = await Linking.canOpenURL(upiUrl);
-          console.log('📱 Can open UPI URL:', supported);
-          
-          if (supported) {
-            await Linking.openURL(upiUrl);
-            console.log('✅ UPI app opened successfully');
-          } else {
-            Alert.alert(
-              'UPI App Not Found',
-              `${paymentMethod.toUpperCase()} app is not installed. Please install it or choose another payment method.`,
-              [
-                { text: 'OK', onPress: () => setLoading(false) },
-                { 
-                  text: 'Use Cashfree Instead', 
-                  onPress: () => handleCashfreePayment() 
-                }
-              ]
-            );
-          }
-        } catch (error) {
-          console.error('❌ Failed to open UPI app:', error);
-          Alert.alert('Error', 'Failed to open UPI app. Please try again.');
-        }
-      } else {
-        throw new Error('Failed to generate UPI URL');
-      }
-    } catch (error) {
-      console.error('❌ Direct UPI payment failed:', error);
-      Alert.alert('Payment Error', 'Failed to generate UPI payment. Please try again.');
-    }
-  };
-
-  const renderPaymentMethod = (method: any) => (
-    <TouchableOpacity
-      key={method.key}
-      style={[
-        styles.paymentMethod,
-        selectedMethod === method.key && styles.selectedMethod
-      ]}
-      onPress={() => handlePaymentMethod(method)}
-      disabled={loading}
-    >
-      <View style={styles.methodHeader}>
-        <View style={styles.methodInfo}>
-          <Text style={styles.methodLabel}>{method.label}</Text>
-          <Text style={styles.methodSubtitle}>{method.subtitle}</Text>
-        </View>
-        {loading && selectedMethod === method.key && (
-          <ActivityIndicator size="small" color="#007AFF" />
-        )}
-      </View>
-      <Text style={styles.methodDescription}>{method.description}</Text>
-    </TouchableOpacity>
-  );
-
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Select Payment Method</Text>
-        <Text style={styles.subtitle}>Total Amount: ₹{BILL_TOTAL}</Text>
-      </View>
-
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {paymentSections.map((section, sectionIndex) => (
-          <View key={sectionIndex} style={styles.section}>
-            <Text style={styles.sectionTitle}>{section.title}</Text>
-            {section.data.map(renderPaymentMethod)}
-          </View>
-        ))}
-      </ScrollView>
-
-      <View style={styles.footer}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-          disabled={loading}
-        >
-          <Text style={styles.backButtonText}>Back to Cart</Text>
+    <View style={{ flex: 1, backgroundColor: '#f8f9fb' }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 24, marginLeft: 16 }}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginRight: 12 }}>
+          <Text style={{ fontSize: 24 }}>{'←'}</Text>
         </TouchableOpacity>
+        <Text style={styles.header}>Bill total: ₹{BILL_TOTAL}</Text>
       </View>
+      <SectionList
+        sections={paymentSections}
+        keyExtractor={(item: PaymentMethodItem) => item.key}
+        contentContainerStyle={{ paddingBottom: 32 }}
+        renderSectionHeader={({ section }: { section: SectionType }) => (
+          <Text style={styles.sectionHeader}>{section.title}</Text>
+        )}
+        renderItem={({ item }: { item: PaymentMethodItem }) => (
+          <>
+            <TouchableOpacity
+              style={[styles.row, item.disabled && styles.disabledRow]}
+              onPress={() => item.onPress && item.onPress(navigation, route)}
+              disabled={item.disabled}
+            >
+              <Image source={item.icon} style={styles.icon} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.label}>{item.label}</Text>
+                {item.subtitle && <Text style={styles.subtitle}>{item.subtitle}</Text>}
+                {item.error && <Text style={styles.error}>{item.error}</Text>}
+              </View>
+              {item.action && <Text style={styles.action}>{item.action}</Text>}
+            </TouchableOpacity>
+            {/* Inline Card Fields */}
+            {item.key === 'add_card' && showCardFields && (
+              <View style={styles.inputBlock}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Card Number"
+                  keyboardType="number-pad"
+                  value={cardNumber}
+                  onChangeText={setCardNumber}
+                  maxLength={19}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Expiry (MM/YY)"
+                  value={expiry}
+                  onChangeText={setExpiry}
+                  maxLength={5}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="CVV"
+                  keyboardType="number-pad"
+                  value={cvv}
+                  onChangeText={setCvv}
+                  maxLength={4}
+                  secureTextEntry
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Name on Card"
+                  value={name}
+                  onChangeText={setName}
+                />
+                <TouchableOpacity style={styles.roundedButton} onPress={handleCardSubmit}>
+                  <Text style={styles.buttonText}>Submit</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            {/* Inline UPI Field */}
+            {item.key === 'add_upi' && showUpiField && (
+              <View style={styles.inputBlock}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="e.g. name@bank"
+                  value={upiId}
+                  onChangeText={setUpiId}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
+                <TouchableOpacity style={styles.roundedButton} onPress={handleUpiSubmit}>
+                  <Text style={styles.buttonText}>Submit</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </>
+        )}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f9fa',
+  header: { fontSize: 18, fontWeight: 'bold' },
+  sectionHeader: { fontWeight: 'bold', fontSize: 16, marginTop: 24, marginLeft: 16, marginBottom: 8 },
+  row: {
+    flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff',
+    marginHorizontal: 12, marginVertical: 4, borderRadius: 12, padding: 16,
   },
-  header: {
+  disabledRow: { opacity: 0.5 },
+  icon: { width: 32, height: 32, marginRight: 16 },
+  label: { fontSize: 16, fontWeight: '500' },
+  subtitle: { fontSize: 13, color: '#888' },
+  error: { color: '#e11d48', fontSize: 13, marginTop: 4 },
+  action: { color: '#22c55e', fontWeight: 'bold', fontSize: 15, marginLeft: 12 },
+  inputBlock: {
     backgroundColor: '#fff',
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#212529',
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#6c757d',
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-  },
-  section: {
-    marginBottom: 30,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#495057',
-    marginBottom: 15,
-  },
-  paymentMethod: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
+    marginHorizontal: 24,
     marginBottom: 12,
-    borderWidth: 2,
-    borderColor: '#e9ecef',
+    borderRadius: 16,
+    padding: 18,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
-  selectedMethod: {
-    borderColor: '#007AFF',
-    backgroundColor: '#f0f8ff',
-  },
-  methodHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  methodInfo: {
-    flex: 1,
-  },
-  methodLabel: {
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 12,
+    marginBottom: 12,
+    borderRadius: 10,
     fontSize: 16,
-    fontWeight: '600',
-    color: '#212529',
-    marginBottom: 2,
+    backgroundColor: '#f8fafc',
   },
-  methodSubtitle: {
-    fontSize: 14,
-    color: '#6c757d',
-  },
-  methodDescription: {
-    fontSize: 13,
-    color: '#868e96',
-    lineHeight: 18,
-  },
-  footer: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderTopWidth: 1,
-    borderTopColor: '#e9ecef',
-  },
-  backButton: {
-    backgroundColor: '#6c757d',
-    borderRadius: 8,
-    padding: 16,
+  roundedButton: {
+    backgroundColor: '#22c55e',
+    paddingVertical: 16,
+    borderRadius: 12,
     alignItems: 'center',
+    marginTop: 4,
   },
-  backButtonText: {
+  buttonText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    fontWeight: 'bold',
+    fontSize: 17,
+    letterSpacing: 0.5,
   },
 });
 
