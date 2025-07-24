@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, ScrollView, SafeAreaView, Alert, ActivityIndicator, Image, Linking } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, ScrollView, SafeAreaView, Alert, ActivityIndicator, Image, Linking, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
@@ -287,7 +287,10 @@ const CartScreen: React.FC = () => {
       <ChooseAddressModal
         visible={addressModalVisible}
         onClose={() => setAddressModalVisible(false)}
-        onAddNew={() => setAddressModalVisible(false)}
+        onAddNew={() => {
+          // This will be handled internally by the modal
+          console.log('Add new address requested');
+        }}
         onSelect={handleSelectAddress}
       />
     </SafeAreaView>
@@ -299,7 +302,7 @@ const styles = StyleSheet.create({
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 48,
+    paddingTop: Platform.OS === 'android' ? 60 : 80,
     paddingLeft: 12,
     paddingBottom: 12,
     height: 90,
@@ -329,7 +332,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
-    paddingBottom: 120,
+    paddingBottom: 140,
   },
   cartItem: {
     flexDirection: 'row',
@@ -648,9 +651,10 @@ const styles = StyleSheet.create({
   },
   bottomBarCentered: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 16,
+    paddingHorizontal: 20,
     backgroundColor: '#fff',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
@@ -659,8 +663,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowRadius: 8,
     elevation: 8,
-    gap: 16, // For React Native 0.71+, otherwise use margin
-    marginBottom: 32, // Move the buttons up from the bottom
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   addMoreBtnCentered: {
     flexDirection: 'row',
@@ -669,7 +675,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingVertical: 14,
     paddingHorizontal: 22,
-    marginRight: 10,
+    flex: 1,
+    marginRight: 8,
+    justifyContent: 'center',
   },
   addMoreTextCentered: {
     color: '#2563eb',
@@ -684,7 +692,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingVertical: 14,
     paddingHorizontal: 22,
-    marginLeft: 10,
+    flex: 1,
+    marginLeft: 8,
+    justifyContent: 'center',
   },
   selectAddressTextCentered: {
     color: '#fff',

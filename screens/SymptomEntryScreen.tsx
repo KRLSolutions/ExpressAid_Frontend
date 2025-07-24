@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, FlatList, Dimensions, Pressable, Animated, Modal, StatusBar } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, FlatList, Dimensions, Pressable, Animated, Modal, StatusBar, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8fafc',
   },
   header: {
-    paddingTop: 48,
+    paddingTop: Platform.OS === 'android' ? 60 : 80,
     paddingBottom: 20,
     paddingHorizontal: 20,
     height: 120,
