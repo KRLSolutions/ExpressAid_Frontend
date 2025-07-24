@@ -156,7 +156,7 @@ export type AppDrawerParamList = {
   AboutUs: undefined;
   Support: undefined;
   FAQ: undefined;
-  DeleteProfile: undefined;
+  DeleteProfile: { onLogout: () => void };
   SearchingForNurseScreen: { orderId: string };
   SelectPaymentMethodScreen: { 
     selectedMethod?: string; 
@@ -195,7 +195,9 @@ const MainDrawer = ({ userData, onLogout }: AppStackProps) => (
     <Drawer.Screen name="AboutUs" component={AboutUsScreen} />
     <Drawer.Screen name="Support" component={SupportScreen} />
     <Drawer.Screen name="FAQ" component={FAQScreen} />
-    <Drawer.Screen name="DeleteProfile" component={DeleteProfileScreen} />
+    <Drawer.Screen name="DeleteProfile">
+      {props => <DeleteProfileScreen {...props} onLogout={onLogout} />}
+    </Drawer.Screen>
   </Drawer.Navigator>
 );
 
