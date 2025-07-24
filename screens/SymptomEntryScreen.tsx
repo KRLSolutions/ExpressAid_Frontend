@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, FlatList, Dimensions, Pressable, Animated, Modal } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, FlatList, Dimensions, Pressable, Animated, Modal, StatusBar, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { Ionicons } from '@expo/vector-icons';
@@ -220,8 +220,18 @@ const SymptomEntryScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  bg: { flex: 1, backgroundColor: '#fff' },
-  topBar: {
+  container: {
+    flex: 1,
+    backgroundColor: '#f8fafc',
+  },
+  header: {
+    paddingTop: Platform.OS === 'android' ? 60 : 80,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    height: 120,
+    zIndex: 2,
+  },
+  headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingTop: 48,

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, ScrollView, SafeAreaView, Alert, ActivityIndicator, Image, Linking } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, ScrollView, SafeAreaView, Alert, ActivityIndicator, Image, Linking, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
@@ -228,7 +228,7 @@ const handlePlaceOrder = async () => {
             <Text style={styles.emoji}>🌙</Text>
             <View style={styles.itemInfo}>
               <Text style={[styles.itemTitle, { color: '#b91c1c' }]}>After-Hours Service Charge</Text>
-              <Text style={styles.itemSubtitle}>₹200 x number of services (applies for bookings after 9 PM or before 7 AM)</Text>
+              <Text style={styles.itemSubtitle}>₹50 x number of services (applies for bookings after 9 PM or before 7 AM)</Text>
               <Text style={styles.itemPrice}>₹{afterHoursCharge}</Text>
             </View>
           </View>
@@ -278,7 +278,10 @@ const handlePlaceOrder = async () => {
       <ChooseAddressModal
         visible={addressModalVisible}
         onClose={() => setAddressModalVisible(false)}
-        onAddNew={() => setAddressModalVisible(false)}
+        onAddNew={() => {
+          // This will be handled internally by the modal
+          console.log('Add new address requested');
+        }}
         onSelect={handleSelectAddress}
       />
     </SafeAreaView>
@@ -290,14 +293,18 @@ const styles = StyleSheet.create({
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 48,
-    paddingLeft: 12,
-    paddingBottom: 12,
-    height: 90,
+    justifyContent: 'center', // Center the content
+    paddingTop: Platform.OS === 'android' ? 60 : 80, // Increased top padding to move everything lower
+    paddingBottom: 16, // Increased bottom padding
+    height: 120, // Increased height to accommodate the lower positioning
     backgroundColor: '#fff',
     zIndex: 2,
+    position: 'relative', // Add position relative for absolute positioning
   },
   backBtn: {
+    position: 'absolute', // Position absolutely
+    left: 16, // Increased left margin
+    top: Platform.OS === 'android' ? 60 : 80, // Increased top positioning to match topBar padding
     width: 44,
     height: 44,
     padding: 10,
@@ -308,7 +315,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.10,
     shadowRadius: 6,
-    marginRight: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -317,10 +323,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#2563eb',
     textAlign: 'center',
+    // Remove any margin/padding that might affect centering
   },
   scrollContent: {
     padding: 16,
-    paddingBottom: 120,
+    paddingTop: 24, // Add top padding to create space below header
+    paddingBottom: 140,
   },
   cartItem: {
     flexDirection: 'row',
@@ -525,12 +533,18 @@ const styles = StyleSheet.create({
   },
   placeOrderBtn: {
     backgroundColor: '#2563eb',
-    borderRadius: 16,
-    padding: 12,
+    borderRadius: 20,
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    elevation: 8,
+    shadowColor: '#2563eb',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
   },
   placeOrderText: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontWeight: '700',
     fontSize: 16,
   },
   bottomBarModernUpdated: {
@@ -634,53 +648,74 @@ const styles = StyleSheet.create({
   },
   placeOrderBtnText: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontWeight: '700',
     fontSize: 16,
   },
   bottomBarCentered: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 16,
+    paddingVertical: 20,
+    paddingHorizontal: 20,
     backgroundColor: '#fff',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 8,
-    gap: 16, // For React Native 0.71+, otherwise use margin
-    marginBottom: 32, // Move the buttons up from the bottom
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    elevation: 12,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    borderTopWidth: 1,
+    borderTopColor: '#f1f5f9',
   },
   addMoreBtnCentered: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f1f5ff',
-    borderRadius: 16,
-    paddingVertical: 14,
-    paddingHorizontal: 22,
-    marginRight: 10,
+    backgroundColor: '#f8fafc',
+    borderRadius: 20,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    flex: 1,
+    marginRight: 12,
+    justifyContent: 'center',
+    elevation: 6,
+    shadowColor: '#2563eb',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
   },
   addMoreTextCentered: {
     color: '#2563eb',
-    fontWeight: 'bold',
-    fontSize: 17,
+    fontWeight: '700',
+    fontSize: 16,
     marginLeft: 8,
   },
   selectAddressBtnCentered: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#2563eb',
-    borderRadius: 16,
-    paddingVertical: 14,
-    paddingHorizontal: 22,
-    marginLeft: 10,
+    borderRadius: 20,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    flex: 1,
+    marginLeft: 12,
+    justifyContent: 'center',
+    elevation: 8,
+    shadowColor: '#2563eb',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
   },
   selectAddressTextCentered: {
     color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 17,
+    fontWeight: '700',
+    fontSize: 16,
     marginLeft: 8,
   },
 });

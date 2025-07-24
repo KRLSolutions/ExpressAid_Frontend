@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, Animated } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import * as Linking from 'expo-linking';
 import api from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const DeleteProfileScreen = ({ navigation }: any) => {
+const DeleteProfileScreen = ({ navigation, onLogout }: any) => {
   const [loading, setLoading] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -26,13 +27,16 @@ const DeleteProfileScreen = ({ navigation }: any) => {
           text: 'Delete', style: 'destructive', onPress: async () => {
             setLoading(true);
             try {
-              await api.deleteProfile();
-              await AsyncStorage.clear();
+              // First logout the user using the onLogout function
+              await onLogout();
+              
+              // Then open the external delete URL
+              await Linking.openURL('https://expressaid.in/delete');
+              
               setLoading(false);
-              navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
             } catch (err) {
               setLoading(false);
-              Alert.alert('Error', 'Failed to delete profile. Please try again.');
+              Alert.alert('Error', 'Failed to open delete page. Please try again.');
             }
           }
         }

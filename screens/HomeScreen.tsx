@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Platform, Pressable, Dimensions, Alert, Modal, FlatList, KeyboardAvoidingView, TextInput, Image, Linking, ScrollView, ImageBackground } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Platform, Pressable, Dimensions, Alert, Modal, FlatList, KeyboardAvoidingView, TextInput, Image, Linking, ScrollView, ImageBackground, SafeAreaView } from 'react-native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { MaterialCommunityIcons, Ionicons, FontAwesome5 } from '@expo/vector-icons';
@@ -135,7 +135,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
 
   const handleTrackNurse = React.useCallback(() => {
     if (activeOrder && (activeOrder.orderId || activeOrder._id)) {
-      navigation.navigate('SearchingForNurseScreen', { orderId: activeOrder.orderId || activeOrder._id });
+      navigation.navigate('SearchingForNurseScreen', { orderId: activeOrder.orderId || activeOrder._id || '' });
     } else {
       // Optionally show an alert if no active order
       // alert('No active order to track');
@@ -344,6 +344,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
     },
   ], []);
 
+
+
   // --- TESTIMONIALS DATA ---
   const testimonials = [
     {
@@ -359,7 +361,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
     {
       id: '3',
       name: 'Anjali T.',
-      message: 'The nurses are caring and skilled. I feel safe using Expressaid for my mother’s care.',
+      message: 'The nurses are caring and skilled. I feel safe using Expressaid for my mother care.',
     },
     {
       id: '4',
@@ -586,31 +588,38 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
   }));
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'transparent' }}>
-      {/* Fullscreen background image */}
-      <ImageBackground
-        source={require('../assets/bg.png')}
-        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}
-        resizeMode="cover"
-      />
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }}>
       {/* Main content */}
       <ScrollView
         style={{ flex: 1, backgroundColor: 'transparent' }}
-        contentContainerStyle={{ flexGrow: 1, backgroundColor: 'transparent' }}
+        contentContainerStyle={{ 
+          paddingBottom: 120, // Add bottom padding to account for the cart bars
+          backgroundColor: 'transparent' 
+        }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Main Content */}
-        <View style={styles.mainContent} pointerEvents="box-none">
+        {/* Header Section - Now inside the scrollable container */}
+        <View style={styles.headerSection}>
+          <View style={styles.headerTopBar}>
+            <TouchableOpacity onPress={openDrawer} style={styles.menuBtn}>
+              <Ionicons name="menu" size={28} color="#222" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.lightbulbBtn} onPress={() => setShowHowItWorksModal(true)}>
+              <MaterialCommunityIcons name="lightbulb-on-outline" size={28} color="#2563eb" />
+            </TouchableOpacity>
+          </View>
+          
           <Animated.View
             entering={FadeInUp.duration(900)}
-            style={[styles.titleWrap, { marginTop: 110, marginBottom: 0, alignItems: 'center' }]}
+            style={styles.titleWrap}
           >
             <Text style={styles.title}>
               {`${t('welcome')} ${getFirstName(userData?.name || 'User')}`}
               {`\n${t('book_nurse')}`}
             </Text>
           </Animated.View>
-          <Animated.View style={[styles.floatingSearchWrap, { marginTop: 24, marginBottom: 48, alignItems: 'center' }]}> 
+          
+          <Animated.View style={styles.floatingSearchWrap}> 
             <Animated.View style={bounceStyle}>
               <Pressable style={styles.bigSearchBar} onPress={goToSymptomEntry} android_ripple={{ color: '#e0e7ff' }}>
                 <Ionicons name="search" size={28} color="#2563eb" style={{ marginLeft: 18, marginRight: 10 }} />
@@ -618,66 +627,34 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
               </Pressable>
             </Animated.View>
           </Animated.View>
-          {/* Health Tips Section */}
-          {/* Sliding Articles Carousel: Health Tips */}
-          <ArticleCarousel data={articles} dotColor="#2563eb" borderColor="#b6d0ff" showDots={false} categoryTag="Health" activeIndex={healthActiveIndex} setActiveIndex={setHealthActiveIndex} />
-          {/* Curved SVG Separator */}
-          <View style={{ width: '100%', height: 36, marginBottom: 8 }}>
-            <Svg width="100%" height="36" viewBox="0 0 400 36" preserveAspectRatio="none" style={{ position: 'absolute', left: 0, right: 0 }}>
-              <Defs>
-                <SvgLinearGradient id="blueCurve" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <Stop offset="0%" stopColor="#2563eb" stopOpacity="0.12" />
-                  <Stop offset="100%" stopColor="#60a5fa" stopOpacity="0.12" />
-                </SvgLinearGradient>
-              </Defs>
-              <Path d="M0,0 Q200,60 400,0 L400,36 L0,36 Z" fill="url(#blueCurve)" />
-            </Svg>
-          </View>
-          {/* Meal Tips Section */}
-          {/* Sliding Articles Carousel: Meal Tips */}
-          <ArticleCarousel data={mealTips} dotColor="#2563eb" borderColor="#b6d0ff" showDots={false} categoryTag="Meal" activeIndex={mealActiveIndex} setActiveIndex={setMealActiveIndex} />
+
+        </View>
+
+        {/* Content Sections */}
+        <View style={styles.contentContainer}>
           {/* --- TESTIMONIALS SECTION --- */}
           <TestimonialCarousel />
         </View>
       </ScrollView>
-      {/* Top Bar - absolutely positioned, render after mainContent for higher stacking */}
-      <View style={styles.topBar} pointerEvents="auto">
-        <TouchableOpacity onPress={openDrawer} style={styles.menuBtn}>
-          <Ionicons name="menu" size={28} color="#222" />
-        </TouchableOpacity>
-        <TouchableOpacity style={{ backgroundColor: '#fff', borderRadius: 20, padding: 8, elevation: 4 }} onPress={() => setHowItWorksVisible(true)}>
-          <MaterialCommunityIcons name="lightbulb-on-outline" size={28} color="#2563eb" />
-        </TouchableOpacity>
-        {/* Removed performance/chart button and notification bell */}
-      </View>
-      {/* How does it work Modal */}
-      <Modal
-        visible={howItWorksVisible}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setHowItWorksVisible(false)}
-      >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.25)', justifyContent: 'flex-end' }}>
-          <View style={{
-            backgroundColor: '#fff',
-            borderTopLeftRadius: 32,
-            borderTopRightRadius: 32,
-            paddingTop: 12,
-            paddingBottom: 0,
-            width: '100%',
-            minHeight: '70%',
-            maxHeight: '85%',
-            alignItems: 'center',
-            elevation: 12,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: -4 },
-            shadowOpacity: 0.12,
-            shadowRadius: 16,
-          }}>
-            {/* Drag indicator */}
-            <View style={{ width: 48, height: 6, borderRadius: 3, backgroundColor: '#e0e0e0', marginBottom: 12 }} />
-            <View style={{ width: '100%', alignItems: 'center', paddingTop: 8, paddingBottom: 12, backgroundColor: '#fff' }}>
-              <Text style={{ fontSize: 28, fontWeight: 'bold', color: '#222', marginBottom: 8 }}>How Expressaid Works</Text>
+
+      {showHowItWorksModal && (
+        <View style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.35)', justifyContent: 'flex-end', zIndex: 9999 }}>
+          <View style={{ backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, width: '100%', alignItems: 'center', elevation: 12, shadowColor: '#000', shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.18, shadowRadius: 12 }}>
+            {/* Heading */}
+            <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#2563eb', marginBottom: 18 }}>How The App Works?</Text>
+            {/* Tab Bar - Only Nursing */}
+            <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 16 }}>
+              <View
+                style={{
+                  paddingVertical: 8,
+                  paddingHorizontal: 18,
+                  borderRadius: 20,
+                  backgroundColor: '#2563eb',
+                  marginHorizontal: 6,
+                }}
+              >
+                <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 14 }}>Nursing</Text>
+              </View>
             </View>
             <ScrollView style={{ width: '100%' }} contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 32 }} showsVerticalScrollIndicator={false}>
               {/* Step 1 */}
@@ -827,7 +804,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
           />
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -837,49 +814,68 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
   },
-  topBar: {
-    position: 'absolute',
-    top: Platform.OS === 'android' ? 44 : 60,
-    left: 0,
-    width: width,
+  headerSection: {
+    width: '100%',
+    backgroundColor: '#ffffff',
+    paddingTop: Platform.OS === 'android' ? 80 : 100, // Increased top padding to move everything down more
+    paddingBottom: 24,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  headerTopBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 18,
-    zIndex: 100, // increased to ensure topBar is always on top
+    paddingHorizontal: 20,
+    marginBottom: 32, // Increased bottom margin for more spacing
+    marginTop: 16, // Added top margin for extra spacing
   },
   menuBtn: {
-    padding: 8,
+    padding: 12,
     backgroundColor: '#fff',
-    borderRadius: 16,
-    elevation: 4,
+    borderRadius: 20,
+    elevation: 6,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.10,
-    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
   },
-  mainContent: {
-    flex: 1,
+  lightbulbBtn: {
+    padding: 12,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+  },
+  contentContainer: {
     width: '100%',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    marginTop: 36,
+    backgroundColor: '#ffffff',
+    paddingTop: 20, // Add some top padding to separate from header
   },
   titleWrap: {
     width: '100%',
     alignItems: 'center',
-    marginBottom: 44,
+    marginBottom: 36, // Increased bottom margin
+    marginTop: 16, // Added top margin
   },
   title: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: '#fff', // changed from '#222' to white
+    color: '#1f2937',
     textAlign: 'center',
     lineHeight: 44,
-    textShadowColor: 'rgba(0,0,0,0.55)', // stronger shadow for readability
-    textShadowOffset: { width: 0, height: 8 },
-    textShadowRadius: 18,
-    elevation: 10,
     letterSpacing: 0.5,
   },
   searchWrap: {
@@ -909,7 +905,6 @@ const styles = StyleSheet.create({
   floatingSearchWrap: {
     width: '92%',
     alignItems: 'center',
-    marginBottom: 36,
     alignSelf: 'center',
   },
   bigSearchBar: {

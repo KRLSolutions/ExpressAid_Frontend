@@ -32,30 +32,50 @@ function CustomDrawerContent({ navigation, userData, onLogout }: any) {
   return (
     <View style={{ flex: 1, backgroundColor: '#fff', justifyContent: 'space-between' }}>
       {/* Profile Section */}
-      <View style={{ alignItems: 'center', marginTop: 36, marginBottom: 12 }}>
-        <Text style={{ fontWeight: 'bold', fontSize: 26, color: '#222', marginBottom: 2 }}>
+      <View style={{ alignItems: 'center', marginTop: 60, marginBottom: 24, paddingHorizontal: 20 }}>
+        <View style={{ 
+          width: 80, 
+          height: 80, 
+          borderRadius: 40, 
+          backgroundColor: '#e0f2fe', 
+          justifyContent: 'center', 
+          alignItems: 'center',
+          marginBottom: 16,
+          shadowColor: '#2563eb',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.2,
+          shadowRadius: 8,
+          elevation: 4,
+        }}>
+          <Text style={{ fontSize: 32, fontWeight: 'bold', color: '#2563eb' }}>
+            {userData?.name ? userData.name.charAt(0).toUpperCase() : 'U'}
+          </Text>
+        </View>
+        <Text style={{ fontWeight: 'bold', fontSize: 24, color: '#222', marginBottom: 4, textAlign: 'center' }}>
           {userData?.name || 'User'}
         </Text>
-        <Text style={{ color: '#2563eb', fontSize: 18, fontWeight: '600', marginTop: 2 }}>
+        <Text style={{ color: '#2563eb', fontSize: 16, fontWeight: '500', textAlign: 'center' }}>
           {userData?.phoneNumber || 'No phone'}
         </Text>
       </View>
+      
       {/* Menu Items */}
-      <View style={{ flex: 1, paddingHorizontal: 32, justifyContent: 'flex-start', marginTop: 0 }}>
-        <DrawerItem icon={<Feather name="list" size={32} color="#2563eb" />} label="Orders" onPress={() => navigation.navigate('Orders')} large />
-        <DrawerItem icon={<Feather name="user-plus" size={32} color="#2563eb" />} label="Invite Friends" onPress={() => navigation.navigate('InviteFriends')} large />
-        <DrawerItem icon={<Ionicons name="notifications-outline" size={32} color="#2563eb" />} label="Notification" onPress={() => navigation.navigate('Notifications')} large />
-        <DrawerItem icon={<Feather name="info" size={32} color="#2563eb" />} label="About us" onPress={() => navigation.navigate('AboutUs')} large />
-        <DrawerItem icon={<Feather name="headphones" size={32} color="#2563eb" />} label="Support" onPress={() => navigation.navigate('Support')} large />
-        <DrawerItem icon={<Feather name="help-circle" size={32} color="#2563eb" />} label="FAQ" onPress={() => navigation.navigate('FAQ')} large />
+      <View style={{ flex: 1, paddingHorizontal: 24, justifyContent: 'flex-start', marginTop: 0 }}>
+        <DrawerItem icon={<Feather name="list" size={24} color="#2563eb" />} label="Orders" onPress={() => navigation.navigate('Orders')} />
+        <DrawerItem icon={<Feather name="user-plus" size={24} color="#2563eb" />} label="Invite Friends" onPress={() => navigation.navigate('InviteFriends')} />
+        <DrawerItem icon={<Ionicons name="notifications-outline" size={24} color="#2563eb" />} label="Notification" onPress={() => navigation.navigate('Notifications')} />
+        <DrawerItem icon={<Feather name="info" size={24} color="#2563eb" />} label="About us" onPress={() => navigation.navigate('AboutUs')} />
+        <DrawerItem icon={<Feather name="headphones" size={24} color="#2563eb" />} label="Support" onPress={() => navigation.navigate('Support')} />
+        <DrawerItem icon={<Feather name="help-circle" size={24} color="#2563eb" />} label="FAQ" onPress={() => navigation.navigate('FAQ')} />
       </View>
+      
       {/* Delete Profile and Logout Buttons at the bottom */}
-      <View style={{ padding: 24 }}>
+      <View style={{ padding: 24, paddingBottom: 40 }}>
         <TouchableOpacity
           style={{
             backgroundColor: '#fff',
-            borderRadius: 16,
-            paddingVertical: 16,
+            borderRadius: 12,
+            paddingVertical: 14,
             alignItems: 'center',
             width: '100%',
             borderWidth: 1,
@@ -64,20 +84,24 @@ function CustomDrawerContent({ navigation, userData, onLogout }: any) {
           }}
           onPress={() => navigation.navigate('DeleteProfile')}
         >
-          <Text style={{ color: '#ff3b30', fontWeight: 'bold', fontSize: 18 }}>Delete Profile</Text>
+          <Text style={{ color: '#ff3b30', fontWeight: 'bold', fontSize: 16 }}>Delete Profile</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={{
             backgroundColor: '#2563eb',
-            borderRadius: 16,
-            paddingVertical: 16,
+            borderRadius: 12,
+            paddingVertical: 14,
             alignItems: 'center',
             width: '100%',
             elevation: 4,
+            shadowColor: '#2563eb',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
           }}
           onPress={onLogout}
         >
-          <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 18 }}>Logout</Text>
+          <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>Logout</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -86,9 +110,37 @@ function CustomDrawerContent({ navigation, userData, onLogout }: any) {
 
 function DrawerItem({ icon, label, onPress, large }: { icon: React.ReactNode; label: string; onPress: () => void; large?: boolean }) {
   return (
-    <TouchableOpacity onPress={onPress} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: large ? 20 : 13 }}>
-      <View style={{ width: large ? 44 : 32, alignItems: 'center' }}>{icon}</View>
-      <Text style={{ fontSize: large ? 20 : 16, color: '#222', marginLeft: 20, fontWeight: '600' }}>{label}</Text>
+    <TouchableOpacity 
+      onPress={onPress} 
+      style={{ 
+        flexDirection: 'row', 
+        alignItems: 'center', 
+        paddingVertical: 16,
+        paddingHorizontal: 8,
+        borderRadius: 12,
+        marginBottom: 4,
+      }}
+      activeOpacity={0.7}
+    >
+      <View style={{ 
+        width: 40, 
+        height: 40, 
+        borderRadius: 20, 
+        backgroundColor: '#f0f9ff', 
+        justifyContent: 'center', 
+        alignItems: 'center',
+        marginRight: 16,
+      }}>
+        {icon}
+      </View>
+      <Text style={{ 
+        fontSize: 16, 
+        color: '#374151', 
+        fontWeight: '500',
+        flex: 1,
+      }}>
+        {label}
+      </Text>
     </TouchableOpacity>
   );
 }
@@ -103,8 +155,15 @@ export type AppDrawerParamList = {
   AboutUs: undefined;
   Support: undefined;
   FAQ: undefined;
-  DeleteProfile: undefined;
-  SelectPaymentMethodScreen: { selectedMethod: string; returnTo: string };
+  DeleteProfile: { onLogout: () => void };
+  SearchingForNurseScreen: { orderId: string };
+  SelectPaymentMethodScreen: { 
+    selectedMethod?: string; 
+    returnTo: string; 
+    orderAmount?: number;
+    transactionRef?: string;
+    upiUrl?: string;
+  };
   CardEntryScreen: { returnTo: string };
   UPIIDEntryScreen: { returnTo: string };
   CashfreePaymentScreen: { paymentSessionId: string };
@@ -134,7 +193,9 @@ const MainDrawer = ({ userData, onLogout }: AppStackProps) => (
     <Drawer.Screen name="AboutUs" component={AboutUsScreen} />
     <Drawer.Screen name="Support" component={SupportScreen} />
     <Drawer.Screen name="FAQ" component={FAQScreen} />
-    <Drawer.Screen name="DeleteProfile" component={DeleteProfileScreen} />
+    <Drawer.Screen name="DeleteProfile">
+      {props => <DeleteProfileScreen {...props} onLogout={onLogout} />}
+    </Drawer.Screen>
   </Drawer.Navigator>
 );
 
