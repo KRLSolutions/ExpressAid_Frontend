@@ -153,11 +153,18 @@ const handlePlaceOrder = async () => {
     CFPaymentGatewayService.setCallback({
       onVerify: (orderId) => {
         console.log('✅ Payment Verified for Order:', orderId);
-        Alert.alert('Success', `Payment successful for order: ${orderId}`);
-        clearCart();
-        navigation.navigate('Home');
+        Alert.alert('Success', `Payment successful for order: ${orderId}`, [
+          {
+            text: 'OK',
+            onPress: () => {
+              clearCart();
+              // Navigate to SearchingForNurseScreen with orderId
+              navigation.navigate('SearchingForNurseScreen', { orderId });
+            }
+          }
+        ]);
       },
-      onError: (err: CFErrorResponse, orderId) => {
+      onError: (err: any, orderId) => {
         console.log('❌ Payment Error:', err.message, orderId);
         Alert.alert('Payment Failed', err.message || 'Unknown error');
       },
@@ -165,7 +172,7 @@ const handlePlaceOrder = async () => {
 
     CFPaymentGatewayService.doPayment(dropPayment);
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('💥 Payment error:', error);
     Alert.alert('Order Failed', error.message || 'Could not place order.');
   } finally {
