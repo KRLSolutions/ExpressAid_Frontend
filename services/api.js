@@ -65,11 +65,6 @@ class ApiService {
   }
 
   // Clear cache for specific endpoint
-  clearCache(endpoint, method = 'GET') {
-    const cacheKey = `${method}:${endpoint}`;
-    this.requestCache.delete(cacheKey);
-    console.log('🗑️ Cleared cache for:', cacheKey);
-  }
 
   // Check if request is already pending
   isPending(endpoint, method = 'GET') {
@@ -297,8 +292,6 @@ class ApiService {
       method: 'POST',
       body: JSON.stringify({ cart: cartItems }),
     });
-    // Clear cart cache after saving
-    this.clearCache('/users/cart');
     return response;
   }
 

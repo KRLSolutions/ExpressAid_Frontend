@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform, Alert, TextInput, FlatList, Modal } from 'react-native';
+import MapView, { Region, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -20,10 +21,19 @@ const SelectAddressScreen = ({ navigation, route }: any) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<LocationItem[]>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const mapRef = useRef<MapView>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     getCurrentLocation();
+    
+    // Cleanup timeout on unmount
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
   }, []);
 
   const getCurrentLocation = async () => {
@@ -66,21 +76,33 @@ const SelectAddressScreen = ({ navigation, route }: any) => {
   };
 
   const searchPlaces = async (query: string) => {
-    if (query.length < 3) {
+    if (query.length < 2) {
       setSearchResults([]);
+      setShowSearchResults(false);
+      setIsSearching(false);
       return;
     }
 
+    setIsSearching(true);
+
     try {
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(query)}&types=geocode&key=AIzaSyBt6vwj4W_smVmNXDPwHQLdFBVpHQgM78c`
+        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(query)}&types=geocode&components=country:in&key=AIzaSyBt6vwj4W_smVmNXDPwHQLdFBVpHQgM78c`
       );
       const data = await response.json();
       if (data.predictions) {
         setSearchResults(data.predictions);
+        setShowSearchResults(true);
+      } else {
+        setSearchResults([]);
+        setShowSearchResults(false);
       }
     } catch (error) {
       console.error('Error searching places:', error);
+      setSearchResults([]);
+      setShowSearchResults(false);
+    } finally {
+      setIsSearching(false);
     }
   };
 
@@ -92,7 +114,7 @@ const SelectAddressScreen = ({ navigation, route }: any) => {
   const selectSearchResult = async (item: LocationItem) => {
     try {
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${item.place_id}&fields=geometry&key=AIzaSyBt6vwj4W_smVmNXDPwHQLdFBVpHQgM78c`
+        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${item.place_id}&fields=geometry,formatted_address&key=AIzaSyBt6vwj4W_smVmNXDPwHQLdFBVpHQgM78c`
       );
       const data = await response.json();
       
@@ -106,13 +128,17 @@ const SelectAddressScreen = ({ navigation, route }: any) => {
         };
         setLocation(region);
         mapRef.current?.animateToRegion(region, 1000);
-        setAddress(item.description);
+        // Use formatted_address if available, otherwise use description
+        setAddress(data.result.formatted_address || item.description);
         setSearchQuery('');
         setSearchResults([]);
         setShowSearchResults(false);
+      } else {
+        Alert.alert('Error', 'Could not get location details for this address.');
       }
     } catch (error) {
       console.error('Error getting place details:', error);
+      Alert.alert('Error', 'Failed to get location details. Please try again.');
     }
   };
 
@@ -168,10 +194,26 @@ const SelectAddressScreen = ({ navigation, route }: any) => {
           value={searchQuery}
           onChangeText={(text) => {
             setSearchQuery(text);
-            searchPlaces(text);
-            setShowSearchResults(text.length > 0);
+            
+            // Clear previous timeout
+            if (searchTimeoutRef.current) {
+              clearTimeout(searchTimeoutRef.current);
+            }
+            
+            // Set new timeout for debounced search
+            searchTimeoutRef.current = setTimeout(() => {
+              searchPlaces(text);
+            }, 300);
           }}
-          onFocus={() => setShowSearchResults(searchQuery.length > 0)}
+          onFocus={() => {
+            if (searchQuery.length >= 2) {
+              setShowSearchResults(true);
+            }
+          }}
+          onBlur={() => {
+            // Keep results visible for a moment to allow selection
+            setTimeout(() => setShowSearchResults(false), 200);
+          }}
         />
         {searchQuery.length > 0 && (
           <TouchableOpacity onPress={() => {
@@ -187,12 +229,22 @@ const SelectAddressScreen = ({ navigation, route }: any) => {
       {/* Search Results */}
       {showSearchResults && (
         <View style={styles.searchResultsContainer}>
-          <FlatList
-            data={searchResults}
-            renderItem={renderSearchResult}
-            keyExtractor={(item) => item.place_id}
-            style={styles.searchResultsList}
-          />
+          {isSearching ? (
+            <View style={styles.noResultsContainer}>
+              <Text style={styles.noResultsText}>Searching...</Text>
+            </View>
+          ) : searchResults.length > 0 ? (
+            <FlatList
+              data={searchResults}
+              renderItem={renderSearchResult}
+              keyExtractor={(item) => item.place_id}
+              style={styles.searchResultsList}
+            />
+          ) : (
+            <View style={styles.noResultsContainer}>
+              <Text style={styles.noResultsText}>No addresses found</Text>
+            </View>
+          )}
         </View>
       )}
 
@@ -287,13 +339,15 @@ const styles = StyleSheet.create({
     right: 16,
     backgroundColor: '#fff',
     borderRadius: 12,
-    maxHeight: 200,
+    maxHeight: 250,
     zIndex: 1000,
-    elevation: 5,
+    elevation: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
   },
   searchResultsList: {
     borderRadius: 12,
@@ -301,9 +355,10 @@ const styles = StyleSheet.create({
   searchResultItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
+    padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#f1f5f9',
+    minHeight: 60,
   },
   searchResultMainText: {
     fontSize: 16,
@@ -350,6 +405,16 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#222',
     flex: 1,
+  },
+  noResultsContainer: {
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noResultsText: {
+    fontSize: 16,
+    color: '#666',
+    fontStyle: 'italic',
   },
 });
 

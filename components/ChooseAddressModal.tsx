@@ -177,8 +177,8 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
 
   // Use backend proxy for Places API
   const getPlacesSuggestions = async (query: string): Promise<Suggestion[]> => {
-    if (query.length < 3) return [];
-    const url = `${BACKEND_BASE_URL}/api/places/autocomplete?input=${encodeURIComponent(query)}`;
+    if (query.length < 2) return [];
+    const url = `${BACKEND_BASE_URL}/places/autocomplete?input=${encodeURIComponent(query)}`;
     console.log('[Autocomplete] Fetching:', url);
     try {
       const response = await fetch(url, {
@@ -193,25 +193,33 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
         return [];
       }
       const data = await response.json();
-      console.log('[Autocomplete] Response:', data);
+      console.log('[Autocomplete] Response status:', data.status);
+      console.log('[Autocomplete] Predictions count:', data.predictions ? data.predictions.length : 0);
       if (data.status !== 'OK') {
         console.log('[Autocomplete] Status not OK:', data.status);
+        if (data.error_message) {
+          console.log('[Autocomplete] Error message:', data.error_message);
+        }
+        return [];
+      }
+      if (!data.predictions || data.predictions.length === 0) {
+        console.log('[Autocomplete] No predictions found');
         return [];
       }
       const mapped = data.predictions.map((item: any) => ({
         place_id: item.place_id,
         description: item.description,
       }));
-      console.log('[Autocomplete] Suggestions:', mapped);
+      console.log('[Autocomplete] Mapped suggestions:', mapped);
       return mapped;
     } catch (err) {
-      console.log('[Autocomplete] Error:', err);
+      console.error('[Autocomplete] Network error:', err);
       return [];
     }
   };
 
   const getLatLongFromPlaceId = async (placeId: string) => {
-    const url = `${BACKEND_BASE_URL}/api/places/details?place_id=${encodeURIComponent(placeId)}`;
+    const url = `${BACKEND_BASE_URL}/places/details?place_id=${encodeURIComponent(placeId)}`;
     console.log('[PlaceDetails] Fetching:', url);
     try {
       const response = await fetch(url);
@@ -232,24 +240,19 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
   };
 
   const handleSearchTextChange = async (text: string) => {
+    console.log('[UI] Search text changed:', text, 'length:', text.length);
     setSearchText(text);
-    setShowSuggestions(true);
-    if (text.length >= 3) {
+    if (text.length >= 2) {
+      console.log('[UI] Text length >= 2, showing suggestions');
+      setShowSuggestions(true);
       const suggestions = await getPlacesSuggestions(text);
+      console.log('[UI] Got suggestions from API:', suggestions.length);
       setSuggestions(suggestions);
-      console.log('[UI] Set suggestions:', suggestions);
-      
-      // If no suggestions from API, show some common addresses
-      if (suggestions.length === 0) {
-        const commonAddresses = [
-          { place_id: 'manual_1', description: 'Home Address' },
-          { place_id: 'manual_2', description: 'Work Address' },
-          { place_id: 'manual_3', description: 'Current Location' },
-        ];
-        setSuggestions(commonAddresses);
-      }
+      console.log('[UI] Set suggestions in state:', suggestions);
     } else {
+      console.log('[UI] Text length < 2, hiding suggestions');
       setSuggestions([]);
+      setShowSuggestions(false);
     }
   };
 
@@ -258,11 +261,7 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
     setSearchText(suggestion.description);
     console.log('[UI] Suggestion selected:', suggestion);
     
-    // Handle manual addresses
-    if (suggestion.place_id.startsWith('manual_')) {
-      setCurrentAddress(suggestion.description);
-      return;
-    }
+    // All suggestions should be from API now
     
     const locationData = await getLatLongFromPlaceId(suggestion.place_id);
     if (!locationData) return;
@@ -488,7 +487,11 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
                     setCurrentAddress(text);
                     handleSearchTextChange(text);
                   }}
-                  onFocus={() => setShowSuggestions(true)}
+                  onFocus={() => {
+                    if (searchText.length >= 2) {
+                      setShowSuggestions(true);
+                    }
+                  }}
                   autoCorrect={false}
                   autoCapitalize="none"
                   returnKeyType="search"
@@ -503,27 +506,39 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
               </View>
 
               {/* Suggestions */}
-              {showSuggestions && suggestions.length > 0 && (
-                <FlatList
-                  data={suggestions}
-                  keyExtractor={(item) => item.place_id}
-                  renderItem={({ item }) => (
-                    <TouchableOpacity
-                      style={styles.suggestionItem}
-                      onPress={() => handleSuggestionSelect(item)}
-                    >
-                      <Text style={styles.suggestionText}>{item.description}</Text>
-                    </TouchableOpacity>
-                  )}
-                  style={styles.suggestionsList}
-                />
+              {showSuggestions && (
+                <>
+                  {suggestions.length > 0 ? (
+                    <FlatList
+                      data={suggestions}
+                      key={`suggestions-${suggestions.length}`}
+                      keyExtractor={(item) => item.place_id}
+                      renderItem={({ item }) => (
+                        <TouchableOpacity
+                          style={styles.suggestionItem}
+                          onPress={() => handleSuggestionSelect(item)}
+                          activeOpacity={0.7}
+                        >
+                          <Text style={styles.suggestionText}>{item.description}</Text>
+                        </TouchableOpacity>
+                      )}
+                      style={styles.suggestionsList}
+                      showsVerticalScrollIndicator={false}
+                    />
+                  ) : searchText.length >= 2 ? (
+                    <View style={styles.noResultsContainer}>
+                      <Text style={styles.noResultsText}>No addresses found</Text>
+                    </View>
+                  ) : null}
+                </>
               )}
+              
+
 
               {/* Map */}
               <View style={styles.mapContainer}>
                 <MapView
                   ref={mapRef}
-                  apiKey={GOOGLE_API_KEY}
                   style={styles.map}
                   region={mapRegion}
                   onRegionChangeComplete={handleMapRegionChange}
@@ -959,14 +974,40 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 8,
     marginBottom: 8,
+    zIndex: 1000,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
   },
   suggestionItem: {
     padding: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
+    backgroundColor: '#fff',
   },
   suggestionText: {
     fontSize: 16,
+    color: '#333',
+  },
+  noResultsContainer: {
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    marginTop: 8,
+  },
+  noResultsText: {
+    fontSize: 16,
+    color: '#666',
+    fontStyle: 'italic',
   },
   mapContainer: {
     flex: 1,
