@@ -598,6 +598,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }}>
+      {/* Fixed Header with Menu and Light Bulb */}
+      <View style={styles.fixedHeader}>
+        <TouchableOpacity onPress={openDrawer} style={styles.menuBtn}>
+          <Ionicons name="menu" size={24} color="#1f2937" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.lightbulbBtn} onPress={() => setHowItWorksVisible(true)}>
+          <MaterialCommunityIcons name="lightbulb-on-outline" size={24} color="#2563eb" />
+        </TouchableOpacity>
+      </View>
+
       {/* Main content */}
       <ScrollView
         style={{ flex: 1, backgroundColor: 'transparent' }}
@@ -609,15 +619,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
       >
         {/* Header Section */}
         <View style={styles.headerSection}>
-          <View style={styles.headerTopBar}>
-            <TouchableOpacity onPress={openDrawer} style={styles.menuBtn}>
-              <Ionicons name="menu" size={24} color="#1f2937" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.lightbulbBtn} onPress={() => setHowItWorksVisible(true)}>
-              <MaterialCommunityIcons name="lightbulb-on-outline" size={24} color="#2563eb" />
-            </TouchableOpacity>
-          </View>
-          
           <Animated.View
             entering={FadeInUp.duration(900)}
             style={styles.titleWrap}
@@ -672,98 +673,178 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
 
       <>
         {howItWorksVisible && (
-          <View style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.35)', justifyContent: 'flex-end', zIndex: 9999 }}>
-            <View style={{ backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, width: '100%', alignItems: 'center', elevation: 12, shadowColor: '#000', shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.18, shadowRadius: 12 }}>
-              {/* Heading */}
-              <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#2563eb', marginBottom: 18 }}>How The App Works?</Text>
-              {/* Tab Bar - Only Nursing */}
-              <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 16 }}>
-                <View
-                  style={{
-                    paddingVertical: 8,
-                    paddingHorizontal: 18,
-                    borderRadius: 20,
-                    backgroundColor: '#2563eb',
-                    marginHorizontal: 6,
-                  }}
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              {/* Header with close button */}
+              <View style={styles.modalHeader}>
+                <View style={styles.modalHeaderContent}>
+                  <MaterialCommunityIcons name="lightbulb-on" size={28} color="#2563eb" />
+                  <Text style={styles.modalTitle}>Health Tips & How It Works</Text>
+                </View>
+                <TouchableOpacity 
+                  style={styles.closeButton} 
+                  onPress={() => setHowItWorksVisible(false)}
                 >
-                  <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 14 }}>Nursing</Text>
-                </View>
-              </View>
-              <ScrollView style={{ width: '100%' }} contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 32 }} showsVerticalScrollIndicator={false}>
-                {/* Step 1 */}
-                <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 24 }}>
-                  <View style={{ width: 44, alignItems: 'center' }}>
-                    <View style={{ backgroundColor: '#e6f9f0', borderRadius: 22, padding: 8, marginBottom: 2 }}>
-                      <MaterialCommunityIcons name="calendar-plus" size={26} color="#1e824c" />
-                    </View>
-                    <View style={{ width: 2, height: 38, backgroundColor: '#1e824c', marginVertical: 2 }} />
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ fontWeight: 'bold', fontSize: 19, color: '#1e3a5c' }}>Book a Home Nurse</Text>
-                    <Text style={{ color: '#444', fontSize: 16, marginTop: 2, lineHeight: 22 }}>
-                      • Choose your location and required service{"\n"}
-                      • Share your care needs and preferences{"\n"}• Submit your request in seconds
-                    </Text>
-                  </View>
-                  <View style={{ alignItems: 'center', marginLeft: 8 }}>
-                    <View style={{ backgroundColor: '#e6f9f0', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 4 }}>
-                      <Text style={{ color: '#1e824c', fontWeight: 'bold', fontSize: 17 }}>~5 <Text style={{ fontSize: 13, color: '#888' }}>min</Text></Text>
-                    </View>
-                  </View>
-                </View>
-                {/* Step 2 */}
-                <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 24 }}>
-                  <View style={{ width: 44, alignItems: 'center' }}>
-                    <View style={{ backgroundColor: '#e6f9f0', borderRadius: 22, padding: 8, marginBottom: 2 }}>
-                      <MaterialCommunityIcons name="account-check-outline" size={26} color="#1e824c" />
-                    </View>
-                    <View style={{ width: 2, height: 38, backgroundColor: '#1e824c', marginVertical: 2 }} />
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ fontWeight: 'bold', fontSize: 19, color: '#1e3a5c' }}>Get Matched with a Nurse</Text>
-                    <Text style={{ color: '#444', fontSize: 16, marginTop: 2, lineHeight: 22 }}>
-                      • We quickly find the best nurse for your needs{"\n"}• Review nurse profile and confirm your choice
-                    </Text>
-                  </View>
-                  <View style={{ alignItems: 'center', marginLeft: 8 }}>
-                    <View style={{ backgroundColor: '#e6f9f0', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 4 }}>
-                    <Text style={{ color: '#1e824c', fontWeight: 'bold', fontSize: 17 }}>~5 <Text style={{ fontSize: 13, color: '#888' }}>min</Text></Text>
-                    </View>
-                  </View>
-                </View>
-                {/* Step 3 */}
-                <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 24 }}>
-                  <View style={{ width: 44, alignItems: 'center' }}>
-                    <View style={{ backgroundColor: '#e6f9f0', borderRadius: 22, padding: 8, marginBottom: 2 }}>
-                      <MaterialCommunityIcons name="handshake-outline" size={26} color="#1e824c" />
-                    </View>
-                    <View style={{ width: 2, height: 38, backgroundColor: '#1e824c', marginVertical: 2 }} />
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ fontWeight: 'bold', fontSize: 19, color: '#1e3a5c' }}>Receive Quality Care at Home</Text>
-                    <Text style={{ color: '#444', fontSize: 16, marginTop: 2, lineHeight: 22 }}>
-                      • Your nurse arrives at your location{"\n"}• Care is delivered as per your plan and needs
-                    </Text>
-                  </View>
-                </View>
-                {/* Step 4 */}
-                <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8 }}>
-                  <View style={{ width: 44, alignItems: 'center' }}>
-                    <View style={{ backgroundColor: '#e6f9f0', borderRadius: 22, padding: 8, marginBottom: 2 }}>
-                      <MaterialCommunityIcons name="currency-inr" size={26} color="#1e824c" />
-                    </View>
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ fontWeight: 'bold', fontSize: 19, color: '#1e3a5c' }}>Pay Easily & Enjoy Peace of Mind</Text>
-                    <Text style={{ color: '#444', fontSize: 16, marginTop: 2, lineHeight: 22 }}>
-                      • Pay securely when your service starts
-                    </Text>
-                  </View>
-                </View>
-                <TouchableOpacity style={{ alignSelf: 'center', marginVertical: 18, marginBottom: 12 }} onPress={() => setHowItWorksVisible(false)}>
-                  <Text style={{ color: '#888', fontSize: 18, fontWeight: 'bold' }}>Close</Text>
+                  <Ionicons name="close" size={24} color="#6b7280" />
                 </TouchableOpacity>
+              </View>
+
+              {/* Tab Navigation */}
+              <View style={styles.tabContainer}>
+                                 <TouchableOpacity 
+                   style={[styles.tabButton, styles.activeTabButton]}
+                   onPress={() => setHowItWorksTab('Nursing')}
+                 >
+                   <MaterialCommunityIcons name="stethoscope" size={20} color="#2563eb" />
+                   <Text style={styles.activeTabText}>Nursing</Text>
+                 </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.tabButton}
+                  onPress={() => setHowItWorksTab('Caregiving')}
+                >
+                  <MaterialCommunityIcons name="account-heart" size={20} color="#6b7280" />
+                  <Text style={styles.tabText}>Caregiving</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.tabButton}
+                  onPress={() => setHowItWorksTab('Equipments')}
+                >
+                  <MaterialCommunityIcons name="medical-bag" size={20} color="#6b7280" />
+                  <Text style={styles.tabText}>Equipment</Text>
+                </TouchableOpacity>
+              </View>
+
+              <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={false}>
+                {howItWorksTab === 'Nursing' && (
+                  <View style={styles.tabContent}>
+                    {/* How It Works Steps */}
+                    <View style={styles.sectionContainer}>
+                      <Text style={styles.sectionTitle}>How Nursing Service Works</Text>
+                      <View style={styles.stepsContainer}>
+                        {[
+                          {
+                            icon: 'calendar-plus',
+                            title: 'Book a Home Nurse',
+                            description: 'Choose your location and required service. Share your care needs and preferences. Submit your request in seconds.',
+                            time: '~5 min',
+                            color: '#10b981'
+                          },
+                          {
+                            icon: 'account-check-outline',
+                            title: 'Get Matched with a Nurse',
+                            description: 'We quickly find the best nurse for your needs. Review nurse profile and confirm your choice.',
+                            time: '~5 min',
+                            color: '#3b82f6'
+                          },
+                          {
+                            icon: 'handshake-outline',
+                            title: 'Receive Quality Care at Home',
+                            description: 'Your nurse arrives at your location. Care is delivered as per your plan and needs.',
+                            time: '~10 min',
+                            color: '#f59e0b'
+                          },
+                          {
+                            icon: 'currency-inr',
+                            title: 'Pay Easily & Enjoy Peace of Mind',
+                            description: 'Pay securely when your service starts. Multiple payment options available.',
+                            time: 'Instant',
+                            color: '#8b5cf6'
+                          }
+                        ].map((step, index) => (
+                          <View key={index} style={styles.stepContainer}>
+                            <View style={styles.stepHeader}>
+                              <View style={[styles.stepIcon, { backgroundColor: step.color + '20' }]}>
+                                <MaterialCommunityIcons name={step.icon as any} size={24} color={step.color} />
+                              </View>
+                              <View style={styles.stepInfo}>
+                                <Text style={styles.stepTitle}>{step.title}</Text>
+                                <View style={styles.timeBadge}>
+                                  <Text style={[styles.timeText, { color: step.color }]}>{step.time}</Text>
+                                </View>
+                              </View>
+                            </View>
+                            <Text style={styles.stepDescription}>{step.description}</Text>
+                            {index < 3 && <View style={[styles.stepDivider, { backgroundColor: step.color + '30' }]} />}
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+
+                    {/* Health Tips */}
+                    <View style={styles.sectionContainer}>
+                      <Text style={styles.sectionTitle}>Daily Health Tips</Text>
+                      <View style={styles.tipsGrid}>
+                        {[
+                          {
+                            icon: 'cup-water',
+                            title: 'Stay Hydrated',
+                            description: 'Drink 8-10 glasses of water daily for better health and recovery',
+                            color: '#3b82f6'
+                          },
+                          {
+                            icon: 'run',
+                            title: 'Light Exercise',
+                            description: 'Gentle walking or stretching helps with circulation and mood',
+                            color: '#10b981'
+                          },
+                          {
+                            icon: 'sleep',
+                            title: 'Quality Sleep',
+                            description: '7-9 hours of sleep improves healing and immune function',
+                            color: '#8b5cf6'
+                          },
+                          {
+                            icon: 'food-apple',
+                            title: 'Balanced Diet',
+                            description: 'Include fruits, vegetables, and proteins in your daily meals',
+                            color: '#f59e0b'
+                          }
+                        ].map((tip, index) => (
+                          <View key={index} style={styles.tipCard}>
+                            <View style={[styles.tipIcon, { backgroundColor: tip.color + '20' }]}>
+                              <MaterialCommunityIcons name={tip.icon as any} size={20} color={tip.color} />
+                            </View>
+                            <Text style={styles.tipTitle}>{tip.title}</Text>
+                            <Text style={styles.tipDescription}>{tip.description}</Text>
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+
+                    {/* Emergency Preparedness */}
+                    <View style={styles.sectionContainer}>
+                      <Text style={styles.sectionTitle}>Emergency Preparedness</Text>
+                      <View style={styles.emergencyTipsContainer}>
+                        <View style={styles.emergencyTip}>
+                          <MaterialCommunityIcons name="phone-alert" size={24} color="#ef4444" />
+                          <Text style={styles.emergencyTipText}>Keep emergency contacts handy</Text>
+                        </View>
+                        <View style={styles.emergencyTip}>
+                          <MaterialCommunityIcons name="medical-bag" size={24} color="#ef4444" />
+                          <Text style={styles.emergencyTipText}>Have basic first aid supplies ready</Text>
+                        </View>
+                        <View style={styles.emergencyTip}>
+                          <MaterialCommunityIcons name="file-document" size={24} color="#ef4444" />
+                          <Text style={styles.emergencyTipText}>Keep medical records organized</Text>
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                )}
+
+                {howItWorksTab === 'Caregiving' && (
+                  <View style={styles.tabContent}>
+                    <Text style={styles.comingSoonText}>Caregiving services coming soon!</Text>
+                    <Text style={styles.comingSoonSubtext}>We're working on bringing you professional caregiving services.</Text>
+                  </View>
+                )}
+
+                {howItWorksTab === 'Equipments' && (
+                  <View style={styles.tabContent}>
+                    <Text style={styles.comingSoonText}>Medical equipment rental coming soon!</Text>
+                    <Text style={styles.comingSoonSubtext}>We're working on bringing you medical equipment rental services.</Text>
+                  </View>
+                )}
               </ScrollView>
             </View>
           </View>
@@ -852,15 +933,9 @@ const styles = StyleSheet.create({
   headerSection: {
     width: '100%',
     backgroundColor: '#ffffff',
-    paddingTop: Platform.OS === 'android' ? 60 : 80,
+    paddingTop: Platform.OS === 'android' ? 120 : 140,
     paddingBottom: 32,
     paddingHorizontal: 20,
-  },
-  headerTopBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 24,
   },
   menuBtn: {
     padding: 12,
@@ -1210,6 +1285,215 @@ const styles = StyleSheet.create({
   welcomeSubtitle: {
     fontSize: 16,
     color: '#6b7280',
+  },
+  fixedHeader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: Platform.OS === 'android' ? 60 : 80,
+    backgroundColor: '#ffffff',
+    zIndex: 10,
+  },
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    justifyContent: 'flex-end',
+    zIndex: 9999,
+  },
+  modalContainer: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
+    width: '100%',
+    alignItems: 'center',
+    elevation: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 16,
+  },
+  modalHeaderContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#1f2937',
+    marginLeft: 12,
+  },
+  closeButton: {
+    padding: 8,
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginBottom: 24,
+  },
+  tabButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 18,
+    borderRadius: 20,
+    backgroundColor: '#f3f4f6',
+  },
+  activeTabButton: {
+    backgroundColor: '#2563eb',
+  },
+  activeTabText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
+    marginLeft: 8,
+  },
+  tabText: {
+    color: '#6b7280',
+    fontWeight: 'bold',
+    fontSize: 14,
+    marginLeft: 8,
+  },
+  modalScrollView: {
+    width: '100%',
+  },
+  tabContent: {
+    width: '100%',
+    paddingHorizontal: 24,
+    paddingBottom: 32,
+  },
+  sectionContainer: {
+    marginBottom: 32,
+  },
+  stepsContainer: {
+    width: '100%',
+  },
+  stepContainer: {
+    marginBottom: 24,
+  },
+  stepHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  stepIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  stepInfo: {
+    flex: 1,
+  },
+  stepTitle: {
+    fontSize: 19,
+    fontWeight: 'bold',
+    color: '#1e3a5c',
+    marginBottom: 4,
+  },
+  timeBadge: {
+    backgroundColor: '#e6f9f0',
+    borderRadius: 12,
+    paddingVertical: 4,
+    paddingHorizontal: 12,
+  },
+  timeText: {
+    fontSize: 13,
+    fontWeight: 'bold',
+  },
+  stepDescription: {
+    fontSize: 15,
+    color: '#444',
+    lineHeight: 22,
+  },
+  stepDivider: {
+    height: 1,
+    marginVertical: 16,
+  },
+  tipsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  tipCard: {
+    width: (width - 60) / 2,
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  tipIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  tipTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  tipDescription: {
+    fontSize: 12,
+    color: '#6b7280',
+    textAlign: 'center',
+  },
+  emergencyTipsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  emergencyTip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    width: (width - 60) / 2, // Adjust for grid layout
+  },
+  emergencyTipText: {
+    fontSize: 14,
+    color: '#444',
+    marginLeft: 10,
+  },
+  comingSoonText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1f2937',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  comingSoonSubtext: {
+    fontSize: 16,
+    color: '#6b7280',
+    textAlign: 'center',
+    lineHeight: 22,
   },
 });
 
