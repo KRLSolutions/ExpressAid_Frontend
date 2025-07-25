@@ -8,21 +8,21 @@ import { AppDrawerParamList } from '../navigation/AppStack';
 import { useCart } from '../CartContext';
 
 const SYMPTOMS = [
-  { id: '1', emoji: '🌡️', title: 'Fever Check', price: 499, subtitle: 'Vitals, doctor call if needed', color: '#FFE4E1', iconColor: '#FF6B6B' },
-  { id: '2', emoji: '💉', title: 'Injection at Home', price: 499, subtitle: 'IM/IV injection with Rx', color: '#E8F5E8', iconColor: '#4CAF50' },
-  { id: '3', emoji: '❤️', title: 'Vitals Monitoring', price: 399, subtitle: 'BP, Pulse, Temperature', color: '#FFF3E0', iconColor: '#FF9800' },
-  { id: '4', emoji: '👴', title: 'Elderly Care', price: 799, subtitle: 'Bedridden, hygiene, mobility', color: '#F3E5F5', iconColor: '#9C27B0' },
-  { id: '5', emoji: '🩹', title: 'Wound Dressing', price: 599, subtitle: 'Surgical or injury dressing', color: '#FFF8E1', iconColor: '#FFC107' },
-  { id: '6', emoji: '💧', title: 'IV Drip Setup', price: 699, subtitle: 'With doctor\'s Rx', color: '#E3F2FD', iconColor: '#2196F3' },
-  { id: '7', emoji: '🩸', title: 'Blood Sample Collection', price: 399, subtitle: 'Partner with labs', color: '#FFEBEE', iconColor: '#F44336' },
-  { id: '8', emoji: '🧾', title: 'Family Wellness', price: 1999, subtitle: 'Annual health check-up visits education & life', color: '#E8F5E8', iconColor: '#4CAF50' },
-  { id: '9', emoji: '🧑‍🦽', title: 'Physiotherapy', price: 999, subtitle: 'At home physiotherapy sessions for pain relief, mobility and', color: '#F3E5F5', iconColor: '#9C27B0' },
-  { id: '10', emoji: '🔁', title: 'Catheter Change', price: 699, subtitle: 'Male/female catheter handling', color: '#E0F2F1', iconColor: '#009688' },
-  { id: '11', emoji: '🧻', title: 'Bedsore Care', price: 599, subtitle: 'Cleaning, dressing, turn support', color: '#FFF3E0', iconColor: '#FF9800' },
-  { id: '12', emoji: '🩺', title: 'Post-Surgery Recovery', price: 899, subtitle: 'Daily care, dressing, vitals', color: '#E8EAF6', iconColor: '#3F51B5' },
-  { id: '13', emoji: '🤰', title: 'Pregnancy Injection', price: 499, subtitle: 'Iron, TT, B12 as prescribed', color: '#FCE4EC', iconColor: '#E91E63' },
-  { id: '14', emoji: '👶', title: 'Newborn Check-Up', price: 499, subtitle: 'Infant vitals, hygiene, bath', color: '#E1F5FE', iconColor: '#00BCD4' },
-  { id: '15', emoji: '⚕️', title: 'Emergency First Response', price: 999, subtitle: 'Non-ICU prep until ambulance', color: '#FFEBEE', iconColor: '#F44336' },
+  { id: '1', emoji: '🌡️', title: 'Fever Check', price: 499, originalPrice: 899, subtitle: 'Vitals, doctor call if needed', color: '#FFE4E1', iconColor: '#FF6B6B' },
+  { id: '2', emoji: '💉', title: 'Injection at Home', price: 499, originalPrice: 799, subtitle: 'IM/IV injection with Rx', color: '#E8F5E8', iconColor: '#4CAF50' },
+  { id: '3', emoji: '❤️', title: 'Vitals Monitoring', price: 399, originalPrice: 699, subtitle: 'BP, Pulse, Temperature', color: '#FFF3E0', iconColor: '#FF9800' },
+  { id: '4', emoji: '👴', title: 'Elderly Care', price: 799, originalPrice: 1299, subtitle: 'Bedridden, hygiene, mobility', color: '#F3E5F5', iconColor: '#9C27B0' },
+  { id: '5', emoji: '🩹', title: 'Wound Dressing', price: 599, originalPrice: 899, subtitle: 'Surgical or injury dressing', color: '#FFF8E1', iconColor: '#FFC107' },
+  { id: '6', emoji: '💧', title: 'IV Drip Setup', price: 699, originalPrice: 1099, subtitle: 'With doctor\'s Rx', color: '#E3F2FD', iconColor: '#2196F3' },
+  { id: '7', emoji: '🩸', title: 'Blood Sample Collection', price: 399, originalPrice: 699, subtitle: 'Partner with labs', color: '#FFEBEE', iconColor: '#F44336' },
+  { id: '8', emoji: '🧾', title: 'Family Wellness', price: 1999, originalPrice: 3499, subtitle: 'Annual health check-up visits education & life', color: '#E8F5E8', iconColor: '#4CAF50' },
+  { id: '9', emoji: '🧑‍🦽', title: 'Physiotherapy', price: 999, originalPrice: 1599, subtitle: 'At home physiotherapy sessions for pain relief, mobility and', color: '#F3E5F5', iconColor: '#9C27B0' },
+  { id: '10', emoji: '🔁', title: 'Catheter Change', price: 699, originalPrice: 1099, subtitle: 'Male/female catheter handling', color: '#E0F2F1', iconColor: '#009688' },
+  { id: '11', emoji: '🧻', title: 'Bedsore Care', price: 599, originalPrice: 899, subtitle: 'Cleaning, dressing, turn support', color: '#FFF3E0', iconColor: '#FF9800' },
+  { id: '12', emoji: '🩺', title: 'Post-Surgery Recovery', price: 899, originalPrice: 1399, subtitle: 'Daily care, dressing, vitals', color: '#E8EAF6', iconColor: '#3F51B5' },
+  { id: '13', emoji: '🤰', title: 'Pregnancy Injection', price: 499, originalPrice: 799, subtitle: 'Iron, TT, B12 as prescribed', color: '#FCE4EC', iconColor: '#E91E63' },
+  { id: '14', emoji: '👶', title: 'Newborn Check-Up', price: 499, originalPrice: 799, subtitle: 'Infant vitals, hygiene, bath', color: '#E1F5FE', iconColor: '#00BCD4' },
+  { id: '15', emoji: '⚕️', title: 'Emergency First Response', price: 999, originalPrice: 1599, subtitle: 'Non-ICU prep until ambulance', color: '#FFEBEE', iconColor: '#F44336' },
 ];
 
 const { width } = Dimensions.get('window');
@@ -34,6 +34,7 @@ interface ServiceItem {
   emoji: string;
   title: string;
   price: number;
+  originalPrice: number;
   subtitle: string;
   color: string;
   iconColor: string;
@@ -151,7 +152,10 @@ const SymptomEntryScreen: React.FC = () => {
                 </View>
                 <Text style={styles.serviceTitle}>{item.title}</Text>
                 <Text style={styles.serviceSubtitle}>{item.subtitle}</Text>
-                <Text style={[styles.servicePrice, { color: item.iconColor }]}>₹{item.price}</Text>
+                <View style={styles.priceContainer}>
+                  <Text style={styles.originalPrice}>₹{item.originalPrice}</Text>
+                  <Text style={[styles.servicePrice, { color: item.iconColor }]}>₹{item.price}</Text>
+                </View>
                 
                 {qty > 0 && (
                   <View style={styles.quantityContainer}>
@@ -356,10 +360,22 @@ const styles = StyleSheet.create({
     lineHeight: 16,
     minHeight: 32,
   },
+  priceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+    gap: 8,
+  },
+  originalPrice: {
+    fontSize: 14,
+    color: '#94a3b8',
+    textDecorationLine: 'line-through',
+    textDecorationColor: '#94a3b8',
+  },
   servicePrice: {
     fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 8,
   },
   quantityContainer: {
     flexDirection: 'row',
