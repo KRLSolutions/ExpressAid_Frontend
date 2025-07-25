@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, FlatList, Dimensions, Pressable, Animated, Modal, StatusBar, Platform } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, FlatList, Dimensions, Pressable, Animated, Modal, StatusBar, Platform, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,25 +8,25 @@ import { AppDrawerParamList } from '../navigation/AppStack';
 import { useCart } from '../CartContext';
 
 const SYMPTOMS = [
-  { id: '1', emoji: '🌡️', title: 'Fever Check', price: 499, subtitle: 'Vitals, doctor call if needed' },
-  { id: '2', emoji: '💉', title: 'Injection at Home', price: 499, subtitle: 'IM/IV injection with Rx' },
-  { id: '3', emoji: '❤️', title: 'Vitals Monitoring', price: 399, subtitle: 'BP, Pulse, Temperature' },
-  { id: '4', emoji: '👴', title: 'Elderly Care', price: 799, subtitle: 'Bedridden, hygiene, mobility' },
-  { id: '5', emoji: '🩹', title: 'Wound Dressing', price: 599, subtitle: 'Surgical or injury dressing' },
-  { id: '6', emoji: '💧', title: 'IV Drip Setup', price: 699, subtitle: 'With doctor\'s Rx' },
-  { id: '7', emoji: '🩸', title: 'Blood Sample Collection', price: 399, subtitle: 'Partner with labs' },
-  { id: '8', emoji: '🧾', title: 'Family Wellness Packages', price: 1999, subtitle: 'Annual health check-up visits for all family members. Health education & lifestyle coaching.' },
-  { id: '9', emoji: '🧑‍🦽', title: 'Physiotherapy', price: 999, subtitle: 'At-home physiotherapy sessions for pain relief, mobility, and recovery.' },
-  { id: '10', emoji: '🔁', title: 'Catheter Change', price: 699, subtitle: 'Male/female catheter handling' },
-  { id: '11', emoji: '🧻', title: 'Bedsore Care', price: 599, subtitle: 'Cleaning, dressing, turn support' },
-  { id: '12', emoji: '🩺', title: 'Post-Surgery Recovery', price: 899, subtitle: 'Daily care, dressing, vitals' },
-  { id: '13', emoji: '🤰', title: 'Pregnancy Injection', price: 499, subtitle: 'Iron, TT, B12 as prescribed' },
-  { id: '14', emoji: '👶', title: 'Newborn Check-Up', price: 499, subtitle: 'Infant vitals, hygiene, bath' },
-  { id: '15', emoji: '⚕️', title: 'Emergency First Response', price: 999, subtitle: 'Non-ICU prep until ambulance' },
+  { id: '1', emoji: '🌡️', title: 'Fever Check', price: 499, subtitle: 'Vitals, doctor call if needed', color: '#FFE4E1', iconColor: '#FF6B6B' },
+  { id: '2', emoji: '💉', title: 'Injection at Home', price: 499, subtitle: 'IM/IV injection with Rx', color: '#E8F5E8', iconColor: '#4CAF50' },
+  { id: '3', emoji: '❤️', title: 'Vitals Monitoring', price: 399, subtitle: 'BP, Pulse, Temperature', color: '#FFF3E0', iconColor: '#FF9800' },
+  { id: '4', emoji: '👴', title: 'Elderly Care', price: 799, subtitle: 'Bedridden, hygiene, mobility', color: '#F3E5F5', iconColor: '#9C27B0' },
+  { id: '5', emoji: '🩹', title: 'Wound Dressing', price: 599, subtitle: 'Surgical or injury dressing', color: '#FFF8E1', iconColor: '#FFC107' },
+  { id: '6', emoji: '💧', title: 'IV Drip Setup', price: 699, subtitle: 'With doctor\'s Rx', color: '#E3F2FD', iconColor: '#2196F3' },
+  { id: '7', emoji: '🩸', title: 'Blood Sample Collection', price: 399, subtitle: 'Partner with labs', color: '#FFEBEE', iconColor: '#F44336' },
+  { id: '8', emoji: '🧾', title: 'Family Wellness', price: 1999, subtitle: 'Annual health check-up visits education & life', color: '#E8F5E8', iconColor: '#4CAF50' },
+  { id: '9', emoji: '🧑‍🦽', title: 'Physiotherapy', price: 999, subtitle: 'At home physiotherapy sessions for pain relief, mobility and', color: '#F3E5F5', iconColor: '#9C27B0' },
+  { id: '10', emoji: '🔁', title: 'Catheter Change', price: 699, subtitle: 'Male/female catheter handling', color: '#E0F2F1', iconColor: '#009688' },
+  { id: '11', emoji: '🧻', title: 'Bedsore Care', price: 599, subtitle: 'Cleaning, dressing, turn support', color: '#FFF3E0', iconColor: '#FF9800' },
+  { id: '12', emoji: '🩺', title: 'Post-Surgery Recovery', price: 899, subtitle: 'Daily care, dressing, vitals', color: '#E8EAF6', iconColor: '#3F51B5' },
+  { id: '13', emoji: '🤰', title: 'Pregnancy Injection', price: 499, subtitle: 'Iron, TT, B12 as prescribed', color: '#FCE4EC', iconColor: '#E91E63' },
+  { id: '14', emoji: '👶', title: 'Newborn Check-Up', price: 499, subtitle: 'Infant vitals, hygiene, bath', color: '#E1F5FE', iconColor: '#00BCD4' },
+  { id: '15', emoji: '⚕️', title: 'Emergency First Response', price: 999, subtitle: 'Non-ICU prep until ambulance', color: '#FFEBEE', iconColor: '#F44336' },
 ];
 
 const { width } = Dimensions.get('window');
-const CARD_WIDTH = (width - 56) / 3;
+const CARD_WIDTH = (width - 48) / 2; // Changed to 2 columns for better alignment
 
 // Define a type for service items
 interface ServiceItem {
@@ -35,6 +35,8 @@ interface ServiceItem {
   title: string;
   price: number;
   subtitle: string;
+  color: string;
+  iconColor: string;
 }
 
 const SymptomEntryScreen: React.FC = () => {
@@ -98,25 +100,34 @@ const SymptomEntryScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.bg}>
-      <View style={styles.topBar}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={26} color="#2563eb" style={{ fontWeight: 'bold' }} />
-        </TouchableOpacity>
-        <View style={{ flex: 1, alignItems: 'center', flexDirection: 'row', marginLeft: 8 }}>
-          <FontAwesome5 name="heartbeat" size={24} color="#2563eb" style={{ marginRight: 8 }} />
-          <View>
-            <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#2563eb', textAlign: 'center', textShadowColor: 'rgba(37,99,235,0.10)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 6, letterSpacing: 0.5 }}>Choose a Service</Text>
-            <Text style={{ fontSize: 14, color: '#555', marginTop: 2, fontWeight: '500', textAlign: 'center' }}>What do you need help with today?</Text>
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#f8fafc" />
+      
+      {/* Header Section */}
+      <View style={styles.header}>
+        <View style={styles.headerContent}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color="#333" />
+          </TouchableOpacity>
+          <View style={styles.headerTitleContainer}>
+            <View style={styles.logoContainer}>
+              <FontAwesome5 name="heartbeat" size={20} color="#2563eb" />
+            </View>
+            <View style={styles.titleContainer}>
+              <Text style={styles.mainTitle}>Choose a Service</Text>
+              <Text style={styles.subtitle}>What do you need help with today?</Text>
+            </View>
           </View>
         </View>
       </View>
-      <View style={{ height: 18 }} /> {/* Add vertical spacing below heading */}
+
+      {/* Services Grid */}
       <FlatList
         data={SYMPTOMS}
-        numColumns={3}
+        numColumns={2}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.grid}
+        contentContainerStyle={styles.gridContainer}
+        showsVerticalScrollIndicator={false}
         renderItem={({ item, index }: { item: ServiceItem; index: number }) => {
           const qty = cart.find(c => c.id === item.id)?.qty || 0;
           return (
@@ -125,24 +136,37 @@ const SymptomEntryScreen: React.FC = () => {
               transform: [{ scale: animValues[index].interpolate({ inputRange: [0, 1], outputRange: [0.95, 1] }) }],
             }}>
               <Pressable
-                style={({ pressed }) => [styles.cardModern, pressed && { backgroundColor: '#e0e7ff' }]}
+                style={({ pressed }) => [
+                  styles.serviceCard,
+                  { backgroundColor: item.color },
+                  pressed && { opacity: 0.8 }
+                ]}
                 onPress={() => {
                   setSelectedService(item as ServiceItem);
                   setModalVisible(true);
                 }}
               >
-                <Text style={styles.emoji}>{item.emoji}</Text>
-                <Text style={styles.cardTitle}>{item.title}</Text>
-                <Text style={styles.cardSubtitle}>{item.subtitle}</Text>
-                <Text style={styles.cardPrice}>₹{item.price}</Text>
+                <View style={[styles.iconContainer, { backgroundColor: item.iconColor }]}>
+                  <Text style={styles.serviceEmoji}>{item.emoji}</Text>
+                </View>
+                <Text style={styles.serviceTitle}>{item.title}</Text>
+                <Text style={styles.serviceSubtitle}>{item.subtitle}</Text>
+                <Text style={[styles.servicePrice, { color: item.iconColor }]}>₹{item.price}</Text>
+                
                 {qty > 0 && (
-                  <View style={styles.qtyRowModern}>
-                    <TouchableOpacity style={styles.qtyBtnModern} onPress={() => removeItem(item.id)}>
-                      <Ionicons name="remove" size={20} color="#fff" />
+                  <View style={styles.quantityContainer}>
+                    <TouchableOpacity 
+                      style={[styles.quantityButton, { backgroundColor: item.iconColor }]} 
+                      onPress={() => removeItem(item.id)}
+                    >
+                      <Ionicons name="remove" size={16} color="#fff" />
                     </TouchableOpacity>
-                    <Text style={styles.qtyTextModern}>{qty}</Text>
-                    <TouchableOpacity style={styles.qtyBtnModern} onPress={() => addItem({ id: item.id, emoji: item.emoji, title: item.title, subtitle: item.subtitle, price: item.price })}>
-                      <Ionicons name="add" size={20} color="#fff" />
+                    <Text style={styles.quantityText}>{qty}</Text>
+                                         <TouchableOpacity 
+                       style={[styles.quantityButton, { backgroundColor: item.iconColor }]} 
+                       onPress={() => addItem({ id: item.id, emoji: item.emoji, title: item.title, subtitle: item.subtitle, price: item.price })}
+                     >
+                      <Ionicons name="add" size={16} color="#fff" />
                     </TouchableOpacity>
                   </View>
                 )}
@@ -151,6 +175,7 @@ const SymptomEntryScreen: React.FC = () => {
           );
         }}
       />
+
       {/* Service Details Modal */}
       <Modal
         visible={modalVisible}
@@ -158,17 +183,19 @@ const SymptomEntryScreen: React.FC = () => {
         animationType="fade"
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.4)' }}>
-          <View style={{ backgroundColor: '#fff', borderRadius: 18, padding: 24, width: '85%', alignItems: 'center' }}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
             {selectedService && (
               <>
-                <Text style={{ fontSize: 38 }}>{selectedService.emoji}</Text>
-                <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 8 }}>{selectedService.title}</Text>
-                <Text style={{ fontSize: 15, color: '#2563eb', fontWeight: 'bold', marginBottom: 8 }}>₹{selectedService.price}</Text>
-                <Text style={{ fontSize: 15, color: '#444', marginBottom: 18, textAlign: 'center' }}>{SERVICE_DETAILS[selectedService.id]}</Text>
-                <View style={{ flexDirection: 'row', marginTop: 8 }}>
+                <View style={[styles.modalIconContainer, { backgroundColor: selectedService.iconColor }]}>
+                  <Text style={styles.modalEmoji}>{selectedService.emoji}</Text>
+                </View>
+                <Text style={styles.modalTitle}>{selectedService.title}</Text>
+                <Text style={[styles.modalPrice, { color: selectedService.iconColor }]}>₹{selectedService.price}</Text>
+                <Text style={styles.modalDescription}>{SERVICE_DETAILS[selectedService.id]}</Text>
+                <View style={styles.modalButtons}>
                   <TouchableOpacity
-                    style={{ backgroundColor: '#2563eb', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 22, marginRight: 12 }}
+                    style={[styles.modalButton, styles.addButton, { backgroundColor: selectedService.iconColor }]}
                     onPress={() => {
                       if (selectedService) {
                         addItem({ id: selectedService.id, emoji: selectedService.emoji, title: selectedService.title, subtitle: selectedService.subtitle, price: selectedService.price });
@@ -176,13 +203,13 @@ const SymptomEntryScreen: React.FC = () => {
                       setModalVisible(false);
                     }}
                   >
-                    <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>Add to Cart</Text>
+                    <Text style={styles.addButtonText}>Add to Cart</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={{ backgroundColor: '#eee', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 22 }}
+                    style={[styles.modalButton, styles.cancelButton]}
                     onPress={() => setModalVisible(false)}
                   >
-                    <Text style={{ color: '#2563eb', fontWeight: 'bold', fontSize: 16 }}>Cancel</Text>
+                    <Text style={styles.cancelButtonText}>Cancel</Text>
                   </TouchableOpacity>
                 </View>
               </>
@@ -190,8 +217,10 @@ const SymptomEntryScreen: React.FC = () => {
           </View>
         </View>
       </Modal>
+
+      {/* Cart Bar */}
       {cart.length > 0 && (
-        <Pressable ref={cartBarRef} style={styles.cartBar} onPress={goToCart} android_ripple={{ color: '#e0e7ff' }}>
+        <Pressable ref={cartBarRef} style={styles.cartBar} onPress={goToCart}>
           <Text style={styles.cartBarEmoji}>{cart[0]?.emoji}</Text>
           <Text style={styles.cartBarText}>View cart</Text>
           <Text style={styles.cartBarCount}>{getCount()} ITEM{getCount() > 1 ? 'S' : ''}</Text>
@@ -199,6 +228,7 @@ const SymptomEntryScreen: React.FC = () => {
           <Ionicons name="chevron-forward" size={20} color="#fff" style={{ marginLeft: 6 }} />
         </Pressable>
       )}
+
       {/* Fly-to-cart animation overlay */}
       {flyAnim && (
         <Animated.View style={{
@@ -211,11 +241,11 @@ const SymptomEntryScreen: React.FC = () => {
             { translateY: flyValue.interpolate({ inputRange: [0, 1], outputRange: [0, cartBarPos.y - flyAnim.y - 20] }) },
             { scale: flyValue.interpolate({ inputRange: [0, 1], outputRange: [1, 0.4] }) },
           ],
-        }}>
+                 }}>
           <Text style={{ fontSize: 38 }}>{flyAnim.emoji}</Text>
         </Animated.View>
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -225,151 +255,254 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8fafc',
   },
   header: {
-    paddingTop: Platform.OS === 'android' ? 60 : 80,
+    backgroundColor: '#f8fafc',
+    paddingTop: Platform.OS === 'ios' ? 50 : 50,
     paddingBottom: 20,
     paddingHorizontal: 20,
-    height: 120,
-    zIndex: 2,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0',
   },
   headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 48,
-    paddingLeft: 12,
-    paddingBottom: 12,
-    height: 90,
-    backgroundColor: '#fff',
-    zIndex: 2,
+    paddingTop: 10,
   },
-  backBtn: {
-    padding: 6,
-    backgroundColor: '#fff',
+  backButton: {
+    width: 40,
+    height: 40,
     borderRadius: 20,
-    borderWidth: 1.5,
-    borderColor: '#e0e7ef',
-    elevation: 6,
-    shadowColor: '#2563eb',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.13,
-    shadowRadius: 6,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 12,
-    width: 38,
-    height: 38,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  headerTitleContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logoContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    backgroundColor: '#dbeafe',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  titleContainer: {
+    flex: 1,
+  },
+  mainTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#1e293b',
+    marginBottom: 2,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#64748b',
+    fontWeight: '500',
+  },
+  gridContainer: {
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    paddingBottom: 180,
+  },
+  serviceCard: {
+    width: CARD_WIDTH,
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    margin: 6,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+  },
+  iconContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  serviceEmoji: {
+    fontSize: 28,
+  },
+  serviceTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1e293b',
+    textAlign: 'center',
+    marginBottom: 4,
+    lineHeight: 20,
+  },
+  serviceSubtitle: {
+    fontSize: 12,
+    color: '#64748b',
+    textAlign: 'center',
+    marginBottom: 8,
+    lineHeight: 16,
+    minHeight: 32,
+  },
+  servicePrice: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  quantityContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8fafc',
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  quantityButton: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  title: {
-    fontSize: 24,
+  quantityText: {
+    fontSize: 14,
     fontWeight: 'bold',
-    color: '#2563eb',
-    textAlign: 'left',
+    color: '#1e293b',
+    marginHorizontal: 8,
+    minWidth: 20,
+    textAlign: 'center',
+  },
+  modalOverlay: {
     flex: 1,
-  },
-  grid: {
-    paddingHorizontal: 12,
-    paddingBottom: 120,
-  },
-  cardModern: {
-    backgroundColor: '#f0f6ff',
-    borderRadius: 18,
-    margin: 4,
-    width: CARD_WIDTH,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
     alignItems: 'center',
-    padding: 14,
-    elevation: 8,
-    shadowColor: '#2563eb',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.13,
-    shadowRadius: 12,
-    borderWidth: 1,
-    borderColor: '#e0e7ff',
   },
-  emoji: {
-    fontSize: 38,
-    marginBottom: 8,
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 24,
+    width: '85%',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    elevation: 10,
   },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#222',
-    marginBottom: 2,
-    textAlign: 'center',
+  modalIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
   },
-  cardSubtitle: {
-    fontSize: 13,
-    color: '#64748b',
-    marginBottom: 6,
-    textAlign: 'center',
-    minHeight: 32,
+  modalEmoji: {
+    fontSize: 40,
   },
-  cardPrice: {
-    fontSize: 15,
-    color: '#2563eb',
+  modalTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
+    color: '#1e293b',
     marginBottom: 8,
+    textAlign: 'center',
   },
-  qtyRowModern: {
+  modalPrice: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 12,
+  },
+  modalDescription: {
+    fontSize: 14,
+    color: '#64748b',
+    textAlign: 'center',
+    marginBottom: 20,
+    lineHeight: 20,
+  },
+  modalButtons: {
     flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#2563eb',
-    borderRadius: 16,
-    marginTop: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+    gap: 12,
   },
-  qtyBtnModern: {
-    backgroundColor: '#1e40af',
+  modalButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
     borderRadius: 12,
-    padding: 4,
-    marginHorizontal: 2,
+    minWidth: 100,
+    alignItems: 'center',
   },
-  qtyTextModern: {
+  addButton: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  addButtonText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 15,
-    marginHorizontal: 6,
+    fontSize: 16,
+  },
+  cancelButton: {
+    backgroundColor: '#f1f5f9',
+  },
+  cancelButtonText: {
+    color: '#64748b',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   cartBar: {
     position: 'absolute',
-    left: width * 0.15,
-    right: width * 0.15,
-    bottom: 28,
+    left: 20,
+    right: 20,
+    bottom: 80,
     backgroundColor: '#2563eb',
-    borderRadius: 24,
+    borderRadius: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 7,
-    paddingHorizontal: 14,
-    elevation: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
     shadowColor: '#2563eb',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    minHeight: 38,
-    maxWidth: width * 0.7,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+    maxWidth: '90%',
     alignSelf: 'center',
   },
   cartBarEmoji: {
-    fontSize: 22,
-    marginRight: 7,
+    fontSize: 20,
+    marginRight: 8,
   },
   cartBarText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 15,
-    marginRight: 7,
+    fontSize: 16,
+    marginRight: 8,
   },
   cartBarCount: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 13,
-    marginRight: 7,
+    fontSize: 14,
+    marginRight: 8,
   },
   cartBarTotal: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 15,
+    fontSize: 16,
     marginRight: 4,
   },
 });
