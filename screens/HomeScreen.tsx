@@ -160,7 +160,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
   const articles = useMemo(() => [
     {
       id: '1',
-      emoji: '🛡️',
+      emoji: '🛡',
       title: '10 Ways to Boost Your Immunity Naturally',
       description: '10 Ways to Boost Your Immunity Naturally',
       link: 'https://www.healthline.com/health/how-to-boost-immune-system',
@@ -335,7 +335,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
     },
     {
       id: '10',
-      emoji: '🍽️',
+      emoji: '🍽',
       title: 'Mindful Eating: How to Develop a Healthier Relationship with Food',
       description: 'Mindful Eating: How to Develop a Healthier Relationship with Food',
       link: 'https://www.healthline.com/nutrition/mindful-eating-guide',
@@ -604,7 +604,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
             <TouchableOpacity onPress={openDrawer} style={styles.menuBtn}>
               <Ionicons name="menu" size={28} color="#222" />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.lightbulbBtn} onPress={() => setShowHowItWorksModal(true)}>
+            <TouchableOpacity style={styles.lightbulbBtn} onPress={() => setHowItWorksVisible(true)}>
               <MaterialCommunityIcons name="lightbulb-on-outline" size={28} color="#2563eb" />
             </TouchableOpacity>
           </View>
@@ -637,173 +637,175 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
         </View>
       </ScrollView>
 
-      {showHowItWorksModal && (
-        <View style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.35)', justifyContent: 'flex-end', zIndex: 9999 }}>
-          <View style={{ backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, width: '100%', alignItems: 'center', elevation: 12, shadowColor: '#000', shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.18, shadowRadius: 12 }}>
-            {/* Heading */}
-            <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#2563eb', marginBottom: 18 }}>How The App Works?</Text>
-            {/* Tab Bar - Only Nursing */}
-            <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 16 }}>
-              <View
-                style={{
-                  paddingVertical: 8,
-                  paddingHorizontal: 18,
-                  borderRadius: 20,
-                  backgroundColor: '#2563eb',
-                  marginHorizontal: 6,
-                }}
-              >
-                <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 14 }}>Nursing</Text>
+      <>
+        {howItWorksVisible && (
+          <View style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.35)', justifyContent: 'flex-end', zIndex: 9999 }}>
+            <View style={{ backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, width: '100%', alignItems: 'center', elevation: 12, shadowColor: '#000', shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.18, shadowRadius: 12 }}>
+              {/* Heading */}
+              <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#2563eb', marginBottom: 18 }}>How The App Works?</Text>
+              {/* Tab Bar - Only Nursing */}
+              <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 16 }}>
+                <View
+                  style={{
+                    paddingVertical: 8,
+                    paddingHorizontal: 18,
+                    borderRadius: 20,
+                    backgroundColor: '#2563eb',
+                    marginHorizontal: 6,
+                  }}
+                >
+                  <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 14 }}>Nursing</Text>
+                </View>
               </View>
-            </View>
-            <ScrollView style={{ width: '100%' }} contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 32 }} showsVerticalScrollIndicator={false}>
-              {/* Step 1 */}
-              <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 24 }}>
-                <View style={{ width: 44, alignItems: 'center' }}>
-                  <View style={{ backgroundColor: '#e6f9f0', borderRadius: 22, padding: 8, marginBottom: 2 }}>
-                    <MaterialCommunityIcons name="calendar-plus" size={26} color="#1e824c" />
+              <ScrollView style={{ width: '100%' }} contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 32 }} showsVerticalScrollIndicator={false}>
+                {/* Step 1 */}
+                <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 24 }}>
+                  <View style={{ width: 44, alignItems: 'center' }}>
+                    <View style={{ backgroundColor: '#e6f9f0', borderRadius: 22, padding: 8, marginBottom: 2 }}>
+                      <MaterialCommunityIcons name="calendar-plus" size={26} color="#1e824c" />
+                    </View>
+                    <View style={{ width: 2, height: 38, backgroundColor: '#1e824c', marginVertical: 2 }} />
                   </View>
-                  <View style={{ width: 2, height: 38, backgroundColor: '#1e824c', marginVertical: 2 }} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontWeight: 'bold', fontSize: 19, color: '#1e3a5c' }}>Book a Home Nurse</Text>
+                    <Text style={{ color: '#444', fontSize: 16, marginTop: 2, lineHeight: 22 }}>
+                      • Choose your location and required service{"\n"}
+                      • Share your care needs and preferences{"\n"}• Submit your request in seconds
+                    </Text>
+                  </View>
+                  <View style={{ alignItems: 'center', marginLeft: 8 }}>
+                    <View style={{ backgroundColor: '#e6f9f0', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 4 }}>
+                      <Text style={{ color: '#1e824c', fontWeight: 'bold', fontSize: 17 }}>~5 <Text style={{ fontSize: 13, color: '#888' }}>min</Text></Text>
+                    </View>
+                  </View>
                 </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontWeight: 'bold', fontSize: 19, color: '#1e3a5c' }}>Book a Home Nurse</Text>
-                  <Text style={{ color: '#444', fontSize: 16, marginTop: 2, lineHeight: 22 }}>
-                    • Choose your location and required service{"\n"}
-                    • Share your care needs and preferences{"\n"}• Submit your request in seconds
-                  </Text>
-                </View>
-                <View style={{ alignItems: 'center', marginLeft: 8 }}>
-                  <View style={{ backgroundColor: '#e6f9f0', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 4 }}>
+                {/* Step 2 */}
+                <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 24 }}>
+                  <View style={{ width: 44, alignItems: 'center' }}>
+                    <View style={{ backgroundColor: '#e6f9f0', borderRadius: 22, padding: 8, marginBottom: 2 }}>
+                      <MaterialCommunityIcons name="account-check-outline" size={26} color="#1e824c" />
+                    </View>
+                    <View style={{ width: 2, height: 38, backgroundColor: '#1e824c', marginVertical: 2 }} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontWeight: 'bold', fontSize: 19, color: '#1e3a5c' }}>Get Matched with a Nurse</Text>
+                    <Text style={{ color: '#444', fontSize: 16, marginTop: 2, lineHeight: 22 }}>
+                      • We quickly find the best nurse for your needs{"\n"}• Review nurse profile and confirm your choice
+                    </Text>
+                  </View>
+                  <View style={{ alignItems: 'center', marginLeft: 8 }}>
+                    <View style={{ backgroundColor: '#e6f9f0', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 4 }}>
                     <Text style={{ color: '#1e824c', fontWeight: 'bold', fontSize: 17 }}>~5 <Text style={{ fontSize: 13, color: '#888' }}>min</Text></Text>
+                    </View>
                   </View>
                 </View>
-              </View>
-              {/* Step 2 */}
-              <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 24 }}>
-                <View style={{ width: 44, alignItems: 'center' }}>
-                  <View style={{ backgroundColor: '#e6f9f0', borderRadius: 22, padding: 8, marginBottom: 2 }}>
-                    <MaterialCommunityIcons name="account-check-outline" size={26} color="#1e824c" />
+                {/* Step 3 */}
+                <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 24 }}>
+                  <View style={{ width: 44, alignItems: 'center' }}>
+                    <View style={{ backgroundColor: '#e6f9f0', borderRadius: 22, padding: 8, marginBottom: 2 }}>
+                      <MaterialCommunityIcons name="handshake-outline" size={26} color="#1e824c" />
+                    </View>
+                    <View style={{ width: 2, height: 38, backgroundColor: '#1e824c', marginVertical: 2 }} />
                   </View>
-                  <View style={{ width: 2, height: 38, backgroundColor: '#1e824c', marginVertical: 2 }} />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontWeight: 'bold', fontSize: 19, color: '#1e3a5c' }}>Get Matched with a Nurse</Text>
-                  <Text style={{ color: '#444', fontSize: 16, marginTop: 2, lineHeight: 22 }}>
-                    • We quickly find the best nurse for your needs{"\n"}• Review nurse profile and confirm your choice
-                  </Text>
-                </View>
-                <View style={{ alignItems: 'center', marginLeft: 8 }}>
-                  <View style={{ backgroundColor: '#e6f9f0', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 4 }}>
-                  <Text style={{ color: '#1e824c', fontWeight: 'bold', fontSize: 17 }}>~5 <Text style={{ fontSize: 13, color: '#888' }}>min</Text></Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontWeight: 'bold', fontSize: 19, color: '#1e3a5c' }}>Receive Quality Care at Home</Text>
+                    <Text style={{ color: '#444', fontSize: 16, marginTop: 2, lineHeight: 22 }}>
+                      • Your nurse arrives at your location{"\n"}• Care is delivered as per your plan and needs
+                    </Text>
                   </View>
                 </View>
-              </View>
-              {/* Step 3 */}
-              <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 24 }}>
-                <View style={{ width: 44, alignItems: 'center' }}>
-                  <View style={{ backgroundColor: '#e6f9f0', borderRadius: 22, padding: 8, marginBottom: 2 }}>
-                    <MaterialCommunityIcons name="handshake-outline" size={26} color="#1e824c" />
+                {/* Step 4 */}
+                <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8 }}>
+                  <View style={{ width: 44, alignItems: 'center' }}>
+                    <View style={{ backgroundColor: '#e6f9f0', borderRadius: 22, padding: 8, marginBottom: 2 }}>
+                      <MaterialCommunityIcons name="currency-inr" size={26} color="#1e824c" />
+                    </View>
                   </View>
-                  <View style={{ width: 2, height: 38, backgroundColor: '#1e824c', marginVertical: 2 }} />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontWeight: 'bold', fontSize: 19, color: '#1e3a5c' }}>Receive Quality Care at Home</Text>
-                  <Text style={{ color: '#444', fontSize: 16, marginTop: 2, lineHeight: 22 }}>
-                    • Your nurse arrives at your location{"\n"}• Care is delivered as per your plan and needs
-                  </Text>
-                </View>
-              </View>
-              {/* Step 4 */}
-              <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8 }}>
-                <View style={{ width: 44, alignItems: 'center' }}>
-                  <View style={{ backgroundColor: '#e6f9f0', borderRadius: 22, padding: 8, marginBottom: 2 }}>
-                    <MaterialCommunityIcons name="currency-inr" size={26} color="#1e824c" />
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontWeight: 'bold', fontSize: 19, color: '#1e3a5c' }}>Pay Easily & Enjoy Peace of Mind</Text>
+                    <Text style={{ color: '#444', fontSize: 16, marginTop: 2, lineHeight: 22 }}>
+                      • Pay securely when your service starts
+                    </Text>
                   </View>
                 </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontWeight: 'bold', fontSize: 19, color: '#1e3a5c' }}>Pay Easily & Enjoy Peace of Mind</Text>
-                  <Text style={{ color: '#444', fontSize: 16, marginTop: 2, lineHeight: 22 }}>
-                    • Pay securely when your service starts
-                  </Text>
-                </View>
-              </View>
-              <TouchableOpacity style={{ alignSelf: 'center', marginVertical: 18, marginBottom: 12 }} onPress={() => setHowItWorksVisible(false)}>
-                <Text style={{ color: '#888', fontSize: 18, fontWeight: 'bold' }}>Close</Text>
-              </TouchableOpacity>
-            </ScrollView>
+                <TouchableOpacity style={{ alignSelf: 'center', marginVertical: 18, marginBottom: 12 }} onPress={() => setHowItWorksVisible(false)}>
+                  <Text style={{ color: '#888', fontSize: 18, fontWeight: 'bold' }}>Close</Text>
+                </TouchableOpacity>
+              </ScrollView>
+            </View>
           </View>
-        </View>
-      </Modal>
-      {/* View Active Order Bar above the cart bar */}
-      <ViewActiveOrderBar navigation={navigation} style={{ height: 40, paddingVertical: 0 }} textStyle={{ fontSize: 14 }} />
-      {/* View Cart Bar at the bottom if cart has items */}
-      <ViewCartBar navigation={navigation} style={{ height: 40, paddingVertical: 0 }} textStyle={{ fontSize: 14 }} />
-      <Modal
-        visible={locationModalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setLocationModalVisible(false)}
-      >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center' }}>
-          <View style={{ backgroundColor: '#fff', borderRadius: 16, padding: 28, width: '80%', alignItems: 'center' }}>
-            <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 12 }}>{t('location_required')}</Text>
-            <Text style={{ fontSize: 16, color: '#444', textAlign: 'center', marginBottom: 24 }}>
-              {locationPermissionPermanentlyDenied
-                ? t('location_access_permanently_denied')
-                : t('location_access_message')}
-            </Text>
-            {locationPermissionPermanentlyDenied ? (
+        )}
+        {/* View Active Order Bar above the cart bar */}
+        <ViewActiveOrderBar navigation={navigation} style={{ height: 40, paddingVertical: 0 }} textStyle={{ fontSize: 14 }} />
+        {/* View Cart Bar at the bottom if cart has items */}
+        <ViewCartBar navigation={navigation} style={{ height: 40, paddingVertical: 0 }} textStyle={{ fontSize: 14 }} />
+        <Modal
+          visible={locationModalVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setLocationModalVisible(false)}
+        >
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center' }}>
+            <View style={{ backgroundColor: '#fff', borderRadius: 16, padding: 28, width: '80%', alignItems: 'center' }}>
+              <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 12 }}>{t('location_required')}</Text>
+              <Text style={{ fontSize: 16, color: '#444', textAlign: 'center', marginBottom: 24 }}>
+                {locationPermissionPermanentlyDenied
+                  ? t('location_access_permanently_denied')
+                  : t('location_access_message')}
+              </Text>
+              {locationPermissionPermanentlyDenied ? (
+                <TouchableOpacity
+                  style={{ backgroundColor: '#2563eb', borderRadius: 12, paddingVertical: 12, paddingHorizontal: 32, marginBottom: 12 }}
+                  onPress={() => {
+                    setLocationModalVisible(false);
+                    Linking.openSettings();
+                  }}
+                >
+                  <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>{t('open_settings')}</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={{ backgroundColor: '#2563eb', borderRadius: 12, paddingVertical: 12, paddingHorizontal: 32, marginBottom: 12 }}
+                  onPress={() => {
+                    setLocationModalVisible(false);
+                    requestLocation();
+                  }}
+                >
+                  <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>{t('retry')}</Text>
+                </TouchableOpacity>
+              )}
               <TouchableOpacity
-                style={{ backgroundColor: '#2563eb', borderRadius: 12, paddingVertical: 12, paddingHorizontal: 32, marginBottom: 12 }}
+                style={{ backgroundColor: '#fff', borderRadius: 12, paddingVertical: 12, paddingHorizontal: 32, borderWidth: 1, borderColor: '#2563eb' }}
                 onPress={() => {
                   setLocationModalVisible(false);
-                  Linking.openSettings();
                 }}
               >
-                <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>{t('open_settings')}</Text>
+                <Text style={{ color: '#2563eb', fontWeight: 'bold', fontSize: 16 }}>{t('close')}</Text>
               </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                style={{ backgroundColor: '#2563eb', borderRadius: 12, paddingVertical: 12, paddingHorizontal: 32, marginBottom: 12 }}
-                onPress={() => {
-                  setLocationModalVisible(false);
-                  requestLocation();
-                }}
-              >
-                <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>{t('retry')}</Text>
+            </View>
+          </View>
+        </Modal>
+        <Modal
+          visible={hospitalMapVisible}
+          animationType="slide"
+          onRequestClose={() => setHospitalMapVisible(false)}
+        >
+          <View style={{ flex: 1, backgroundColor: '#fff' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#e0e0e0' }}>
+              <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{t('nearby_hospitals')}</Text>
+              <TouchableOpacity onPress={() => setHospitalMapVisible(false)}>
+                <Text style={{ fontSize: 24, color: '#666' }}>×</Text>
               </TouchableOpacity>
-            )}
-            <TouchableOpacity
-              style={{ backgroundColor: '#fff', borderRadius: 12, paddingVertical: 12, paddingHorizontal: 32, borderWidth: 1, borderColor: '#2563eb' }}
-              onPress={() => {
-                setLocationModalVisible(false);
-              }}
-            >
-              <Text style={{ color: '#2563eb', fontWeight: 'bold', fontSize: 16 }}>{t('close')}</Text>
-            </TouchableOpacity>
+            </View>
+            <WebView
+              source={{ uri: getHospitalMapUrl() }}
+              style={{ flex: 1 }}
+              javaScriptEnabled={true}
+              domStorageEnabled={true}
+            />
           </View>
-        </View>
-      </Modal>
-      <Modal
-        visible={hospitalMapVisible}
-        animationType="slide"
-        onRequestClose={() => setHospitalMapVisible(false)}
-      >
-        <View style={{ flex: 1, backgroundColor: '#fff' }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#e0e0e0' }}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{t('nearby_hospitals')}</Text>
-            <TouchableOpacity onPress={() => setHospitalMapVisible(false)}>
-              <Text style={{ fontSize: 24, color: '#666' }}>×</Text>
-            </TouchableOpacity>
-          </View>
-          <WebView
-            source={{ uri: getHospitalMapUrl() }}
-            style={{ flex: 1 }}
-            javaScriptEnabled={true}
-            domStorageEnabled={true}
-          />
-        </View>
-      </Modal>
+        </Modal>
+      </>
     </SafeAreaView>
   );
 };
@@ -932,4 +934,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen; 
+export default HomeScreen;
