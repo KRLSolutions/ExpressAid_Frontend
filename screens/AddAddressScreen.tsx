@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, Dimensions, Modal,
 import * as Location from 'expo-location';
 import MapView, { Marker, Region } from 'react-native-maps';
 import apiService from '../services/api';
+import { autoFillAddressFields } from '../utils/addressUtils';
 
 const { width } = Dimensions.get('window');
 
@@ -100,7 +101,7 @@ const AddAddressScreen = ({ navigation }: any) => {
     setDetailsModalVisible(true);
   };
 
-  // Save address handler
+  // Save address handler with auto-fill functionality
   const handleSaveAddress = async () => {
     try {
       // Validation: require houseNumber, floor, name, addressType, and location
@@ -124,33 +125,78 @@ const AddAddressScreen = ({ navigation }: any) => {
         Alert.alert('Error', 'Please select address type (Home, Work, etc.)');
         return;
       }
+
       // Compose address string
       const details = `${houseNumber ? houseNumber + ', ' : ''}${floor ? 'Floor ' + floor + ', ' : ''}${tower ? tower + ', ' : ''}${landmark ? landmark + ', ' : ''}${addressType}`;
-      const addressData = {
+      
+      // Create initial address data
+      const initialAddressData = {
         name: name || (orderingFor === 'Myself' ? 'My Address' : 'Recipient'),
         address: address || details,
         type: addressType.toLowerCase(),
         latitude: location.latitude,
         longitude: location.longitude,
+        houseNumber: houseNumber || '',
+        floor: floor || '',
+        block: tower || '',
         landmark: landmark || '',
         city: '',
         state: '',
         pincode: '',
         isDefault: true // Set as default address
       };
-      console.log('Saving address to backend:', addressData);
-      const response = await apiService.addAddress(addressData);
-      console.log('Address saved successfully:', response);
+
+      console.log('📍 Initial address data:', initialAddressData);
+
+      // Auto-fill missing address fields
+      const filledAddressData = await autoFillAddressFields(initialAddressData);
+      
+      console.log('✅ Auto-filled address data:', filledAddressData);
+
+      // Show user what was auto-filled
+      const autoFilledFields = [];
+      if (filledAddressData.city && !initialAddressData.city) {
+        autoFilledFields.push(`City: ${filledAddressData.city}`);
+      }
+      if (filledAddressData.state && !initialAddressData.state) {
+        autoFilledFields.push(`State: ${filledAddressData.state}`);
+      }
+      if (filledAddressData.pincode && !initialAddressData.pincode) {
+        autoFilledFields.push(`Pincode: ${filledAddressData.pincode}`);
+      }
+      if (filledAddressData.landmark && !initialAddressData.landmark) {
+        autoFilledFields.push(`Landmark: ${filledAddressData.landmark}`);
+      }
+      if (filledAddressData.block && !initialAddressData.block) {
+        autoFilledFields.push(`Block: ${filledAddressData.block}`);
+      }
+
+      if (autoFilledFields.length > 0) {
+        console.log('🔧 Auto-filled fields:', autoFilledFields);
+      }
+
+      // Save the enhanced address data
+      console.log('💾 Saving enhanced address to backend:', filledAddressData);
+      const response = await apiService.addAddress(filledAddressData);
+      console.log('✅ Address saved successfully:', response);
+      
       setSavedAddress({
-        name: addressData.name,
-        details: addressData.address,
+        name: filledAddressData.name,
+        details: filledAddressData.address,
       });
       setDetailsModalVisible(false);
-      Alert.alert('Success', 'Address saved successfully!');
+      
+      // Show success message with auto-filled info
+      const successMessage = autoFilledFields.length > 0 
+        ? `Address saved successfully!\n\nAuto-filled fields:\n${autoFilledFields.join('\n')}`
+        : 'Address saved successfully!';
+      
+      Alert.alert('Success', successMessage);
+      
       // Navigate back or to next screen
       navigation.goBack();
     } catch (error) {
-      console.error('Error saving address:', error);
+      console.error('❌ Error saving address:', error);
       Alert.alert('Error', 'Failed to save address. Please try again.');
     }
   };

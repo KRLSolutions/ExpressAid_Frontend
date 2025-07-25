@@ -228,8 +228,6 @@ class ApiService {
       method: 'POST',
       body: JSON.stringify(addressData),
     });
-    // Clear addresses cache after adding new address
-    this.clearCache('/users/addresses');
     return response;
   }
 
@@ -238,8 +236,6 @@ class ApiService {
       method: 'PUT',
       body: JSON.stringify(addressData),
     });
-    // Clear addresses cache after updating
-    this.clearCache('/users/addresses');
     return response;
   }
 
@@ -247,8 +243,6 @@ class ApiService {
     const response = await this.request(`/users/addresses/${addressId}`, {
       method: 'DELETE',
     });
-    // Clear addresses cache after deleting
-    this.clearCache('/users/addresses');
     return response;
   }
 
@@ -256,8 +250,6 @@ class ApiService {
     const response = await this.request(`/users/addresses/${addressId}/default`, {
       method: 'PATCH',
     });
-    // Clear addresses cache after setting default
-    this.clearCache('/users/addresses');
     return response;
   }
 
@@ -419,6 +411,28 @@ class ApiService {
       method: 'POST',
       body: JSON.stringify({ paymentSessionId, paymentMethod }),
     });
+  }
+
+  // Reverse geocoding to auto-fill address fields
+  async reverseGeocode(latitude, longitude) {
+    console.log('🌍 Frontend reverse geocoding request for:', { latitude, longitude });
+    
+    const response = await fetch(`${this.baseURL}/places/reverse-geocode`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ latitude, longitude }),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to reverse geocode location');
+    }
+    
+    const data = await response.json();
+    console.log('🌍 Reverse geocoding response:', data);
+    return data.address;
   }
 }
 
