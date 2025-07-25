@@ -8,6 +8,8 @@ import { useCart, useActiveOrder } from '../CartContext';
 import ViewCartBar from '../components/ViewCartBar';
 import { fetchAndSetCart } from '../hooks/useCartInitialization';
 import ViewActiveOrderBar from '../components/ViewActiveOrderBar';
+import AnimatedChatbot from '../components/AnimatedChatbot';
+import ChatbotModal from '../components/ChatbotModal';
 import * as Location from 'expo-location';
 import { useUserStore } from '../store/userStore';
 import { WebView } from 'react-native-webview';
@@ -41,6 +43,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
   const [languageModalVisible, setLanguageModalVisible] = React.useState(false);
   const [locationPermissionPermanentlyDenied, setLocationPermissionPermanentlyDenied] = React.useState(false);
   const [howItWorksVisible, setHowItWorksVisible] = React.useState(false);
+  const [chatbotVisible, setChatbotVisible] = React.useState(false);
   
   // Optimize cart polling with better state management
   const setCartRef = React.useRef(setCart);
@@ -135,6 +138,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
       // alert('No active order to track');
     }
   }, [activeOrder, navigation]);
+
+  const handleChatbotOpen = React.useCallback(() => {
+    setChatbotVisible(true);
+  }, []);
 
   const openHospitalInMaps = React.useCallback(() => {
     if (!location) {
@@ -769,6 +776,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
             </View>
           </View>
         )}
+        {/* Animated Chatbot */}
+        <AnimatedChatbot onChatOpen={handleChatbotOpen} />
+        
+        {/* Chatbot Modal */}
+        <ChatbotModal 
+          visible={chatbotVisible} 
+          onClose={() => setChatbotVisible(false)} 
+        />
+        
         {/* View Active Order Bar above the cart bar */}
         <ViewActiveOrderBar navigation={navigation} style={{ height: 40, paddingVertical: 0 }} textStyle={{ fontSize: 14 }} />
         {/* View Cart Bar at the bottom if cart has items */}
