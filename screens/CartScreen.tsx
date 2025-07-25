@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, ScrollView, SafeAreaView, Alert, ActivityIndicator, Image, Linking, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -38,6 +38,13 @@ const CartScreen: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState('phonepe');
   const [selectedAddress, setSelectedAddress] = useState<any>(null); // Local address state with proper typing
   // Remove isFetching state
+
+  // Clear selectedAddress when cart becomes empty
+  useEffect(() => {
+    if (cart.length === 0) {
+      setSelectedAddress(null);
+    }
+  }, [cart.length]);
 
   // Calculate after-hours charge
   const afterHoursCharge = getAfterHoursCharge();
