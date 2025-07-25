@@ -41,7 +41,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
   const [languageModalVisible, setLanguageModalVisible] = React.useState(false);
   const [locationPermissionPermanentlyDenied, setLocationPermissionPermanentlyDenied] = React.useState(false);
   const [howItWorksVisible, setHowItWorksVisible] = React.useState(false);
-  const [howItWorksTab, setHowItWorksTab] = React.useState<'Nursing' | 'Caregiving' | 'Equipments'>('Nursing');
   
   // Optimize cart polling with better state management
   const setCartRef = React.useRef(setCart);
@@ -679,172 +678,94 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
               <View style={styles.modalHeader}>
                 <View style={styles.modalHeaderContent}>
                   <MaterialCommunityIcons name="lightbulb-on" size={28} color="#2563eb" />
-                  <Text style={styles.modalTitle}>Health Tips & How It Works</Text>
+                  <Text style={styles.modalTitle}>How ExpressAid Works</Text>
                 </View>
                 <TouchableOpacity 
                   style={styles.closeButton} 
                   onPress={() => setHowItWorksVisible(false)}
                 >
-                  <Ionicons name="close" size={24} color="#6b7280" />
-                </TouchableOpacity>
-              </View>
-
-              {/* Tab Navigation */}
-              <View style={styles.tabContainer}>
-                                 <TouchableOpacity 
-                   style={[styles.tabButton, styles.activeTabButton]}
-                   onPress={() => setHowItWorksTab('Nursing')}
-                 >
-                   <MaterialCommunityIcons name="stethoscope" size={20} color="#2563eb" />
-                   <Text style={styles.activeTabText}>Nursing</Text>
-                 </TouchableOpacity>
-                <TouchableOpacity 
-                  style={styles.tabButton}
-                  onPress={() => setHowItWorksTab('Caregiving')}
-                >
-                  <MaterialCommunityIcons name="account-heart" size={20} color="#6b7280" />
-                  <Text style={styles.tabText}>Caregiving</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={styles.tabButton}
-                  onPress={() => setHowItWorksTab('Equipments')}
-                >
-                  <MaterialCommunityIcons name="medical-bag" size={20} color="#6b7280" />
-                  <Text style={styles.tabText}>Equipment</Text>
+                  <Ionicons name="close" size={20} color="#6b7280" />
                 </TouchableOpacity>
               </View>
 
               <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={false}>
-                {howItWorksTab === 'Nursing' && (
-                  <View style={styles.tabContent}>
-                    {/* How It Works Steps */}
-                    <View style={styles.sectionContainer}>
-                      <Text style={styles.sectionTitle}>How Nursing Service Works</Text>
-                      <View style={styles.stepsContainer}>
-                        {[
-                          {
-                            icon: 'calendar-plus',
-                            title: 'Book a Home Nurse',
-                            description: 'Choose your location and required service. Share your care needs and preferences. Submit your request in seconds.',
-                            time: '~5 min',
-                            color: '#10b981'
-                          },
-                          {
-                            icon: 'account-check-outline',
-                            title: 'Get Matched with a Nurse',
-                            description: 'We quickly find the best nurse for your needs. Review nurse profile and confirm your choice.',
-                            time: '~5 min',
-                            color: '#3b82f6'
-                          },
-                          {
-                            icon: 'handshake-outline',
-                            title: 'Receive Quality Care at Home',
-                            description: 'Your nurse arrives at your location. Care is delivered as per your plan and needs.',
-                            time: '~10 min',
-                            color: '#f59e0b'
-                          },
-                          {
-                            icon: 'currency-inr',
-                            title: 'Pay Easily & Enjoy Peace of Mind',
-                            description: 'Pay securely when your service starts. Multiple payment options available.',
-                            time: 'Instant',
-                            color: '#8b5cf6'
-                          }
-                        ].map((step, index) => (
-                          <View key={index} style={styles.stepContainer}>
-                            <View style={styles.stepHeader}>
-                              <View style={[styles.stepIcon, { backgroundColor: step.color + '20' }]}>
-                                <MaterialCommunityIcons name={step.icon as any} size={24} color={step.color} />
-                              </View>
-                              <View style={styles.stepInfo}>
-                                <Text style={styles.stepTitle}>{step.title}</Text>
-                                <View style={styles.timeBadge}>
-                                  <Text style={[styles.timeText, { color: step.color }]}>{step.time}</Text>
-                                </View>
+                <View style={styles.tabContent}>
+                  {/* How It Works Steps */}
+                  <View style={styles.sectionContainer}>
+                    <Text style={styles.sectionTitle}>How ExpressAid Works</Text>
+                    <View style={styles.stepsContainer}>
+                      {[
+                        {
+                          icon: 'calendar-plus',
+                          title: 'Book a Home Nurse',
+                          description: 'Choose your location and required service. Share your care needs and preferences. Submit your request in seconds.',
+                          time: '~5 min',
+                          color: '#10b981'
+                        },
+                        {
+                          icon: 'account-check-outline',
+                          title: 'Get Matched with a Nurse',
+                          description: 'We quickly find the best nurse for your needs. Review nurse profile and confirm your choice.',
+                          time: '~5 min',
+                          color: '#3b82f6'
+                        },
+                        {
+                          icon: 'handshake-outline',
+                          title: 'Receive Quality Care at Home',
+                          description: 'Your nurse arrives at your location. Care is delivered as per your plan and needs.',
+                          time: '~10 min',
+                          color: '#f59e0b'
+                        },
+                        {
+                          icon: 'currency-inr',
+                          title: 'Pay Easily & Enjoy Peace of Mind',
+                          description: 'Pay securely when your service starts. Multiple payment options available.',
+                          time: 'Instant',
+                          color: '#8b5cf6'
+                        }
+                      ].map((step, index) => (
+                        <View key={index} style={styles.stepContainer}>
+                          <View style={styles.stepHeader}>
+                            <View style={[styles.stepIcon, { backgroundColor: step.color + '20' }]}>
+                              <MaterialCommunityIcons name={step.icon as any} size={24} color={step.color} />
+                            </View>
+                            <View style={styles.stepInfo}>
+                              <Text style={styles.stepTitle}>{step.title}</Text>
+                              <View style={styles.timeBadge}>
+                                <Text style={[styles.timeText, { color: step.color }]}>{step.time}</Text>
                               </View>
                             </View>
-                            <Text style={styles.stepDescription}>{step.description}</Text>
-                            {index < 3 && <View style={[styles.stepDivider, { backgroundColor: step.color + '30' }]} />}
                           </View>
-                        ))}
-                      </View>
+                          <Text style={styles.stepDescription}>{step.description}</Text>
+                          {index < 3 && <View style={[styles.stepDivider, { backgroundColor: step.color + '30' }]} />}
+                        </View>
+                      ))}
                     </View>
+                  </View>
 
-                    {/* Health Tips */}
-                    <View style={styles.sectionContainer}>
-                      <Text style={styles.sectionTitle}>Daily Health Tips</Text>
-                      <View style={styles.tipsGrid}>
-                        {[
-                          {
-                            icon: 'cup-water',
-                            title: 'Stay Hydrated',
-                            description: 'Drink 8-10 glasses of water daily for better health and recovery',
-                            color: '#3b82f6'
-                          },
-                          {
-                            icon: 'run',
-                            title: 'Light Exercise',
-                            description: 'Gentle walking or stretching helps with circulation and mood',
-                            color: '#10b981'
-                          },
-                          {
-                            icon: 'sleep',
-                            title: 'Quality Sleep',
-                            description: '7-9 hours of sleep improves healing and immune function',
-                            color: '#8b5cf6'
-                          },
-                          {
-                            icon: 'food-apple',
-                            title: 'Balanced Diet',
-                            description: 'Include fruits, vegetables, and proteins in your daily meals',
-                            color: '#f59e0b'
-                          }
-                        ].map((tip, index) => (
-                          <View key={index} style={styles.tipCard}>
-                            <View style={[styles.tipIcon, { backgroundColor: tip.color + '20' }]}>
-                              <MaterialCommunityIcons name={tip.icon as any} size={20} color={tip.color} />
-                            </View>
-                            <Text style={styles.tipTitle}>{tip.title}</Text>
-                            <Text style={styles.tipDescription}>{tip.description}</Text>
-                          </View>
-                        ))}
+                  {/* Key Features */}
+                  <View style={styles.sectionContainer}>
+                    <Text style={styles.sectionTitle}>Why Choose ExpressAid?</Text>
+                    <View style={styles.featuresList}>
+                      <View style={styles.featureItem}>
+                        <MaterialCommunityIcons name="clock-fast" size={20} color="#10b981" />
+                        <Text style={styles.featureText}>Quick booking in under 10 minutes</Text>
                       </View>
-                    </View>
-
-                    {/* Emergency Preparedness */}
-                    <View style={styles.sectionContainer}>
-                      <Text style={styles.sectionTitle}>Emergency Preparedness</Text>
-                      <View style={styles.emergencyTipsContainer}>
-                        <View style={styles.emergencyTip}>
-                          <MaterialCommunityIcons name="phone-alert" size={24} color="#ef4444" />
-                          <Text style={styles.emergencyTipText}>Keep emergency contacts handy</Text>
-                        </View>
-                        <View style={styles.emergencyTip}>
-                          <MaterialCommunityIcons name="medical-bag" size={24} color="#ef4444" />
-                          <Text style={styles.emergencyTipText}>Have basic first aid supplies ready</Text>
-                        </View>
-                        <View style={styles.emergencyTip}>
-                          <MaterialCommunityIcons name="file-document" size={24} color="#ef4444" />
-                          <Text style={styles.emergencyTipText}>Keep medical records organized</Text>
-                        </View>
+                      <View style={styles.featureItem}>
+                        <MaterialCommunityIcons name="shield-check" size={20} color="#3b82f6" />
+                        <Text style={styles.featureText}>Verified and trained nurses</Text>
+                      </View>
+                      <View style={styles.featureItem}>
+                        <MaterialCommunityIcons name="map-marker" size={20} color="#f59e0b" />
+                        <Text style={styles.featureText}>Real-time tracking and updates</Text>
+                      </View>
+                      <View style={styles.featureItem}>
+                        <MaterialCommunityIcons name="credit-card" size={20} color="#8b5cf6" />
+                        <Text style={styles.featureText}>Secure payment options</Text>
                       </View>
                     </View>
                   </View>
-                )}
-
-                {howItWorksTab === 'Caregiving' && (
-                  <View style={styles.tabContent}>
-                    <Text style={styles.comingSoonText}>Caregiving services coming soon!</Text>
-                    <Text style={styles.comingSoonSubtext}>We're working on bringing you professional caregiving services.</Text>
-                  </View>
-                )}
-
-                {howItWorksTab === 'Equipments' && (
-                  <View style={styles.tabContent}>
-                    <Text style={styles.comingSoonText}>Medical equipment rental coming soon!</Text>
-                    <Text style={styles.comingSoonSubtext}>We're working on bringing you medical equipment rental services.</Text>
-                  </View>
-                )}
+                </View>
               </ScrollView>
             </View>
           </View>
@@ -1315,6 +1236,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24,
     padding: 24,
     width: '100%',
+    height: '60%', // Half page height
     alignItems: 'center',
     elevation: 12,
     shadowColor: '#000',
@@ -1341,36 +1263,14 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: 8,
-  },
-  tabContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginBottom: 24,
-  },
-  tabButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 18,
-    borderRadius: 20,
     backgroundColor: '#f3f4f6',
+    borderRadius: 20,
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  activeTabButton: {
-    backgroundColor: '#2563eb',
-  },
-  activeTabText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 14,
-    marginLeft: 8,
-  },
-  tabText: {
-    color: '#6b7280',
-    fontWeight: 'bold',
-    fontSize: 14,
-    marginLeft: 8,
-  },
+
   modalScrollView: {
     width: '100%',
   },
@@ -1429,59 +1329,7 @@ const styles = StyleSheet.create({
     height: 1,
     marginVertical: 16,
   },
-  tipsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  tipCard: {
-    width: (width - 60) / 2,
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-  tipIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  tipTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 4,
-    textAlign: 'center',
-  },
-  tipDescription: {
-    fontSize: 12,
-    color: '#6b7280',
-    textAlign: 'center',
-  },
-  emergencyTipsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  emergencyTip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-    width: (width - 60) / 2, // Adjust for grid layout
-  },
-  emergencyTipText: {
-    fontSize: 14,
-    color: '#444',
-    marginLeft: 10,
-  },
+
   comingSoonText: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -1494,6 +1342,22 @@ const styles = StyleSheet.create({
     color: '#6b7280',
     textAlign: 'center',
     lineHeight: 22,
+  },
+  featuresList: {
+    width: '100%',
+  },
+  featureItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    paddingHorizontal: 4,
+  },
+  featureText: {
+    fontSize: 15,
+    color: '#374151',
+    marginLeft: 12,
+    flex: 1,
+    lineHeight: 20,
   },
 });
 
