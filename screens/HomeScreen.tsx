@@ -692,34 +692,33 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
                 <View style={styles.tabContent}>
                   {/* How It Works Steps */}
                   <View style={styles.sectionContainer}>
-                    <Text style={styles.sectionTitle}>How ExpressAid Works</Text>
                     <View style={styles.stepsContainer}>
                       {[
                         {
                           icon: 'calendar-plus',
                           title: 'Book a Home Nurse',
-                          description: 'Choose your location and required service. Share your care needs and preferences. Submit your request in seconds.',
+                          description: 'Choose your location and required service',
                           time: '~5 min',
                           color: '#10b981'
                         },
                         {
                           icon: 'account-check-outline',
                           title: 'Get Matched with a Nurse',
-                          description: 'We quickly find the best nurse for your needs. Review nurse profile and confirm your choice.',
+                          description: 'We quickly find the best nurse for your needs.',
                           time: '~5 min',
                           color: '#3b82f6'
                         },
                         {
                           icon: 'handshake-outline',
                           title: 'Receive Quality Care at Home',
-                          description: 'Your nurse arrives at your location. Care is delivered as per your plan and needs.',
+                          description: 'Your nurse arrives at your location.',
                           time: '~10 min',
                           color: '#f59e0b'
                         },
                         {
                           icon: 'currency-inr',
                           title: 'Pay Easily & Enjoy Peace of Mind',
-                          description: 'Pay securely when your service starts. Multiple payment options available.',
+                          description: 'Pay securely when your service starts.',
                           time: 'Instant',
                           color: '#8b5cf6'
                         }
