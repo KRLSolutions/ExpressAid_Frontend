@@ -13,8 +13,8 @@ const NurseAssignedScreen = ({ route }: any) => {
   const [eta, setEta] = useState('');
   const [distance, setDistance] = useState('');
   const [routeCoordinates, setRouteCoordinates] = useState<Array<{latitude: number, longitude: number}>>([]);
-  // Random distance between 5 and 10 km (inclusive)
-  const [fakeDistance] = useState(() => `${(Math.random() * 5 + 5).toFixed(1)} km`);
+  // Fixed distance for consistent display
+  const [fakeDistance] = useState('6.5 km');
   // Countdown timer (15:00)
   const [timer, setTimer] = useState(15 * 60); // seconds
 
@@ -131,7 +131,7 @@ const NurseAssignedScreen = ({ route }: any) => {
   return (
     <View style={styles.container}>
       {/* Back Button */}
-      <TouchableOpacity style={styles.backBtn} onPress={() => navigation.navigate('Home' as never)}>
+              <TouchableOpacity style={styles.backBtn} onPress={() => (navigation as any).navigate('MainDrawer', { screen: 'Home' })}>
         <Text style={styles.backBtnText}>←</Text>
       </TouchableOpacity>
       <MapView
@@ -229,7 +229,7 @@ const NurseAssignedScreen = ({ route }: any) => {
       <View style={styles.navigationAnchor}>
         <TouchableOpacity 
           style={styles.anchorButton}
-          onPress={() => navigation.navigate('Home' as never)}
+          onPress={() => (navigation as any).navigate('MainDrawer', { screen: 'Home' })}
         >
           <Text style={styles.anchorButtonText}>🏠 Home</Text>
         </TouchableOpacity>

@@ -68,10 +68,10 @@ const SearchingForNurseScreen = () => {
           }
           
           if (status === 'nurse_assigned' && nurse) {
-            console.log('Nurse already assigned, setting countdown to 3 seconds');
+            console.log('Nurse already assigned, showing confirmation immediately');
             setAssignedNurse(nurse);
-            // Show searching screen for at least 3 seconds even if nurse is assigned
-            setCountdown(Math.min(countdown, 3));
+            // Show nurse assignment confirmation immediately
+            setOrderStatus('nurse_assigned');
           }
         }
       } catch (error: any) {
@@ -171,6 +171,8 @@ const SearchingForNurseScreen = () => {
         
         if (status === 'nurse_assigned' && nurse) {
           setAssignedNurse(nurse);
+          // Show nurse assignment confirmation directly in this screen
+          // No navigation to NurseAssignedScreen - user wants confirmation only
         } else if (status === 'no_nurses_available') {
           Alert.alert(
             'No Nurses Available',
@@ -235,7 +237,7 @@ const SearchingForNurseScreen = () => {
 
   const renderNurseAssignedView = () => {
     // Generate a random distance between 5 and 10 km
-    const fakeDistance = `${(Math.random() * 5 + 5).toFixed(1)} km`;
+    const fakeDistance = '6.5 km';
     // Always show 10 completed orders
     const completedOrders = 10;
     // Helper for experience display

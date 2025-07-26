@@ -168,7 +168,7 @@ const OrdersScreen = () => {
   const renderBackButton = () => (
     <TouchableOpacity
       style={{ position: 'absolute', left: 10, top: 48, zIndex: 10 }}
-      onPress={() => navigation.navigate('Home' as never)}
+              onPress={() => (navigation as any).navigate('MainDrawer', { screen: 'Home' })}
     >
       <Ionicons name="arrow-back" size={28} color="#2563eb" />
     </TouchableOpacity>

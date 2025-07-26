@@ -21,7 +21,7 @@ const CashfreePaymentScreen = ({ route, navigation }: { route: any, navigation: 
       if (placingOrder) return;
       setPlacingOrder(true);
       Alert.alert('Payment Success', 'Your payment was successful!');
-      navigation.navigate('HomeScreen');
+      (navigation as any).navigate('MainDrawer', { screen: 'Home' });
     } else if (navState.url.includes('failure')) {
       Alert.alert('Payment Failed', 'Your payment was not successful. Please try again.');
       navigation.goBack();

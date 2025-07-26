@@ -157,6 +157,7 @@ export type AppDrawerParamList = {
   FAQ: undefined;
   DeleteProfile: { onLogout: () => void };
   SearchingForNurseScreen: { orderId: string };
+  NurseAssignedScreen: { order: any };
   SelectPaymentMethodScreen: { 
     selectedMethod?: string; 
     returnTo: string; 

@@ -6,6 +6,7 @@ import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { AppDrawerParamList } from '../navigation/AppStack';
 import { useCart } from '../CartContext';
 import ChooseAddressModal from '../components/ChooseAddressModal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
 
   CFSession,
@@ -151,18 +152,65 @@ const handlePlaceOrder = async () => {
     const dropPayment = new CFDropCheckoutPayment(session, paymentModes, theme);
 
     CFPaymentGatewayService.setCallback({
-      onVerify: (orderId) => {
+      onVerify: async (orderId) => {
         console.log('✅ Payment Verified for Order:', orderId);
-        Alert.alert('Success', `Payment successful for order: ${orderId}`, [
-          {
-            text: 'OK',
-            onPress: () => {
-              clearCart();
-              // Navigate to SearchingForNurseScreen with orderId
-              navigation.navigate('SearchingForNurseScreen', { orderId });
-            }
+        
+        try {
+          // Create the actual order in the database
+          const orderPayload = {
+            items: cart.map(item => ({
+              productId: item.id,
+              name: item.title,
+              quantity: item.qty,
+              price: item.price,
+              image: item.emoji
+            })),
+            address: selectedAddress,
+            total: total + afterHoursCharge,
+            paymentMethod: 'Cashfree UPI',
+            cashfreeOrderId: orderId
+          };
+
+          console.log('📦 Creating order in database:', orderPayload);
+          
+          const token = await AsyncStorage.getItem('userToken');
+          if (!token) {
+            throw new Error('User not authenticated');
           }
-        ]);
+
+          const response = await fetch(`${url}/orders`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(orderPayload)
+          });
+
+          const orderData = await response.json();
+          
+          if (!orderData.success) {
+            throw new Error(orderData.error || 'Failed to create order');
+          }
+
+          console.log('✅ Order created successfully:', orderData.order);
+          
+          Alert.alert('Success', `Payment successful for order: ${orderData.order._id}`, [
+            {
+              text: 'OK',
+              onPress: () => {
+                clearCart();
+                // Navigate to SearchingForNurseScreen with the actual order ID from database
+                navigation.navigate('SearchingForNurseScreen', { 
+                  orderId: orderData.order._id
+                });
+              }
+            }
+          ]);
+        } catch (error) {
+          console.error('❌ Error creating order:', error);
+          Alert.alert('Error', 'Payment successful but failed to create order. Please contact support.');
+        }
       },
       onError: (err: any, orderId) => {
         console.log('❌ Payment Error:', err.message, orderId);
