@@ -434,6 +434,34 @@ class ApiService {
     console.log('🌍 Reverse geocoding response:', data);
     return data.address;
   }
+
+  // Gemini AI Chat API
+  async sendGeminiMessage(message) {
+    try {
+      console.log('🤖 Sending message to Gemini:', message);
+      
+      const response = await fetch(`${this.baseURL}/gemini-chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('🤖 Gemini response:', data);
+      
+      return data.reply || 'Sorry, I couldn\'t process your request at the moment.';
+    } catch (error) {
+      console.error('🤖 Gemini API error:', error);
+      // Fallback to a friendly response if API fails
+      return 'I\'m having trouble connecting right now, but I\'m here to help! You can ask me about booking nurses, pricing, or our services.';
+    }
+  }
 }
 
 export default new ApiService(); 

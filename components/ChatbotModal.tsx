@@ -22,6 +22,7 @@ import Animated, {
   runOnJS,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
+import apiService from '../services/api';
 
 const { width, height } = Dimensions.get('window');
 
@@ -80,9 +81,10 @@ const ChatbotModal: React.FC<ChatbotModalProps> = ({ visible, onClose }) => {
     }, 100);
   };
 
-  const simulateTyping = (response: string) => {
+  const simulateTyping = async (responsePromise: Promise<string>) => {
     setIsTyping(true);
-    setTimeout(() => {
+    try {
+      const response = await responsePromise;
       const newMessage: Message = {
         id: Date.now().toString(),
         text: response,
@@ -90,40 +92,36 @@ const ChatbotModal: React.FC<ChatbotModalProps> = ({ visible, onClose }) => {
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, newMessage]);
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+      const errorMessage: Message = {
+        id: Date.now().toString(),
+        text: 'Sorry, I\'m having trouble responding right now. Please try again later.',
+        isUser: false,
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsTyping(false);
       scrollToBottom();
-    }, 1500);
+    }
   };
 
-  const generateAIResponse = (userMessage: string) => {
-    const lowerMessage = userMessage.toLowerCase();
-    
-    if (lowerMessage.includes('book') || lowerMessage.includes('nurse') || lowerMessage.includes('care')) {
-      return "Great! To book a nurse, simply tap the 'Book Nurse' button on the home screen. You'll be guided through a quick process to select your location and service type. Our nurses typically arrive within 10-15 minutes! 🚀";
-    } else if (lowerMessage.includes('price') || lowerMessage.includes('cost') || lowerMessage.includes('fee')) {
-      return "Our pricing is transparent and varies based on the service type and duration. Basic home nursing starts from ₹500/hour. You'll see the exact price before confirming your booking. We also offer package deals for regular care! 💰";
-    } else if (lowerMessage.includes('time') || lowerMessage.includes('duration') || lowerMessage.includes('how long')) {
-      return "Booking takes just 2-3 minutes! Our nurses typically arrive within 10-15 minutes of booking. Service duration depends on your needs - from 1 hour to full-day care. We're available 24/7! ⏰";
-    } else if (lowerMessage.includes('qualification') || lowerMessage.includes('trained') || lowerMessage.includes('certified')) {
-      return "All our nurses are professionally qualified, certified, and thoroughly vetted. They have years of experience in home healthcare. We also conduct regular training and background checks for your safety! ✅";
-    } else if (lowerMessage.includes('emergency') || lowerMessage.includes('urgent')) {
-      return "For emergencies, please call 108 immediately. While we provide quick home care, serious medical emergencies require professional emergency services. We can assist with post-emergency care once you're stable! 🚨";
-    } else if (lowerMessage.includes('payment') || lowerMessage.includes('pay') || lowerMessage.includes('cash')) {
-      return "We accept multiple payment methods: UPI, cards, digital wallets, and cash. Payment is processed securely when your service starts. You can also save payment methods for faster future bookings! 💳";
-    } else if (lowerMessage.includes('location') || lowerMessage.includes('area') || lowerMessage.includes('city')) {
-      return "We currently serve major cities across India including Mumbai, Delhi, Bangalore, Chennai, Hyderabad, and more. We're expanding rapidly! Just enter your location in the app to check availability in your area! 📍";
-    } else if (lowerMessage.includes('thank') || lowerMessage.includes('thanks')) {
-      return "You're welcome! I'm here to help anytime. Feel free to ask more questions or use the app to book services. Have a great day! 😊";
-    } else if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
-      return "Hello! 👋 I'm here to help you with ExpressAid services. You can ask me about booking nurses, pricing, locations, or any other questions about our home healthcare services!";
-    } else {
-      const responses = [
-        "That's a great question! For specific details about our services, you can explore the app or ask me about booking, pricing, or locations. I'm here to help! 🤖",
-        "I'd be happy to help with that! ExpressAid offers professional home nursing care. You can ask me about booking, pricing, nurse qualifications, or service areas. What would you like to know? 💡",
-        "Thanks for asking! I can help you with booking nurses, understanding our services, pricing, or finding care in your area. What specific information are you looking for? 🏥",
-        "Great question! ExpressAid provides 24/7 home healthcare services. I can assist with bookings, pricing, nurse details, or service information. What would you like to learn more about? ⭐",
+  const generateAIResponse = async (userMessage: string) => {
+    try {
+      console.log('🤖 Calling Gemini API with message:', userMessage);
+      const response = await apiService.sendGeminiMessage(userMessage);
+      console.log('🤖 Gemini API response received:', response);
+      return response;
+    } catch (error) {
+      console.error('🤖 Error calling Gemini API:', error);
+      // Fallback responses if API fails
+      const fallbackResponses = [
+        "I'm having trouble connecting right now, but I'm here to help! You can ask me about booking nurses, pricing, or our services.",
+        "Sorry, I'm experiencing some technical difficulties. Feel free to ask me about ExpressAid services when I'm back online!",
+        "I'm temporarily unavailable, but you can explore our app to learn about booking nurses and our healthcare services.",
       ];
-      return responses[Math.floor(Math.random() * responses.length)];
+      return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
     }
   };
 
@@ -142,8 +140,8 @@ const ChatbotModal: React.FC<ChatbotModalProps> = ({ visible, onClose }) => {
     scrollToBottom();
 
     // Generate AI response
-    const aiResponse = generateAIResponse(inputText.trim());
-    simulateTyping(aiResponse);
+    const aiResponsePromise = generateAIResponse(inputText.trim());
+    simulateTyping(aiResponsePromise);
   };
 
   const handleQuickAction = (action: string) => {
@@ -158,8 +156,8 @@ const ChatbotModal: React.FC<ChatbotModalProps> = ({ visible, onClose }) => {
     scrollToBottom();
 
     // Generate AI response
-    const aiResponse = generateAIResponse(action);
-    simulateTyping(aiResponse);
+    const aiResponsePromise = generateAIResponse(action);
+    simulateTyping(aiResponsePromise);
   };
 
   const formatTime = (date: Date) => {
