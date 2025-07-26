@@ -212,6 +212,18 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
       icon: 'hospital-building',
       color: '#f59e0b',
     },
+    {
+      id: '5',
+      title: 'Pediatric Care',
+      icon: 'baby-face',
+      color: '#8b5cf6',
+    },
+    {
+      id: '6',
+      title: 'Wound Dressing',
+      icon: 'bandage',
+      color: '#ec4899',
+    },
   ];
 
   // --- QUICK ACTIONS DATA ---
@@ -243,41 +255,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
       bgColor: '#fffbeb',
       onPress: openHospitalInMaps,
     },
-    {
-      id: '4',
-      title: 'Health Tips',
-      subtitle: 'Daily wellness',
-      icon: 'lightbulb-on',
-      color: '#8b5cf6',
-      bgColor: '#f3f4f6',
-      onPress: () => setHowItWorksVisible(true),
-    },
+
   ];
 
-  // --- HEALTH TIPS DATA ---
-  const healthTips = [
-    {
-      id: '1',
-      title: 'Stay Hydrated',
-      description: 'Drink 8 glasses of water daily for better health',
-      icon: 'cup-water',
-      color: '#3b82f6',
-    },
-    {
-      id: '2',
-      title: 'Regular Exercise',
-      description: '30 minutes of daily activity boosts immunity',
-      icon: 'run',
-      color: '#10b981',
-    },
-    {
-      id: '3',
-      title: 'Quality Sleep',
-      description: '7-9 hours of sleep improves recovery',
-      icon: 'sleep',
-      color: '#8b5cf6',
-    },
-  ];
+
 
   // --- EMERGENCY CONTACTS DATA ---
   const emergencyContacts = [
@@ -425,18 +406,31 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
   const FeaturedServices: React.FC = () => {
     return (
       <View style={styles.featuredServicesContainer}>
-        <Text style={styles.sectionTitle}>Featured Services</Text>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Featured Services</Text>
+          <Text style={styles.sectionSubtitle}>Professional care at your doorstep</Text>
+        </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.servicesScroll}>
           {featuredServices.map((service, index) => (
             <Animated.View
               key={service.id}
-              entering={FadeInUp.duration(900).delay(index * 100)}
+              entering={FadeInUp.duration(900).delay(index * 150)}
               style={styles.serviceCard}
             >
-              <View style={[styles.serviceIcon, { backgroundColor: service.color + '20' }]}>
-                <MaterialCommunityIcons name={service.icon as any} size={28} color={service.color} />
-              </View>
-              <Text style={styles.serviceTitle}>{service.title}</Text>
+              <LinearGradient
+                colors={[service.color + '10', service.color + '05']}
+                style={styles.serviceCardGradient}
+              >
+                <View style={styles.serviceCardContent}>
+                  <View style={[styles.serviceIconContainer, { backgroundColor: service.color + '20' }]}>
+                    <MaterialCommunityIcons name={service.icon as any} size={32} color={service.color} />
+                  </View>
+                  <Text style={[styles.serviceTitle, { color: service.color }]}>{service.title}</Text>
+                  <View style={styles.serviceBadge}>
+                    <Text style={[styles.serviceBadgeText, { color: service.color }]}>Available 24/7</Text>
+                  </View>
+                </View>
+              </LinearGradient>
             </Animated.View>
           ))}
         </ScrollView>
@@ -473,29 +467,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
     );
   };
 
-  // --- HEALTH TIPS COMPONENT ---
-  const HealthTips: React.FC = () => {
-    return (
-      <View style={styles.healthTipsContainer}>
-        <Text style={styles.sectionTitle}>Daily Health Tips</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tipsScroll}>
-          {healthTips.map((tip, index) => (
-            <Animated.View
-              key={tip.id}
-              entering={FadeInUp.duration(900).delay(index * 100)}
-              style={styles.healthTipCard}
-            >
-              <View style={[styles.healthTipIcon, { backgroundColor: tip.color + '20' }]}>
-                <MaterialCommunityIcons name={tip.icon as any} size={24} color={tip.color} />
-              </View>
-              <Text style={styles.healthTipTitle}>{tip.title}</Text>
-              <Text style={styles.healthTipDescription}>{tip.description}</Text>
-            </Animated.View>
-          ))}
-        </ScrollView>
-      </View>
-    );
-  };
+
 
   // --- EMERGENCY CONTACTS COMPONENT ---
   const EmergencyContacts: React.FC = () => {
@@ -668,9 +640,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
 
           {/* Featured Services Section */}
           <FeaturedServices />
-
-          {/* Health Tips Section */}
-          <HealthTips />
 
           {/* Emergency Contacts Section */}
           <EmergencyContacts />
@@ -1001,30 +970,53 @@ const styles = StyleSheet.create({
   },
   serviceCard: {
     backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 20,
-    marginRight: 16,
+    borderRadius: 20,
+    padding: 24,
+    marginRight: 20,
     alignItems: 'center',
-    minWidth: 120,
+    minWidth: 140,
+    height: 180,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 8,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
   },
-  serviceIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+  serviceCardGradient: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 20,
+    padding: 8,
+  },
+  serviceCardContent: {
+    alignItems: 'center',
+  },
+  serviceIconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
   },
   serviceTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
     textAlign: 'center',
+  },
+  serviceBadge: {
+    backgroundColor: '#e6f9f0',
+    borderRadius: 12,
+    paddingVertical: 4,
+    paddingHorizontal: 12,
+  },
+  serviceBadgeText: {
+    fontSize: 12,
+    fontWeight: 'bold',
   },
   quickActionsContainer: {
     paddingHorizontal: 20,
@@ -1067,45 +1059,7 @@ const styles = StyleSheet.create({
     color: '#6b7280',
     textAlign: 'center',
   },
-  healthTipsContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 32,
-  },
-  tipsScroll: {
-    paddingRight: 20,
-  },
-  healthTipCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 20,
-    marginRight: 16,
-    alignItems: 'center',
-    minWidth: 120,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-  healthTipIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  healthTipTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 4,
-    textAlign: 'center',
-  },
-  healthTipDescription: {
-    fontSize: 12,
-    color: '#6b7280',
-    textAlign: 'center',
-  },
+
   emergencyContainer: {
     paddingHorizontal: 20,
     marginBottom: 32,
@@ -1373,6 +1327,16 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     flex: 1,
     lineHeight: 20,
+  },
+  sectionHeader: {
+    marginBottom: 20,
+    paddingHorizontal: 4,
+  },
+  sectionSubtitle: {
+    fontSize: 15,
+    color: '#6b7280',
+    marginTop: 6,
+    fontWeight: '500',
   },
 });
 
