@@ -303,9 +303,9 @@ const SplashScreen = ({ navigation }: any) => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       
-      {/* Dark gradient background */}
+      {/* Blue gradient background */}
       <LinearGradient
-        colors={['#0f172a', '#1e293b', '#334155']}
+        colors={['#1e40af', '#2563eb', '#3b82f6']}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -655,13 +655,13 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   glassCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     borderRadius: 24,
     padding: 40,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    borderColor: 'rgba(255, 255, 255, 0.25)',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -680,11 +680,11 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.4)',
   },
   animatedIcon: {
     width: 50,
@@ -698,7 +698,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: '#ffffff',
     marginLeft: -4,
   },
   iconDot2: {
@@ -708,7 +708,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: '#ffffff',
     marginTop: -4,
   },
   iconDot3: {
@@ -718,7 +718,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: '#ffffff',
     marginLeft: -4,
   },
   iconDot4: {
@@ -728,7 +728,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: '#ffffff',
     marginTop: -4,
   },
   appName: {
@@ -771,7 +771,7 @@ const styles = StyleSheet.create({
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: '#ffffff',
   },
   networkContainer: {
     position: 'absolute',
@@ -783,7 +783,7 @@ const styles = StyleSheet.create({
   networkLine: {
     position: 'absolute',
     height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.6)',
+    backgroundColor: '#ffffff',
     transformOrigin: 'left',
   },
   arcContainer: {
@@ -801,7 +801,7 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 30,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.4)',
+    borderColor: '#ffffff',
     borderTopColor: 'transparent',
     borderRightColor: 'transparent',
   },
@@ -810,7 +810,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    backgroundColor: '#ffffff',
   },
   loadingContainer: {
     flexDirection: 'row',
@@ -822,7 +822,7 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: '#ffffff',
     marginHorizontal: 6,
     shadowColor: '#fff',
     shadowOffset: {

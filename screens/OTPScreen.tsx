@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, StyleSheet, Text, TextInput as RNTextInput, TouchableOpacity, Dimensions, Alert, ScrollView, Animated, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, StyleSheet, Text, TextInput as RNTextInput, TouchableOpacity, Dimensions, Alert, ScrollView, Animated, KeyboardAvoidingView, Platform, AppState } from 'react-native';
 import { Button } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
@@ -7,6 +7,7 @@ import { AuthStackParamList } from '../navigation/AuthStack';
 import apiService from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSMSAutoFill } from '../hooks/useSMSAutoFill';
 
 const { width, height } = Dimensions.get('window');
 const OTP_LENGTH = 6;
@@ -32,12 +33,52 @@ const OTPScreen: React.FC<{
   const icon7Anim = new Animated.ValueXY({ x: 120, y: 90 });
   const icon8Anim = new Animated.ValueXY({ x: width - 60, y: 220 });
 
+  // SMS Auto-fill hook
+  const { smsPermission, isListening, startListening, stopListening } = useSMSAutoFill({
+    onOTPReceived: (receivedOtp) => {
+      console.log('Auto-filling OTP:', receivedOtp);
+      setOtp(receivedOtp);
+    },
+    phoneNumber,
+  });
+
   // Auto-fill OTP in development mode
   useEffect(() => {
     if (devOtp) {
       setOtp(devOtp);
     }
   }, [devOtp]);
+
+  // Start listening for SMS when component mounts
+  useEffect(() => {
+    startListening();
+    
+    // Cleanup when component unmounts
+    return () => {
+      stopListening();
+    };
+  }, []);
+
+  // Add focus listener to handle input focus issues
+  useEffect(() => {
+    const handleFocus = () => {
+      // Ensure input is properly focused when screen gains focus
+      if (inputRef.current) {
+        inputRef.current.setNativeProps({ editable: true });
+      }
+    };
+
+    // Listen for app state changes
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      if (nextAppState === 'active') {
+        handleFocus();
+      }
+    });
+
+    return () => {
+      subscription?.remove();
+    };
+  }, []);
 
   useEffect(() => {
     if (timer > 0) {
@@ -138,12 +179,34 @@ const OTPScreen: React.FC<{
     setOtp(numericValue);
   };
 
+  const focusInput = () => {
+    // Ensure input is focused and editable
+    if (inputRef.current) {
+      // First ensure the input is editable
+      inputRef.current.setNativeProps({ editable: true });
+      // Then focus it
+      inputRef.current.focus();
+      // Additional focus attempt with slight delay to ensure it works
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, 50);
+    }
+  };
+
   const handleResend = async () => {
     try {
       setLoading(true);
       await apiService.sendOTP(phoneNumber);
       setTimer(RESEND_TIME);
+      setOtp(''); // Clear previous OTP
       Alert.alert('Success', 'OTP resent successfully!');
+      
+      // Re-focus the input after resending
+      setTimeout(() => {
+        focusInput();
+      }, 500);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to resend OTP. Please try again.';
       Alert.alert('Error', errorMessage);
@@ -184,7 +247,7 @@ const OTPScreen: React.FC<{
     for (let i = 0; i < OTP_LENGTH; i++) {
       boxes.push(
         <View key={i} style={[styles.otpBox, otp[i] && styles.otpBoxFilled]}>
-          <Text style={styles.otpText}>{otp[i] || ''}</Text>
+          <Text style={[styles.otpText, otp[i] && styles.otpTextFilled]}>{otp[i] || ''}</Text>
         </View>
       );
     }
@@ -256,13 +319,24 @@ const OTPScreen: React.FC<{
                 keyboardType="number-pad"
                 maxLength={OTP_LENGTH}
                 autoFocus={true}
+                editable={!loading}
+                selectTextOnFocus={true}
+                autoComplete="one-time-code"
+                textContentType="oneTimeCode"
               />
               
               {/* Visual OTP boxes */}
               <TouchableOpacity 
                 style={styles.otpContainer} 
-                onPress={() => inputRef.current?.focus()}
+                onPress={focusInput}
                 activeOpacity={0.8}
+                disabled={loading}
+                onPressIn={() => {
+                  // Immediate focus on press in for better responsiveness
+                  if (inputRef.current) {
+                    inputRef.current.focus();
+                  }
+                }}
               >
                 {renderOtpBoxes()}
               </TouchableOpacity>
@@ -304,6 +378,23 @@ const OTPScreen: React.FC<{
                 </Text>
               </TouchableOpacity>
             </View>
+
+            {/* Auto-fill status */}
+            {Platform.OS === 'android' && (
+              <View style={styles.autoFillSection}>
+                <Text style={styles.autoFillText}>
+                  {smsPermission 
+                    ? '💡 SMS auto-fill enabled' 
+                    : '💡 Enable SMS permissions for auto-fill OTP'
+                  }
+                </Text>
+                {isListening && (
+                  <Text style={styles.listeningText}>
+                    Listening for SMS...
+                  </Text>
+                )}
+              </View>
+            )}
           </View>
         </LinearGradient>
       </ScrollView>
@@ -425,9 +516,12 @@ const styles = StyleSheet.create({
     borderColor: '#1e40af',
   },
   otpText: {
-    color: '#1e293b',
+    color: '#64748b',
     fontSize: 24,
     fontWeight: 'bold',
+  },
+  otpTextFilled: {
+    color: '#ffffff',
   },
   otpTimer: {
     color: '#64748b',
@@ -471,6 +565,7 @@ const styles = StyleSheet.create({
   },
   resendSection: {
     alignItems: 'center',
+    marginBottom: 20,
   },
   resendBtn: {
     backgroundColor: '#f1f5f9',
@@ -491,6 +586,22 @@ const styles = StyleSheet.create({
   },
   resendTextDisabled: {
     color: '#94a3b8',
+  },
+  autoFillSection: {
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  autoFillText: {
+    fontSize: 12,
+    color: '#64748b',
+    textAlign: 'center',
+    fontStyle: 'italic',
+  },
+  listeningText: {
+    fontSize: 10,
+    color: '#3b82f6',
+    textAlign: 'center',
+    marginTop: 4,
   },
 });
 
