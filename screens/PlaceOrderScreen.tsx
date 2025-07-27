@@ -6,9 +6,8 @@ import { useCart } from '../CartContext';
 console.log('🔧 PlaceOrderScreen component loaded!');
 
 function getPaymentIcon(method: string) {
-  if (method === 'phonepe') return require('../assets/phonepe.png');
-  if (method === 'googlepay') return require('../assets/googlepay.png');
-  return require('../assets/card.png');
+  // Return null for now since the image files don't exist
+  return null;
 }
 
 const PlaceOrderScreen = ({ navigation, route }: { navigation: any, route: any }) => {

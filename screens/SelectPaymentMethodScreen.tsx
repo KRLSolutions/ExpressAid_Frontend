@@ -72,7 +72,7 @@ const SelectPaymentMethodScreen = ({ navigation, route }: { navigation: any, rou
         {
           key: 'phonepe',
           label: 'PhonePe UPI',
-          icon: require('../assets/phonepe.png'),
+          icon: null,
           action: null,
           onPress: (navigation: any, route: any) => {
             if (route.params?.returnTo === 'CartScreen') {
@@ -89,7 +89,7 @@ const SelectPaymentMethodScreen = ({ navigation, route }: { navigation: any, rou
         {
           key: 'googlepay',
           label: 'Google Pay',
-          icon: require('../assets/googlepay.png'),
+          icon: null,
           action: null,
           onPress: (navigation: any, route: any) => {
             if (route.params?.returnTo === 'CartScreen') {
@@ -111,7 +111,7 @@ const SelectPaymentMethodScreen = ({ navigation, route }: { navigation: any, rou
         {
           key: 'add_card',
           label: 'Add credit or debit cards',
-          icon: require('../assets/card.png'),
+          icon: null,
           action: 'ADD',
           onPress: () => setShowCardFields((v) => !v),
         },
@@ -123,7 +123,7 @@ const SelectPaymentMethodScreen = ({ navigation, route }: { navigation: any, rou
         {
           key: 'add_upi',
           label: 'Add new UPI ID',
-          icon: require('../assets/googlepay.png'),
+          icon: null,
           action: 'ADD',
           onPress: () => setShowUpiField((v) => !v),
         },
@@ -153,7 +153,7 @@ const SelectPaymentMethodScreen = ({ navigation, route }: { navigation: any, rou
               onPress={() => item.onPress && item.onPress(navigation, route)}
               disabled={item.disabled}
             >
-              <Image source={item.icon} style={styles.icon} />
+              {item.icon && <Image source={item.icon} style={styles.icon} />}
               <View style={{ flex: 1 }}>
                 <Text style={styles.label}>{item.label}</Text>
                 {item.subtitle && <Text style={styles.subtitle}>{item.subtitle}</Text>}
