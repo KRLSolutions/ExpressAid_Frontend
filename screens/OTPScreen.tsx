@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, StyleSheet, Text, TextInput as RNTextInput, TouchableOpacity, ImageBackground, Dimensions, Alert } from 'react-native';
+import { View, StyleSheet, Text, TextInput as RNTextInput, TouchableOpacity, Dimensions, Alert, ScrollView, Animated, KeyboardAvoidingView, Platform } from 'react-native';
 import { Button } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { AuthStackParamList } from '../navigation/AuthStack';
 import apiService from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
 const OTP_LENGTH = 6;
@@ -21,6 +22,16 @@ const OTPScreen: React.FC<{
   const { phoneNumber, onLogin, otp: devOtp } = route.params;
   const inputRef = useRef<RNTextInput>(null);
 
+  // Animation values for bouncing icons in blue area
+  const icon1Anim = new Animated.ValueXY({ x: 30, y: 100 });
+  const icon2Anim = new Animated.ValueXY({ x: width - 80, y: 150 });
+  const icon3Anim = new Animated.ValueXY({ x: 50, y: 200 });
+  const icon4Anim = new Animated.ValueXY({ x: width - 100, y: 80 });
+  const icon5Anim = new Animated.ValueXY({ x: 80, y: 120 });
+  const icon6Anim = new Animated.ValueXY({ x: width - 120, y: 180 });
+  const icon7Anim = new Animated.ValueXY({ x: 120, y: 90 });
+  const icon8Anim = new Animated.ValueXY({ x: width - 60, y: 220 });
+
   // Auto-fill OTP in development mode
   useEffect(() => {
     if (devOtp) {
@@ -34,6 +45,92 @@ const OTPScreen: React.FC<{
       return () => clearInterval(interval);
     }
   }, [timer]);
+
+  useEffect(() => {
+    // Bouncing animation for icons in blue area
+    const blueAreaWidth = width - 60; // Full width minus padding
+    const blueAreaHeight = 300; // Keep icons within the blue area only
+
+    const createBounceAnimation = (anim: Animated.ValueXY, startX: number, startY: number) => {
+      const bounceX = Animated.loop(
+        Animated.sequence([
+          Animated.timing(anim.x, {
+            toValue: blueAreaWidth - 50,
+            duration: 3000 + Math.random() * 2000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(anim.x, {
+            toValue: 30,
+            duration: 3000 + Math.random() * 2000,
+            useNativeDriver: true,
+          }),
+        ])
+      );
+
+      const bounceY = Animated.loop(
+        Animated.sequence([
+          Animated.timing(anim.y, {
+            toValue: blueAreaHeight - 50,
+            duration: 2500 + Math.random() * 1500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(anim.y, {
+            toValue: 80,
+            duration: 2500 + Math.random() * 1500,
+            useNativeDriver: true,
+          }),
+        ])
+      );
+
+      return { bounceX, bounceY };
+    };
+
+    const icon1Bounce = createBounceAnimation(icon1Anim, 30, 100);
+    const icon2Bounce = createBounceAnimation(icon2Anim, width - 80, 150);
+    const icon3Bounce = createBounceAnimation(icon3Anim, 50, 200);
+    const icon4Bounce = createBounceAnimation(icon4Anim, width - 100, 80);
+    const icon5Bounce = createBounceAnimation(icon5Anim, 80, 120);
+    const icon6Bounce = createBounceAnimation(icon6Anim, width - 120, 180);
+    const icon7Bounce = createBounceAnimation(icon7Anim, 120, 90);
+    const icon8Bounce = createBounceAnimation(icon8Anim, width - 60, 220);
+
+    // Start bouncing animations
+    icon1Bounce.bounceX.start();
+    icon1Bounce.bounceY.start();
+    icon2Bounce.bounceX.start();
+    icon2Bounce.bounceY.start();
+    icon3Bounce.bounceX.start();
+    icon3Bounce.bounceY.start();
+    icon4Bounce.bounceX.start();
+    icon4Bounce.bounceY.start();
+    icon5Bounce.bounceX.start();
+    icon5Bounce.bounceY.start();
+    icon6Bounce.bounceX.start();
+    icon6Bounce.bounceY.start();
+    icon7Bounce.bounceX.start();
+    icon7Bounce.bounceY.start();
+    icon8Bounce.bounceX.start();
+    icon8Bounce.bounceY.start();
+
+    return () => {
+      icon1Bounce.bounceX.stop();
+      icon1Bounce.bounceY.stop();
+      icon2Bounce.bounceX.stop();
+      icon2Bounce.bounceY.stop();
+      icon3Bounce.bounceX.stop();
+      icon3Bounce.bounceY.stop();
+      icon4Bounce.bounceX.stop();
+      icon4Bounce.bounceY.stop();
+      icon5Bounce.bounceX.stop();
+      icon5Bounce.bounceY.stop();
+      icon6Bounce.bounceX.stop();
+      icon6Bounce.bounceY.stop();
+      icon7Bounce.bounceX.stop();
+      icon7Bounce.bounceY.stop();
+      icon8Bounce.bounceX.stop();
+      icon8Bounce.bounceY.stop();
+    };
+  }, []);
 
   const handleOtpChange = (value: string) => {
     // Only allow numbers and limit to 6 digits
@@ -95,94 +192,206 @@ const OTPScreen: React.FC<{
   };
 
   return (
-    <ImageBackground source={require('../assets/bg.png')} style={styles.bg}>
-      <View style={styles.overlay} />
-      <View style={styles.content}>
-        <Text style={styles.title}>Verify</Text>
-        <Text style={styles.subtitle}>Enter OTP</Text>
-        <Text style={styles.info}>A 6-digit code has been sent to {phoneNumber}</Text>
-        
-        {/* Hidden input for actual OTP entry */}
-        <RNTextInput
-          ref={inputRef}
-          style={styles.hiddenInput}
-          value={otp}
-          onChangeText={handleOtpChange}
-          keyboardType="number-pad"
-          maxLength={OTP_LENGTH}
-          autoFocus={true}
-        />
-        
-        {/* Visual OTP boxes */}
-        <TouchableOpacity 
-          style={styles.otpContainer} 
-          onPress={() => inputRef.current?.focus()}
-          activeOpacity={0.8}
+    <KeyboardAvoidingView 
+      style={styles.container} 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+    >
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <LinearGradient
+          colors={['#1e40af', '#3b82f6', '#60a5fa', '#93c5fd']}
+          style={styles.gradient}
         >
-          {renderOtpBoxes()}
-        </TouchableOpacity>
-        
-        <Text style={styles.otpTimer}>OTP valid till 00:{timer.toString().padStart(2, '0')}</Text>
-        <Button
-          mode="contained"
-          style={styles.button}
-          labelStyle={styles.buttonLabel}
-          onPress={handleVerify}
-          disabled={otp.length !== OTP_LENGTH || loading}
-          loading={loading}
-        >
-          Verify
-        </Button>
-        <View style={styles.resendRow}>
-          <TouchableOpacity
-            style={styles.resendBtn}
-            onPress={handleResend}
-            disabled={timer > 0}
-          >
-            <Text style={styles.resendText}>Resend SMS {timer > 0 ? `in ${timer}` : ''}</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </ImageBackground>
+          {/* Bouncing medical icons in blue area */}
+          <View style={styles.bouncingIconsContainer}>
+            <Animated.View style={[styles.bouncingIcon, { transform: icon1Anim.getTranslateTransform() }]}>
+              <Text style={styles.iconText}>🏥</Text>
+            </Animated.View>
+            <Animated.View style={[styles.bouncingIcon, { transform: icon2Anim.getTranslateTransform() }]}>
+              <Text style={styles.iconText}>👨‍⚕️</Text>
+            </Animated.View>
+            <Animated.View style={[styles.bouncingIcon, { transform: icon3Anim.getTranslateTransform() }]}>
+              <Text style={styles.iconText}>💊</Text>
+            </Animated.View>
+            <Animated.View style={[styles.bouncingIcon, { transform: icon4Anim.getTranslateTransform() }]}>
+              <Text style={styles.iconText}>🚑</Text>
+            </Animated.View>
+            <Animated.View style={[styles.bouncingIcon, { transform: icon5Anim.getTranslateTransform() }]}>
+              <Text style={styles.iconText}>🩺</Text>
+            </Animated.View>
+            <Animated.View style={[styles.bouncingIcon, { transform: icon6Anim.getTranslateTransform() }]}>
+              <Text style={styles.iconText}>🩹</Text>
+            </Animated.View>
+            <Animated.View style={[styles.bouncingIcon, { transform: icon7Anim.getTranslateTransform() }]}>
+              <Text style={styles.iconText}>💉</Text>
+            </Animated.View>
+            <Animated.View style={[styles.bouncingIcon, { transform: icon8Anim.getTranslateTransform() }]}>
+              <Text style={styles.iconText}>🩻</Text>
+            </Animated.View>
+          </View>
+
+          {/* OTP form */}
+          <View style={styles.formContainer}>
+            <View style={styles.welcomeSection}>
+              <Text style={styles.welcomeTitle}>Verify OTP</Text>
+              <Text style={styles.welcomeSubtitle}>
+                Enter the 6-digit code sent to {phoneNumber}
+              </Text>
+            </View>
+
+            <View style={styles.otpSection}>
+              <View style={styles.otpHeader}>
+                <Text style={styles.otpLabel}>Enter OTP Code</Text>
+                <Text style={styles.otpDescription}>
+                  We've sent a verification code to your mobile number
+                </Text>
+              </View>
+              
+              {/* Hidden input for actual OTP entry */}
+              <RNTextInput
+                ref={inputRef}
+                style={styles.hiddenInput}
+                value={otp}
+                onChangeText={handleOtpChange}
+                keyboardType="number-pad"
+                maxLength={OTP_LENGTH}
+                autoFocus={true}
+              />
+              
+              {/* Visual OTP boxes */}
+              <TouchableOpacity 
+                style={styles.otpContainer} 
+                onPress={() => inputRef.current?.focus()}
+                activeOpacity={0.8}
+              >
+                {renderOtpBoxes()}
+              </TouchableOpacity>
+
+              <Text style={styles.otpTimer}>
+                OTP valid till 00:{timer.toString().padStart(2, '0')}
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              style={[styles.button, otp.length === OTP_LENGTH && styles.buttonActive]}
+              onPress={handleVerify}
+              disabled={otp.length !== OTP_LENGTH || loading}
+              activeOpacity={0.8}
+            >
+              {loading ? (
+                <View style={styles.loadingContainer}>
+                  <Text style={styles.loadingText}>Verifying...</Text>
+                </View>
+              ) : (
+                <LinearGradient
+                  colors={otp.length === OTP_LENGTH ? ['#3b82f6', '#1e40af'] : ['#cbd5e1', '#94a3b8']}
+                  style={styles.buttonGradient}
+                >
+                  <Text style={styles.buttonText}>Verify OTP</Text>
+                </LinearGradient>
+              )}
+            </TouchableOpacity>
+
+            <View style={styles.resendSection}>
+              <TouchableOpacity
+                style={[styles.resendBtn, timer > 0 && styles.resendBtnDisabled]}
+                onPress={handleResend}
+                disabled={timer > 0 || loading}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.resendText, timer > 0 && styles.resendTextDisabled]}>
+                  {timer > 0 ? `Resend SMS in ${timer}s` : 'Resend SMS'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </LinearGradient>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  bg: {
+  container: {
     flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  gradient: {
+    flex: 1,
+    minHeight: height,
+  },
+  bouncingIconsContainer: {
+    position: 'absolute',
+    width: '100%',
+    height: 300, // Keep icons within blue area only
+    zIndex: 1,
+  },
+  bouncingIcon: {
+    position: 'absolute',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.45)',
+  iconText: {
+    fontSize: 24,
   },
-  content: {
-    width: '90%',
-    alignSelf: 'center',
+  formContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
+    borderTopLeftRadius: 35,
+    borderTopRightRadius: 35,
+    paddingHorizontal: 24,
+    paddingTop: 35,
+    paddingBottom: 40,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -5 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 10,
+    marginTop: 250, // Adjusted to prevent overlap with bouncing icons
+  },
+  welcomeSection: {
     alignItems: 'center',
-    zIndex: 2,
+    marginBottom: 35,
   },
-  title: {
-    color: '#fff',
+  welcomeTitle: {
     fontSize: 26,
     fontWeight: 'bold',
-    marginBottom: 8,
-    marginTop: 32,
-  },
-  subtitle: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    marginTop: 8,
-  },
-  info: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '400',
-    marginBottom: 24,
+    color: '#1e293b',
+    marginBottom: 10,
     textAlign: 'center',
+  },
+  welcomeSubtitle: {
+    fontSize: 16,
+    color: '#64748b',
+    textAlign: 'center',
+    lineHeight: 24,
+  },
+  otpSection: {
+    marginBottom: 35,
+  },
+  otpHeader: {
+    marginBottom: 20,
+  },
+  otpLabel: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#1e293b',
+    marginBottom: 8,
+  },
+  otpDescription: {
+    fontSize: 14,
+    color: '#64748b',
   },
   hiddenInput: {
     position: 'absolute',
@@ -196,63 +405,92 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   otpBox: {
-    width: 40,
-    height: 48,
-    borderRadius: 10,
-    backgroundColor: 'rgba(255,255,255,0.10)',
-    marginHorizontal: 6,
+    width: 50,
+    height: 60,
+    borderRadius: 12,
+    backgroundColor: '#f8fafc',
+    marginHorizontal: 8,
     borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.18)',
+    borderColor: '#e2e8f0',
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   otpBoxFilled: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderColor: '#7c3aed',
+    backgroundColor: '#3b82f6',
+    borderColor: '#1e40af',
   },
   otpText: {
-    color: '#fff',
+    color: '#1e293b',
     fontSize: 24,
     fontWeight: 'bold',
   },
   otpTimer: {
-    color: '#fff',
+    color: '#64748b',
     fontSize: 14,
-    marginBottom: 16,
-    fontWeight: 'bold',
+    textAlign: 'center',
+    fontWeight: '500',
   },
   button: {
     width: '100%',
-    marginTop: 8,
-    backgroundColor: '#7c3aed',
-    borderRadius: 12,
-    paddingVertical: 6,
-    elevation: 4,
+    borderRadius: 18,
+    marginBottom: 25,
+    overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
-    shadowRadius: 4,
+    shadowRadius: 8,
+    elevation: 8,
   },
-  buttonLabel: {
+  buttonActive: {
+    shadowColor: '#3b82f6',
+    shadowOpacity: 0.3,
+  },
+  buttonGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  buttonText: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 18,
   },
-  resendRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 12,
+  loadingContainer: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    backgroundColor: '#cbd5e1',
+  },
+  loadingText: {
+    color: '#64748b',
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+  resendSection: {
+    alignItems: 'center',
   },
   resendBtn: {
-    backgroundColor: 'rgba(255,255,255,0.10)',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginHorizontal: 8,
+    backgroundColor: '#f1f5f9',
+    borderRadius: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  resendBtnDisabled: {
+    backgroundColor: '#f8fafc',
+    borderColor: '#cbd5e1',
   },
   resendText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: '#3b82f6',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  resendTextDisabled: {
+    color: '#94a3b8',
   },
 });
 

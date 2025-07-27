@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ActivityIndicator, Alert, TouchableOpacity, Text, View, Image, ScrollView, StyleSheet, Linking } from 'react-native';
 import api from '../services/api';
+import { useCart } from '../CartContext';
 
 console.log('🔧 PlaceOrderScreen component loaded!');
 
@@ -15,6 +16,7 @@ const PlaceOrderScreen = ({ navigation, route }: { navigation: any, route: any }
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(route?.params?.selectedPaymentMethod || 'phonepe');
   const [cardDetails, setCardDetails] = useState(route?.params?.cardDetails || null);
   const [upiId, setUpiId] = useState(route?.params?.upiId || null);
+  const { clearCart } = useCart();
 
   // TODO: Replace these with real values from context/store/props
   const totalAmount = 290;
@@ -140,6 +142,8 @@ const PlaceOrderScreen = ({ navigation, route }: { navigation: any, route: any }
               
               if (upiUrl) {
                 console.log('🔗 Opening UPI app with URL:', upiUrl);
+                // Clear cart after successful UPI payment initiation
+                clearCart();
                 Linking.openURL(upiUrl);
                 setLoading(false);
                 return;
@@ -166,6 +170,8 @@ const PlaceOrderScreen = ({ navigation, route }: { navigation: any, route: any }
               {
                 text: 'OK',
                 onPress: () => {
+                  // Clear cart after successful payment initiation
+                  clearCart();
                   Linking.openURL(paymentUrl);
                   setLoading(false);
                 }

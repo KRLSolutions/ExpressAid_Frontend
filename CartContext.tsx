@@ -173,6 +173,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSaveTime = useRef<number>(0);
   const saveCooldown = 2000; // 2 seconds cooldown between saves
+  const isClearingCart = useRef<boolean>(false); // Added flag
 
   // Remove any lingering 'after_hours' items on mount
   useEffect(() => {
@@ -191,6 +192,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   // Optimized debounced save cart to backend with cooldown
   useEffect(() => {
     console.log('🛒 Cart changed, length:', cart.length, 'items:', cart.map(i => `${i.title}(${i.qty})`));
+
+    // Skip saving if we're explicitly clearing the cart
+    if (isClearingCart.current) { // Added check
+      console.log('🛒 Skipping cart save - cart is being cleared');
+      return;
+    }
     
     const now = Date.now();
     if (now - lastSaveTime.current < saveCooldown) {
@@ -252,13 +259,34 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const clearCart = async () => {
+    console.log('🛒 clearCart called, current cart length:', cart.length);
+
+    // Prevent clearing if cart is already empty
+    if (cart.length === 0) { // Added safeguard
+      console.log('🛒 Cart is already empty, skipping clear operation');
+      return;
+    }
+
+    // Set flag to prevent useEffect from running
+    isClearingCart.current = true; // Set flag
+
+    // Clear the debounced save timeout to prevent race conditions
+    if (saveTimeout.current) { // Clear timeout
+      clearTimeout(saveTimeout.current);
+      saveTimeout.current = null;
+    }
+
     setCart([]);
+    console.log('🛒 Cart state cleared, now clearing from backend...');
     // Also clear cart from backend immediately
     try {
       await apiService.saveCart([]);
-      console.log('Cart cleared from backend successfully');
+      console.log('✅ Cart cleared from backend successfully');
     } catch (error) {
-      console.error('Error clearing cart from backend:', error);
+      console.error('❌ Error clearing cart from backend:', error);
+    } finally {
+      // Reset flag after clearing is complete
+      isClearingCart.current = false; // Reset flag
     }
   };
 

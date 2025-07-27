@@ -178,6 +178,7 @@ const handlePlaceOrder = async () => {
             throw new Error('User not authenticated');
           }
 
+          console.log('📤 Sending order creation request to backend...');
           const response = await fetch(`${url}/orders`, {
             method: 'POST',
             headers: {
@@ -187,19 +188,24 @@ const handlePlaceOrder = async () => {
             body: JSON.stringify(orderPayload)
           });
 
+          console.log('📥 Order creation response status:', response.status);
           const orderData = await response.json();
+          console.log('📥 Order creation response data:', orderData);
           
           if (!orderData.success) {
             throw new Error(orderData.error || 'Failed to create order');
           }
 
           console.log('✅ Order created successfully:', orderData.order);
+          console.log('🛒 About to clear cart...');
           
           Alert.alert('Success', `Payment successful for order: ${orderData.order._id}`, [
             {
               text: 'OK',
               onPress: () => {
+                console.log('🛒 Clearing cart after successful order...');
                 clearCart();
+                console.log('🛒 Cart cleared, navigating to nurse screen...');
                 // Navigate to SearchingForNurseScreen with the actual order ID from database
                 navigation.navigate('SearchingForNurseScreen', { 
                   orderId: orderData.order._id
@@ -207,8 +213,9 @@ const handlePlaceOrder = async () => {
               }
             }
           ]);
-        } catch (error) {
+        } catch (error: any) { // Fixed TypeScript error here
           console.error('❌ Error creating order:', error);
+          console.error('❌ Error details:', error.message, error.stack);
           Alert.alert('Error', 'Payment successful but failed to create order. Please contact support.');
         }
       },

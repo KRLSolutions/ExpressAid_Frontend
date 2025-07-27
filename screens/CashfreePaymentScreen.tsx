@@ -1,12 +1,14 @@
 import React from 'react';
 import { View, ActivityIndicator, Alert, Text, TouchableOpacity } from 'react-native';
 import { WebView } from 'react-native-webview';
+import { useCart } from '../CartContext';
 
 const CashfreePaymentScreen = ({ route, navigation }: { route: any, navigation: any }) => {
   const { paymentSessionId } = route.params;
   const [placingOrder, setPlacingOrder] = React.useState(false);
   const [webviewError, setWebviewError] = React.useState<string | null>(null);
   const [webviewKey, setWebviewKey] = React.useState(0); // for retry
+  const { clearCart } = useCart();
 
   // Cashfree hosted checkout URL (sandbox)
   // Format: https://sandbox.cashfree.com/pg/view/payment/{payment_session_id}
@@ -20,6 +22,8 @@ const CashfreePaymentScreen = ({ route, navigation }: { route: any, navigation: 
     if (navState.url.includes('success')) {
       if (placingOrder) return;
       setPlacingOrder(true);
+      // Clear cart after successful payment
+      clearCart();
       Alert.alert('Payment Success', 'Your payment was successful!');
       (navigation as any).navigate('MainDrawer', { screen: 'Home' });
     } else if (navState.url.includes('failure')) {
