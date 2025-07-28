@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, StyleSheet, Dimensions, TouchableOpacity, Animated, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
 import { MaterialIcons } from '@expo/vector-icons';
-import Svg, { Circle, Rect, Path, G, Defs, LinearGradient, Stop, Ellipse, Polygon } from 'react-native-svg';
+import Svg, { Circle, Rect, Path, G, Defs, LinearGradient, Stop, Ellipse, Polygon, Text as SvgText } from 'react-native-svg';
 import { LinearGradient as ExpoLinearGradient } from 'expo-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
@@ -67,6 +67,78 @@ const HealthTrackingIllustration = () => (
   </Svg>
 );
 
+// New illustrations for the updated onboarding flow
+const QuickNurseArrivalIllustration = () => (
+  <Svg width={width * 0.9} height={height * 0.4} viewBox="0 0 400 240">
+    <Defs>
+      <LinearGradient id="clockGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <Stop offset="0%" stopColor="#2563eb" />
+        <Stop offset="100%" stopColor="#1d4ed8" />
+      </LinearGradient>
+      <LinearGradient id="nurseGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <Stop offset="0%" stopColor="#10b981" />
+        <Stop offset="100%" stopColor="#059669" />
+      </LinearGradient>
+      <LinearGradient id="speedGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <Stop offset="0%" stopColor="#f59e0b" />
+        <Stop offset="100%" stopColor="#d97706" />
+      </LinearGradient>
+    </Defs>
+    
+    {/* Large Clock with 10 minutes */}
+    <G transform="rotate(-5 200 120)">
+      <Circle cx="200" cy="120" r="60" fill="url(#clockGradient)" />
+      <Circle cx="200" cy="120" r="55" fill="#ffffff" />
+      <Circle cx="200" cy="120" r="3" fill="#2563eb" />
+      
+      {/* Clock hands */}
+      <Path d="M200 120 L200 85" stroke="#2563eb" strokeWidth="3" strokeLinecap="round" />
+      <Path d="M200 120 L230 120" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" />
+      
+      {/* Clock numbers */}
+      <SvgText x="200" y="75" fontSize="12" fill="#2563eb" textAnchor="middle">12</SvgText>
+      <SvgText x="200" y="165" fontSize="12" fill="#2563eb" textAnchor="middle">6</SvgText>
+      <SvgText x="125" y="120" fontSize="12" fill="#2563eb" textAnchor="middle">9</SvgText>
+      <SvgText x="275" y="120" fontSize="12" fill="#2563eb" textAnchor="middle">3</SvgText>
+    </G>
+    
+    {/* Nurse arriving with speed lines */}
+    <G transform="rotate(10 320 140)">
+      {/* Speed lines */}
+      <Path d="M280 130 L300 130" stroke="#f59e0b" strokeWidth="2" opacity="0.8" />
+      <Path d="M285 140 L305 140" stroke="#f59e0b" strokeWidth="2" opacity="0.6" />
+      <Path d="M290 150 L310 150" stroke="#f59e0b" strokeWidth="2" opacity="0.4" />
+      
+      {/* Nurse figure */}
+      <Circle cx="320" cy="120" r="25" fill="url(#nurseGradient)" />
+      <Circle cx="320" cy="95" r="18" fill="#fbbf24" />
+      
+      {/* Nurse cap */}
+      <Path d="M302 85 Q320 70 338 85 L335 90 Q320 75 305 90 Z" fill="#ffffff" />
+      <Rect x="315" y="80" width="10" height="5" fill="#10b981" />
+      
+      {/* Nurse body */}
+      <Rect x="305" y="135" width="30" height="40" rx="6" fill="url(#nurseGradient)" />
+      
+      {/* Nurse arms */}
+      <Rect x="295" y="140" width="12" height="30" rx="6" fill="url(#nurseGradient)" />
+      <Rect x="333" y="140" width="12" height="30" rx="6" fill="url(#nurseGradient)" />
+      
+      {/* Nurse legs */}
+      <Rect x="310" y="170" width="8" height="25" rx="4" fill="url(#nurseGradient)" />
+      <Rect x="322" y="170" width="8" height="25" rx="4" fill="url(#nurseGradient)" />
+    </G>
+    
+    {/* "10 mins" text */}
+    <SvgText x="200" y="220" fontSize="16" fill="#2563eb" textAnchor="middle" fontWeight="bold">10 MINUTES</SvgText>
+    
+    {/* Floating elements */}
+    <Circle cx="60" cy="60" r="8" fill="#2563eb" opacity="0.6" />
+    <Circle cx="340" cy="60" r="6" fill="#10b981" opacity="0.7" />
+    <Path d="M30 100 L50 100 M40 90 L40 110" stroke="#2563eb" strokeWidth="2" />
+  </Svg>
+);
+
 const NurseCareIllustration = () => (
   <Svg width={width * 0.9} height={height * 0.4} viewBox="0 0 400 240">
     <Defs>
@@ -81,6 +153,10 @@ const NurseCareIllustration = () => (
       <LinearGradient id="uniformGradient" x1="0%" y1="0%" x2="100%" y2="100%">
         <Stop offset="0%" stopColor="#ffffff" />
         <Stop offset="100%" stopColor="#f8fafc" />
+      </LinearGradient>
+      <LinearGradient id="vitalsGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <Stop offset="0%" stopColor="#10b981" />
+        <Stop offset="100%" stopColor="#059669" />
       </LinearGradient>
     </Defs>
     
@@ -114,17 +190,17 @@ const NurseCareIllustration = () => (
       <Rect x="217" y="205" width="18" height="8" rx="4" fill="#374151" />
     </G>
     
-    {/* Medical equipment */}
+    {/* Vitals monitoring equipment */}
     <G transform="rotate(5 320 120)">
-      <Rect x="300" y="100" width="60" height="80" rx="6" fill="#ffffff" opacity="0.9" />
-      <Rect x="305" y="105" width="50" height="70" rx="3" fill="#f1f5f9" />
+      <Rect x="300" y="100" width="60" height="80" rx="6" fill="url(#vitalsGradient)" />
+      <Rect x="305" y="105" width="50" height="70" rx="3" fill="#ffffff" />
       
-      {/* Medical cross on equipment */}
-      <Path d="M320 120 L340 120 M330 110 L330 130" stroke="#2563eb" strokeWidth="3" />
+      {/* Heart rate monitor */}
+      <Path d="M310 120 L320 115 L330 125 L340 110 L350 120" stroke="#10b981" strokeWidth="2" fill="none" />
       
-      {/* Medical tools */}
-      <Rect x="315" y="140" width="30" height="4" fill="#2563eb" rx="2" />
-      <Circle cx="330" cy="160" r="8" fill="#2563eb" opacity="0.3" />
+      {/* Blood pressure cuff */}
+      <Rect x="315" y="140" width="30" height="4" fill="#10b981" rx="2" />
+      <Circle cx="330" cy="160" r="8" fill="#10b981" opacity="0.3" />
     </G>
     
     {/* Patient bed */}
@@ -140,201 +216,172 @@ const NurseCareIllustration = () => (
     
     {/* Floating medical elements */}
     <Circle cx="50" cy="80" r="8" fill="#2563eb" opacity="0.6" />
-    <Circle cx="350" cy="60" r="6" fill="#2563eb" opacity="0.5" />
+    <Circle cx="350" cy="60" r="6" fill="#10b981" opacity="0.5" />
     <Path d="M30 120 L50 120 M40 110 L40 130" stroke="#2563eb" strokeWidth="2" />
   </Svg>
 );
 
-const MedicineIllustration = () => (
+const AffordableCareIllustration = () => (
   <Svg width={width * 0.9} height={height * 0.4} viewBox="0 0 400 240">
     <Defs>
-      <LinearGradient id="medicineGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <LinearGradient id="moneyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <Stop offset="0%" stopColor="#10b981" />
+        <Stop offset="100%" stopColor="#059669" />
+      </LinearGradient>
+      <LinearGradient id="efficiencyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <Stop offset="0%" stopColor="#f59e0b" />
+        <Stop offset="100%" stopColor="#d97706" />
+      </LinearGradient>
+      <LinearGradient id="chartGradient" x1="0%" y1="0%" x2="100%" y2="100%">
         <Stop offset="0%" stopColor="#2563eb" />
         <Stop offset="100%" stopColor="#1d4ed8" />
       </LinearGradient>
-      <LinearGradient id="pharmacyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-        <Stop offset="0%" stopColor="#f3f4f6" />
-        <Stop offset="100%" stopColor="#e5e7eb" />
-      </LinearGradient>
-      <LinearGradient id="bottleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-        <Stop offset="0%" stopColor="#3b82f6" />
-        <Stop offset="100%" stopColor="#2563eb" />
-      </LinearGradient>
     </Defs>
     
-    {/* Large Pharmacy/Medicine Storage */}
-    <G transform="rotate(-12 200 130)">
-      <Rect x="60" y="80" width="280" height="100" rx="10" fill="url(#pharmacyGradient)" />
-      <Rect x="70" y="90" width="260" height="80" rx="6" fill="#ffffff" />
+    {/* Large Price Tag */}
+    <G transform="rotate(-5 200 120)">
+      <Rect x="150" y="80" width="100" height="80" rx="8" fill="url(#moneyGradient)" />
+      <Rect x="155" y="85" width="90" height="70" rx="4" fill="#ffffff" />
       
-      {/* Multiple medicine shelves */}
-      <Rect x="80" y="100" width="240" height="20" rx="3" fill="#f8fafc" />
-      <Rect x="80" y="130" width="240" height="20" rx="3" fill="#f8fafc" />
-      <Rect x="80" y="160" width="240" height="20" rx="3" fill="#f8fafc" />
+      {/* Dollar sign */}
+      <SvgText x="200" y="115" fontSize="24" fill="#10b981" textAnchor="middle" fontWeight="bold">$</SvgText>
+      <SvgText x="200" y="140" fontSize="16" fill="#10b981" textAnchor="middle">AFFORDABLE</SvgText>
     </G>
     
-    {/* Large Medicine Bottles */}
-    <G transform="rotate(-8 200 120)">
-      {/* Row 1 */}
-      <Rect x="90" y="105" width="35" height="50" rx="4" fill="url(#bottleGradient)" />
-      <Rect x="135" y="105" width="35" height="50" rx="4" fill="url(#bottleGradient)" />
-      <Rect x="180" y="105" width="35" height="50" rx="4" fill="url(#bottleGradient)" />
-      <Rect x="225" y="105" width="35" height="50" rx="4" fill="url(#bottleGradient)" />
-      <Rect x="270" y="105" width="35" height="50" rx="4" fill="url(#bottleGradient)" />
+    {/* Efficiency Chart */}
+    <G transform="rotate(8 320 100)">
+      <Rect x="300" y="60" width="80" height="80" rx="6" fill="url(#efficiencyGradient)" />
+      <Rect x="305" y="65" width="70" height="70" rx="3" fill="#ffffff" />
       
-      {/* Row 2 */}
-      <Rect x="90" y="165" width="35" height="50" rx="4" fill="url(#bottleGradient)" />
-      <Rect x="135" y="165" width="35" height="50" rx="4" fill="url(#bottleGradient)" />
-      <Rect x="180" y="165" width="35" height="50" rx="4" fill="url(#bottleGradient)" />
-      <Rect x="225" y="165" width="35" height="50" rx="4" fill="url(#bottleGradient)" />
-      <Rect x="270" y="165" width="35" height="50" rx="4" fill="url(#bottleGradient)" />
+      {/* Chart bars */}
+      <Rect x="310" y="120" width="15" height="20" fill="#f59e0b" />
+      <Rect x="330" y="110" width="15" height="30" fill="#f59e0b" />
+      <Rect x="350" y="100" width="15" height="40" fill="#f59e0b" />
       
-      {/* Bottle details */}
-      <Rect x="95" y="110" width="25" height="40" rx="2" fill="#ffffff" opacity="0.4" />
-      <Rect x="140" y="110" width="25" height="40" rx="2" fill="#ffffff" opacity="0.4" />
-      <Rect x="185" y="110" width="25" height="40" rx="2" fill="#ffffff" opacity="0.4" />
-      <Rect x="230" y="110" width="25" height="40" rx="2" fill="#ffffff" opacity="0.4" />
-      <Rect x="275" y="110" width="25" height="40" rx="2" fill="#ffffff" opacity="0.4" />
-      
-      <Rect x="95" y="170" width="25" height="40" rx="2" fill="#ffffff" opacity="0.4" />
-      <Rect x="140" y="170" width="25" height="40" rx="2" fill="#ffffff" opacity="0.4" />
-      <Rect x="185" y="170" width="25" height="40" rx="2" fill="#ffffff" opacity="0.4" />
-      <Rect x="230" y="170" width="25" height="40" rx="2" fill="#ffffff" opacity="0.4" />
-      <Rect x="275" y="170" width="25" height="40" rx="2" fill="#ffffff" opacity="0.4" />
+      {/* Chart line */}
+      <Path d="M310 120 L330 110 L350 100" stroke="#f59e0b" strokeWidth="2" fill="none" />
     </G>
     
-    {/* Large Pill Container */}
-    <G transform="rotate(5 320 80)">
-      <Rect x="300" y="60" width="80" height="40" rx="8" fill="url(#medicineGradient)" />
-      <Rect x="305" y="65" width="70" height="30" rx="4" fill="#ffffff" />
+    {/* Efficiency icon */}
+    <G transform="rotate(-3 100 100)">
+      <Circle cx="100" cy="100" r="30" fill="url(#efficiencyGradient)" />
+      <Circle cx="100" cy="100" r="25" fill="#ffffff" />
       
-      {/* Pills */}
-      <Circle cx="320" cy="80" r="4" fill="#2563eb" />
-      <Circle cx="335" cy="80" r="4" fill="#2563eb" />
-      <Circle cx="350" cy="80" r="4" fill="#2563eb" />
-      <Circle cx="365" cy="80" r="4" fill="#2563eb" />
+      {/* Lightning bolt */}
+      <Path d="M95 85 L105 95 L100 105 L110 115 L105 125 L95 115 L100 105 Z" fill="#f59e0b" />
     </G>
     
-    {/* Medical Cross */}
-    <Path d="M190 50 L210 50 M200 40 L200 60" stroke="url(#medicineGradient)" strokeWidth="5" />
+    {/* Money symbols */}
+    <Circle cx="60" cy="60" r="12" fill="url(#moneyGradient)" />
+    <SvgText x="60" y="65" fontSize="12" fill="#ffffff" textAnchor="middle" fontWeight="bold">$</SvgText>
     
-    {/* Floating pills */}
-    <Circle cx="60" cy="70" r="6" fill="#2563eb" opacity="0.8" />
-    <Circle cx="340" cy="40" r="5" fill="#2563eb" opacity="0.7" />
-    <Circle cx="50" cy="200" r="4" fill="#2563eb" opacity="0.6" />
-    <Circle cx="350" cy="200" r="5" fill="#2563eb" opacity="0.7" />
+    <Circle cx="340" cy="60" r="10" fill="url(#moneyGradient)" />
+    <SvgText x="340" y="65" fontSize="10" fill="#ffffff" textAnchor="middle" fontWeight="bold">$</SvgText>
+    
+    {/* Efficiency text */}
+    <SvgText x="200" y="220" fontSize="14" fill="#10b981" textAnchor="middle" fontWeight="bold">VERY CHEAP & EFFICIENT</SvgText>
+    
+    {/* Floating elements */}
+    <Circle cx="50" cy="180" r="6" fill="#10b981" opacity="0.7" />
+    <Circle cx="350" cy="180" r="5" fill="#f59e0b" opacity="0.6" />
+    <Path d="M30 140 L50 140 M40 130 L40 150" stroke="#10b981" strokeWidth="2" />
   </Svg>
 );
 
-const HomeCareIllustration = () => (
+const AppFeaturesIllustration = () => (
   <Svg width={width * 0.9} height={height * 0.4} viewBox="0 0 400 240">
     <Defs>
-      <LinearGradient id="homeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <LinearGradient id="supportGradient" x1="0%" y1="0%" x2="100%" y2="100%">
         <Stop offset="0%" stopColor="#2563eb" />
         <Stop offset="100%" stopColor="#1d4ed8" />
       </LinearGradient>
-      <LinearGradient id="sofaGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-        <Stop offset="0%" stopColor="#dbeafe" />
-        <Stop offset="100%" stopColor="#bfdbfe" />
+      <LinearGradient id="clockGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <Stop offset="0%" stopColor="#f59e0b" />
+        <Stop offset="100%" stopColor="#d97706" />
       </LinearGradient>
-      <LinearGradient id="roomGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
-        <Stop offset="0%" stopColor="#eff6ff" />
-        <Stop offset="100%" stopColor="#dbeafe" />
+      <LinearGradient id="emergencyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <Stop offset="0%" stopColor="#ef4444" />
+        <Stop offset="100%" stopColor="#dc2626" />
       </LinearGradient>
     </Defs>
     
-    {/* Large Home Interior */}
-    <Rect x="40" y="60" width="320" height="160" rx="12" fill="url(#roomGradient2)" />
-    <Rect x="50" y="70" width="300" height="140" rx="8" fill="#ffffff" />
-    
-    {/* Large 3D House Structure */}
-    <Path d="M120 100 L280 100 L280 60 L200 30 L120 60 Z" fill="url(#homeGradient)" />
-    <Rect x="140" y="80" width="120" height="20" fill="#ffffff" />
-    <Rect x="160" y="85" width="80" height="10" fill="#2563eb" />
-    
-    {/* Large 3D Sofa */}
-    <G transform="rotate(-10 200 160)">
-      <Rect x="100" y="140" width="200" height="60" rx="10" fill="url(#sofaGradient)" />
-      <Rect x="110" y="150" width="180" height="40" rx="6" fill="#ffffff" opacity="0.3" />
+    {/* Large 24/7 Clock */}
+    <G transform="rotate(-5 200 120)">
+      <Circle cx="200" cy="120" r="60" fill="url(#clockGradient)" />
+      <Circle cx="200" cy="120" r="55" fill="#ffffff" />
+      <Circle cx="200" cy="120" r="3" fill="#f59e0b" />
       
-      {/* Sofa cushions */}
-      <Rect x="120" y="155" width="50" height="30" rx="4" fill="#ffffff" opacity="0.5" />
-      <Rect x="180" y="155" width="50" height="30" rx="4" fill="#ffffff" opacity="0.5" />
-      <Rect x="240" y="155" width="50" height="30" rx="4" fill="#ffffff" opacity="0.5" />
+      {/* Clock hands */}
+      <Path d="M200 120 L200 85" stroke="#f59e0b" strokeWidth="3" strokeLinecap="round" />
+      <Path d="M200 120 L230 120" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" />
+      
+      {/* Clock numbers */}
+      <SvgText x="200" y="75" fontSize="12" fill="#f59e0b" textAnchor="middle">12</SvgText>
+      <SvgText x="200" y="165" fontSize="12" fill="#f59e0b" textAnchor="middle">6</SvgText>
+      <SvgText x="125" y="120" fontSize="12" fill="#f59e0b" textAnchor="middle">9</SvgText>
+      <SvgText x="275" y="120" fontSize="12" fill="#f59e0b" textAnchor="middle">3</SvgText>
+      
+      {/* 24/7 text */}
+      <SvgText x="200" y="200" fontSize="14" fill="#f59e0b" textAnchor="middle" fontWeight="bold">24/7</SvgText>
     </G>
     
-    {/* Medical equipment in home */}
-    <G transform="rotate(8 100 120)">
-      <Rect x="70" y="100" width="60" height="40" rx="6" fill="url(#homeGradient)" />
-      <Rect x="75" y="105" width="50" height="30" rx="3" fill="#ffffff" />
-      <Path d="M85 115 L95 110 L105 115 L115 105" stroke="#2563eb" strokeWidth="2" fill="none" />
+    {/* Emergency support icons */}
+    <G transform="rotate(8 100 100)">
+      <Circle cx="100" cy="100" r="25" fill="url(#emergencyGradient)" />
+      <Path d="M95 95 L105 105 M105 95 L95 105" stroke="#ffffff" strokeWidth="3" />
     </G>
     
-    {/* Nurse visiting home */}
-    <G transform="rotate(-5 320 140)">
-      {/* Nurse figure */}
-      <Circle cx="320" cy="120" r="20" fill="url(#homeGradient)" />
-      <Circle cx="320" cy="95" r="15" fill="#fbbf24" />
-      
-      {/* Nurse cap */}
-      <Path d="M305 85 Q320 70 335 85 L330 90 Q320 75 310 90 Z" fill="#ffffff" />
-      <Rect x="315" y="80" width="10" height="5" fill="#2563eb" />
-      
-      {/* Nurse body */}
-      <Rect x="305" y="135" width="30" height="40" rx="6" fill="url(#homeGradient)" />
-      
-      {/* Nurse arms */}
-      <Rect x="295" y="140" width="12" height="30" rx="6" fill="url(#homeGradient)" />
-      <Rect x="333" y="140" width="12" height="30" rx="6" fill="url(#homeGradient)" />
-      
-      {/* Nurse legs */}
-      <Rect x="310" y="170" width="8" height="25" rx="4" fill="url(#homeGradient)" />
-      <Rect x="322" y="170" width="8" height="25" rx="4" fill="url(#homeGradient)" />
+    <G transform="rotate(-8 320 100)">
+      <Circle cx="320" cy="100" r="20" fill="url(#emergencyGradient)" />
+      <Path d="M315 95 L325 105 M325 95 L315 105" stroke="#ffffff" strokeWidth="2" />
     </G>
     
-    {/* Medical bag */}
-    <G transform="rotate(3 80 180)">
-      <Rect x="60" y="170" width="40" height="30" rx="6" fill="#374151" />
-      <Rect x="65" y="175" width="30" height="20" rx="3" fill="#6b7280" />
-      <Path d="M70 180 L90 180 M80 175 L80 185" stroke="#2563eb" strokeWidth="2" />
+    <G transform="rotate(5 100 180)">
+      <Circle cx="100" cy="180" r="18" fill="url(#supportGradient)" />
+      <Path d="M95 175 L105 185 M105 175 L95 185" stroke="#ffffff" strokeWidth="2" />
     </G>
     
-    {/* Large Heart symbol */}
-    <Path d="M350 80 Q350 65 365 65 Q380 65 380 80 Q380 95 365 95 Q350 95 350 80" fill="#2563eb" />
+    <G transform="rotate(-5 320 180)">
+      <Circle cx="320" cy="180" r="22" fill="url(#supportGradient)" />
+      <Path d="M315 175 L325 185 M325 175 L315 185" stroke="#ffffff" strokeWidth="2" />
+    </G>
     
-    {/* Floating medical elements */}
-    <Circle cx="50" cy="100" r="8" fill="#2563eb" opacity="0.7" />
-    <Circle cx="350" cy="40" r="6" fill="#2563eb" opacity="0.6" />
+    {/* Support text */}
+    <SvgText x="200" y="220" fontSize="14" fill="#2563eb" textAnchor="middle" fontWeight="bold">24/7 SUPPORT</SvgText>
+    
+    {/* Floating elements */}
+    <Circle cx="60" cy="60" r="8" fill="#2563eb" opacity="0.7" />
+    <Circle cx="340" cy="60" r="6" fill="#ef4444" opacity="0.6" />
     <Path d="M30 140 L50 140 M40 130 L40 150" stroke="#2563eb" strokeWidth="2" />
   </Svg>
 );
 
 const slides = [
   {
-    illustration: HealthTrackingIllustration,
-    title: 'Smart Health\nMonitoring',
-    subtitle: 'Track your vital signs and health metrics with advanced monitoring technology.',
+    illustration: QuickNurseArrivalIllustration,
+    title: 'Nurse Arrives in\n10 Minutes',
+    subtitle: 'When you book, a qualified nurse will arrive at your doorstep within 10 minutes.',
     buttonText: 'Continue',
     gradient: ['#2563eb', '#1d4ed8'],
   },
   {
     illustration: NurseCareIllustration,
-    title: 'Professional\nNurse Care',
-    subtitle: 'Get expert nursing care delivered to your doorstep with certified professionals.',
+    title: 'Professional Care\n& Treatment',
+    subtitle: 'The nurse will treat you by taking vitals and providing comprehensive care.',
     buttonText: 'Continue',
     gradient: ['#2563eb', '#1d4ed8'],
   },
   {
-    illustration: MedicineIllustration,
-    title: 'Authentic\nMedicines',
-    subtitle: 'Access genuine medicines and healthcare products from trusted sources.',
+    illustration: AffordableCareIllustration,
+    title: 'Very Cheap &\nEfficient',
+    subtitle: 'Get quality healthcare services at affordable prices with maximum efficiency.',
     buttonText: 'Continue',
     gradient: ['#2563eb', '#1d4ed8'],
   },
   {
-    illustration: HomeCareIllustration,
-    title: 'Home Healthcare\nServices',
-    subtitle: 'Quality healthcare services delivered to your home for your comfort.',
+    illustration: AppFeaturesIllustration,
+    title: '24/7 Healthcare\nSupport',
+    subtitle: 'Get round-the-clock healthcare support and emergency services whenever you need them.',
     buttonText: 'Get Started',
     gradient: ['#2563eb', '#1d4ed8'],
   },
@@ -357,16 +404,16 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ navigation }) => {
     subtitleAnim.setValue(0);
     buttonAnim.setValue(0);
 
-    // Animate content in sequence
+    // Enhanced animations with bounce effect
     Animated.sequence([
       Animated.timing(titleAnim, {
         toValue: 1,
-        duration: 600,
+        duration: 800,
         useNativeDriver: true,
       }),
       Animated.timing(subtitleAnim, {
         toValue: 1,
-        duration: 600,
+        duration: 700,
         useNativeDriver: true,
       }),
       Animated.timing(buttonAnim, {
@@ -378,11 +425,16 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ navigation }) => {
   }, [currentIndex]);
 
   const handleNext = () => {
-    // Button press animation
+    // Enhanced button press animation with bounce
     Animated.sequence([
       Animated.timing(buttonScale, {
-        toValue: 0.9,
-        duration: 100,
+        toValue: 0.85,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+      Animated.timing(buttonScale, {
+        toValue: 1.1,
+        duration: 150,
         useNativeDriver: true,
       }),
       Animated.timing(buttonScale, {
