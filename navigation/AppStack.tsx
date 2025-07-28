@@ -22,6 +22,9 @@ import CardEntryScreen from '../screens/CardEntryScreen';
 import UPIIDEntryScreen from '../screens/UPIIDEntryScreen';
 import CashfreePaymentScreen from '../screens/CashfreePaymentScreen';
 import ArticleDetailScreen from '../screens/ArticleDetailScreen';
+import HealthDashboardScreen from '../screens/HealthDashboardScreen';
+import BMICalculatorScreen from '../screens/BMICalculatorScreen';
+import VitalsEntryScreen from '../screens/VitalsEntryScreen';
 
 type AppStackProps = {
   userData: any;
@@ -150,6 +153,9 @@ export type AppDrawerParamList = {
   SymptomEntry: undefined;
   Cart: { selectedPaymentMethod?: string };
   Orders: undefined;
+  HealthDashboard: undefined;
+  BMICalculator: undefined;
+  VitalsEntry: undefined;
   InviteFriends: undefined;
   Notifications: undefined;
   AboutUs: undefined;
@@ -189,6 +195,9 @@ const MainDrawer = ({ userData, onLogout }: AppStackProps) => (
     <Drawer.Screen name="SymptomEntry" component={SymptomEntryScreen} />
     <Drawer.Screen name="Cart" component={CartScreen} />
     <Drawer.Screen name="Orders" component={OrdersScreen} />
+    <Drawer.Screen name="HealthDashboard" component={HealthDashboardScreen} />
+    <Drawer.Screen name="BMICalculator" component={BMICalculatorScreen} />
+    <Drawer.Screen name="VitalsEntry" component={VitalsEntryScreen} />
     <Drawer.Screen name="InviteFriends" component={InviteFriendsScreen} />
     <Drawer.Screen name="Notifications" component={NotificationsScreen} />
     <Drawer.Screen name="AboutUs" component={AboutUsScreen} />
