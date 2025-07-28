@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Platform, PermissionsAndroid } from 'react-native';
+import { Platform, PermissionsAndroid, NativeEventEmitter, NativeModules } from 'react-native';
 
 interface UseSMSAutoFillProps {
   onOTPReceived: (otp: string) => void;
@@ -43,13 +43,15 @@ export const useSMSAutoFill = ({ onOTPReceived, phoneNumber }: UseSMSAutoFillPro
 
   // Extract OTP from SMS text
   const extractOTPFromSMS = (smsText: string): string | null => {
-    // Common OTP patterns
+    // Common OTP patterns for ExpressAid
     const otpPatterns = [
       /(\d{6})/, // 6-digit OTP
       /OTP[:\s]*(\d{6})/i, // OTP: 123456
       /code[:\s]*(\d{6})/i, // code: 123456
       /verification[:\s]*(\d{6})/i, // verification: 123456
       /(\d{6})[^\d]*$/i, // 6 digits at the end
+      /verification code is:\s*(\d{6})/i, // "verification code is: 123456"
+      /ExpressAid.*?(\d{6})/i, // ExpressAid...123456
     ];
 
     for (const pattern of otpPatterns) {
@@ -79,30 +81,23 @@ export const useSMSAutoFill = ({ onOTPReceived, phoneNumber }: UseSMSAutoFillPro
     console.log('Stopped listening for SMS');
   };
 
-  // Simulate SMS detection (in a real app, this would be replaced with actual SMS listener)
+  // Listen for real SMS events from native module
   useEffect(() => {
     if (isListening && smsPermission) {
-      // This is a simulation - in production, you would use a native module
-      // or library like react-native-sms-retriever
-      const simulateSMSDetection = () => {
-        // Simulate receiving an SMS with OTP
-        // In real implementation, this would be triggered by actual SMS
-        console.log('Simulating SMS detection...');
-        
-        // Example: Simulate receiving SMS after 5 seconds
-        setTimeout(() => {
-          const mockSMS = `Your ExpressAid OTP is 123456. Valid for 10 minutes.`;
-          const extractedOTP = extractOTPFromSMS(mockSMS);
-          
-          if (extractedOTP) {
-            console.log('OTP extracted from SMS:', extractedOTP);
-            onOTPReceived(extractedOTP);
-            stopListening();
-          }
-        }, 5000);
+      console.log('SMS auto-fill is active. Send an SMS with OTP to test.');
+      
+      // Listen for SMS events from native module
+      const eventEmitter = new NativeEventEmitter(NativeModules.ReactNativeEventEmitter);
+      const subscription = eventEmitter.addListener('SMS_OTP_RECEIVED', (otp: string) => {
+        console.log('Real OTP received from SMS:', otp);
+        console.log('Auto-filling OTP:', otp);
+        onOTPReceived(otp);
+        stopListening();
+      });
+      
+      return () => {
+        subscription.remove();
       };
-
-      simulateSMSDetection();
     }
   }, [isListening, smsPermission, onOTPReceived]);
 

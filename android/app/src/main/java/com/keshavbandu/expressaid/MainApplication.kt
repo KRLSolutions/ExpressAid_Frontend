@@ -2,6 +2,8 @@ package com.keshavbandu.expressaid
 
 import android.app.Application
 import android.content.res.Configuration
+import android.content.IntentFilter
+import android.provider.Telephony
 
 import com.facebook.react.PackageList
 import com.facebook.react.ReactApplication
@@ -48,6 +50,15 @@ class MainApplication : Application(), ReactApplication {
       load()
     }
     ApplicationLifecycleDispatcher.onApplicationCreate(this)
+    
+    // Register SMS receiver
+    registerSMSReceiver()
+  }
+
+  private fun registerSMSReceiver() {
+    val smsReceiver = SMSReceiver()
+    val filter = IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)
+    registerReceiver(smsReceiver, filter)
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
