@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, FlatList, Dimensions, Pressable, Animated, Modal, StatusBar, Platform, SafeAreaView } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, FlatList, Dimensions, Pressable, Animated, Modal, StatusBar, Platform, SafeAreaView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { Ionicons } from '@expo/vector-icons';
@@ -76,10 +76,27 @@ const SymptomEntryScreen: React.FC = () => {
         useNativeDriver: true,
       })
     )).start();
+    
+    // Show location restriction alert once when screen opens
+    showLocationRestrictionAlert();
   }, []);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedService, setSelectedService] = useState<ServiceItem | null>(null);
+
+  // Function to show location restriction alert
+  const showLocationRestrictionAlert = () => {
+    Alert.alert(
+      'Service Area Restriction',
+      'Our services are currently available only in Bangalore and its outskirts. We will notify you when we expand to your area.',
+      [
+        {
+          text: 'OK',
+          style: 'default',
+        }
+      ]
+    );
+  };
 
   // Service details text mapping
   const SERVICE_DETAILS: { [key: string]: string } = {
