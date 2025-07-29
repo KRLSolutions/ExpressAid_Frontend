@@ -7,10 +7,26 @@ interface Location {
   address?: string;
 }
 
+interface HealthProfile {
+  name: string;
+  age: number;
+  gender: 'male' | 'female' | 'other';
+  currentSteps: number;
+  sleepHours: number;
+  waterIntake: number;
+  conditions: string[];
+  medications: string[];
+  allergies: string[];
+}
+
 interface UserStoreContextType {
   location: Location | null;
   setLocation: (location: Location) => void;
   saveLocationToBackend: (location: Location) => Promise<void>;
+  healthProfile: HealthProfile | null;
+  setHealthProfile: (profile: HealthProfile) => void;
+  loadHealthProfile: () => Promise<void>;
+  updateHealthProfile: (updates: Partial<HealthProfile>) => Promise<void>;
 }
 
 const UserStoreContext = createContext<UserStoreContextType | undefined>(undefined);
@@ -29,11 +45,16 @@ interface UserStoreProviderProps {
 
 export const UserStoreProvider: React.FC<UserStoreProviderProps> = ({ children }) => {
   const [location, setLocationState] = useState<Location | null>(null);
+  const [healthProfile, setHealthProfileState] = useState<HealthProfile | null>(null);
 
   const setLocation = (newLocation: Location) => {
     setLocationState(newLocation);
     // Auto-save to backend when location changes
     saveLocationToBackend(newLocation);
+  };
+
+  const setHealthProfile = (profile: HealthProfile) => {
+    setHealthProfileState(profile);
   };
 
   const saveLocationToBackend = async (locationData: Location) => {
@@ -50,8 +71,59 @@ export const UserStoreProvider: React.FC<UserStoreProviderProps> = ({ children }
     }
   };
 
+  const loadHealthProfile = async () => {
+    try {
+      const token = await apiService.getToken();
+      if (!token) return;
+
+      const response = await apiService.request('/users/health-profile', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.success && response.data) {
+        setHealthProfileState(response.data);
+      }
+    } catch (error) {
+      console.error('Error loading health profile:', error);
+    }
+  };
+
+  const updateHealthProfile = async (updates: Partial<HealthProfile>) => {
+    try {
+      const token = await apiService.getToken();
+      if (!token) return;
+
+      const response = await apiService.request('/users/update-health-profile', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updates),
+      });
+
+      if (response.success) {
+        setHealthProfileState(prev => prev ? { ...prev, ...updates } : null);
+      }
+    } catch (error) {
+      console.error('Error updating health profile:', error);
+      throw error;
+    }
+  };
+
   return (
-    <UserStoreContext.Provider value={{ location, setLocation, saveLocationToBackend }}>
+    <UserStoreContext.Provider value={{ 
+      location, 
+      setLocation, 
+      saveLocationToBackend,
+      healthProfile,
+      setHealthProfile,
+      loadHealthProfile,
+      updateHealthProfile
+    }}>
       {children}
     </UserStoreContext.Provider>
   );

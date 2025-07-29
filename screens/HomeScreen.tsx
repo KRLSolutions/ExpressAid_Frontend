@@ -559,49 +559,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
   };
 
   // --- HEALTH BUTTONS COMPONENT ---
-  const HealthButtons: React.FC = () => {
-    return (
-      <Animated.View
-        entering={FadeInUp.duration(900)}
-        style={styles.healthButtonsContainer}
-      >
-        <View style={styles.healthButtonsRow}>
-          <TouchableOpacity 
-            style={styles.healthButton}
-            onPress={() => navigation.navigate('HealthDashboard')}
-            activeOpacity={0.7}
-          >
-            <View style={[styles.healthButtonIcon, { backgroundColor: '#fce4ec' }]}>
-              <Ionicons name="heart" size={24} color="#e91e63" />
-            </View>
-            <Text style={styles.healthButtonText}>Health Dashboard</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={styles.healthButton}
-            onPress={() => navigation.navigate('BMICalculator')}
-            activeOpacity={0.7}
-          >
-            <View style={[styles.healthButtonIcon, { backgroundColor: '#e8f5e8' }]}>
-              <Ionicons name="calculator" size={24} color="#4caf50" />
-            </View>
-            <Text style={styles.healthButtonText}>BMI Calculator</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={styles.healthButton}
-            onPress={() => navigation.navigate('VitalsEntry')}
-            activeOpacity={0.7}
-          >
-            <View style={[styles.healthButtonIcon, { backgroundColor: '#fff3e0' }]}>
-              <Ionicons name="pulse" size={24} color="#ff9800" />
-            </View>
-            <Text style={styles.healthButtonText}>Vital Signs</Text>
-          </TouchableOpacity>
-        </View>
-      </Animated.View>
-    );
-  };
+  // Removed health dashboard and BMI calculator buttons
 
   const bounce = useSharedValue(0);
   React.useEffect(() => {
@@ -665,8 +623,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
 
         {/* Content Sections */}
         <View style={styles.contentContainer}>
-          {/* Health Buttons */}
-          <HealthButtons />
           {/* Stats Banner - At the top for impact */}
           <StatsBanner />
 
@@ -1381,51 +1337,6 @@ const styles = StyleSheet.create({
     color: '#6b7280',
     marginTop: 6,
     fontWeight: '500',
-  },
-  healthButtonsContainer: {
-    width: '100%',
-    paddingHorizontal: 20,
-    marginBottom: 32,
-  },
-  healthButtonsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: 12,
-  },
-  healthButton: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-    borderRadius: 20,
-    padding: 16,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
-    elevation: 8,
-    borderWidth: 1,
-    borderColor: '#f1f5f9',
-  },
-  healthButtonIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  healthButtonText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#1f2937',
-    textAlign: 'center',
-    letterSpacing: 0.3,
   },
 });
 

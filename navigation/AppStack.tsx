@@ -22,9 +22,7 @@ import CardEntryScreen from '../screens/CardEntryScreen';
 import UPIIDEntryScreen from '../screens/UPIIDEntryScreen';
 import CashfreePaymentScreen from '../screens/CashfreePaymentScreen';
 import ArticleDetailScreen from '../screens/ArticleDetailScreen';
-import HealthDashboardScreen from '../screens/HealthDashboardScreen';
-import BMICalculatorScreen from '../screens/BMICalculatorScreen';
-import VitalsEntryScreen from '../screens/VitalsEntryScreen';
+import HealthOnboardingScreen from '../screens/HealthOnboardingScreen';
 
 type AppStackProps = {
   userData: any;
@@ -153,9 +151,7 @@ export type AppDrawerParamList = {
   SymptomEntry: undefined;
   Cart: { selectedPaymentMethod?: string };
   Orders: undefined;
-  HealthDashboard: undefined;
-  BMICalculator: undefined;
-  VitalsEntry: undefined;
+  HealthOnboarding: undefined;
   InviteFriends: undefined;
   Notifications: undefined;
   AboutUs: undefined;
@@ -195,9 +191,6 @@ const MainDrawer = ({ userData, onLogout }: AppStackProps) => (
     <Drawer.Screen name="SymptomEntry" component={SymptomEntryScreen} />
     <Drawer.Screen name="Cart" component={CartScreen} />
     <Drawer.Screen name="Orders" component={OrdersScreen} />
-    <Drawer.Screen name="HealthDashboard" component={HealthDashboardScreen} />
-    <Drawer.Screen name="BMICalculator" component={BMICalculatorScreen} />
-    <Drawer.Screen name="VitalsEntry" component={VitalsEntryScreen} />
     <Drawer.Screen name="InviteFriends" component={InviteFriendsScreen} />
     <Drawer.Screen name="Notifications" component={NotificationsScreen} />
     <Drawer.Screen name="AboutUs" component={AboutUsScreen} />
@@ -223,6 +216,7 @@ const AppStack: React.FC<AppStackProps> = ({ userData, onLogout }) => (
     <Stack.Screen name="SearchingForNurseScreen" component={SearchingForNurseScreen} />
     <Stack.Screen name="NurseAssignedScreen" component={NurseAssignedScreen} />
     <Stack.Screen name="ArticleDetail" component={ArticleDetailScreen} />
+    <Stack.Screen name="HealthOnboarding" component={HealthOnboardingScreen} />
   </Stack.Navigator>
 );
 
