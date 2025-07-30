@@ -221,19 +221,26 @@ const OTPScreen: React.FC<{
       try {
         const response = await apiService.verifyOTP(phoneNumber, otp);
         
-        console.log('OTP verified successfully:', response);
+        console.log('✅ OTP verified successfully:', response);
+        console.log('🔑 Token received:', response.token ? `${response.token.substring(0, 20)}...` : 'null');
+        
+        // Verify token was saved
+        const savedToken = await AsyncStorage.getItem('userToken');
+        console.log('💾 Token saved to storage:', savedToken ? `${savedToken.substring(0, 20)}...` : 'null');
         
         // Check if user has profile
         if (response.user.hasProfile) {
           // User has complete profile, save userData and go to home
           await AsyncStorage.setItem('userData', JSON.stringify(response.user));
+          console.log('💾 User data saved');
           onLogin(response.user);
         } else {
           // User needs to complete profile
+          console.log('📝 User needs to complete profile');
           navigation.navigate('ProfileSetup', { phoneNumber, onLogin });
         }
       } catch (error) {
-        console.error('Error verifying OTP:', error);
+        console.error('❌ Error verifying OTP:', error);
         const errorMessage = error instanceof Error ? error.message : 'Failed to verify OTP. Please try again.';
         Alert.alert('Error', errorMessage);
       } finally {

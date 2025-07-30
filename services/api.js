@@ -16,10 +16,10 @@ class ApiService {
   async getToken() {
     try {
       const token = await AsyncStorage.getItem('userToken');
-      console.log('Retrieved token:', token);
+      console.log('🔑 Retrieved token:', token ? `${token.substring(0, 20)}...` : 'null');
       return token;
     } catch (error) {
-      console.error('Error getting token:', error);
+      console.error('🚨 Error getting token:', error);
       return null;
     }
   }
@@ -28,9 +28,9 @@ class ApiService {
   async saveToken(token) {
     try {
       await AsyncStorage.setItem('userToken', token);
-      console.log('Saved token:', token);
+      console.log('💾 Saved token:', token ? `${token.substring(0, 20)}...` : 'null');
     } catch (error) {
-      console.error('Error saving token:', error);
+      console.error('🚨 Error saving token:', error);
     }
   }
 
@@ -125,9 +125,9 @@ class ApiService {
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log('🔑 Using token in request:', token.substring(0, 10) + '...');
+      console.log('🔑 Using token in request:', token.substring(0, 20) + '...');
     } else {
-      console.log('⚠️ No token found for request');
+      console.log('⚠️ No token found for request to:', endpoint);
     }
 
     try {
@@ -216,6 +216,22 @@ class ApiService {
 
   async getCurrentUser() {
     return this.request('/auth/me');
+  }
+
+  // Test authentication
+  async testAuth() {
+    console.log('🧪 Testing authentication...');
+    const token = await this.getToken();
+    console.log('🧪 Current token:', token ? `${token.substring(0, 20)}...` : 'null');
+    
+    try {
+      const response = await this.request('/auth/test-auth');
+      console.log('🧪 Auth test successful:', response);
+      return response;
+    } catch (error) {
+      console.error('🧪 Auth test failed:', error);
+      throw error;
+    }
   }
 
   // User endpoints

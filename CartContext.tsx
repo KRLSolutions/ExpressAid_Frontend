@@ -62,13 +62,21 @@ export const ActiveOrderProvider = ({ children }: { children: ReactNode }) => {
   const refreshCooldown = 5000; // 5 seconds cooldown between refreshes
 
   useEffect(() => {
-    // On mount, fetch from backend
+    // On mount, check if user is authenticated before fetching
     const fetchActive = async () => {
       try {
+        const token = await AsyncStorage.getItem('userToken');
+        if (!token) {
+          console.log('🔑 No token found, skipping active order fetch');
+          setActiveOrderState(null);
+          return;
+        }
+        
         const res = await apiService.getActiveOrder();
         if (res && res.order) setActiveOrderState(res.order);
         else setActiveOrderState(null);
-      } catch {
+      } catch (error) {
+        console.log('❌ Error fetching active order:', error);
         setActiveOrderState(null);
       }
     };
@@ -95,6 +103,14 @@ export const ActiveOrderProvider = ({ children }: { children: ReactNode }) => {
     
     lastRefreshTime.current = now;
     try {
+      // Check if user is authenticated before refreshing
+      const token = await AsyncStorage.getItem('userToken');
+      if (!token) {
+        console.log('🔑 No token found, skipping active order refresh');
+        setActiveOrderState(null);
+        return;
+      }
+      
       console.log('🔄 Refreshing active order...');
       const res = await apiService.getActiveOrder();
       if (res && res.order) setActiveOrderState(res.order);
@@ -110,10 +126,19 @@ export const ActiveOrderProvider = ({ children }: { children: ReactNode }) => {
     if (!activeOrder?.orderId && !activeOrder?._id) return;
     const id = activeOrder.orderId || activeOrder._id;
     try {
+      // Check if user is authenticated before finishing order
+      const token = await AsyncStorage.getItem('userToken');
+      if (!token) {
+        console.log('🔑 No token found, skipping finish order');
+        return;
+      }
+      
       await apiService.finishOrder(id);
       setActiveOrderState(null);
       AsyncStorage.removeItem('activeOrder');
-    } catch {}
+    } catch (error) {
+      console.error('❌ Error finishing order:', error);
+    }
   };
 
   return (
@@ -211,6 +236,13 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     saveTimeout.current = setTimeout(() => {
       const saveCartToBackend = async () => {
         try {
+          // Check if user is authenticated before saving
+          const token = await AsyncStorage.getItem('userToken');
+          if (!token) {
+            console.log('🔑 No token found, skipping cart save');
+            return;
+          }
+          
           lastSaveTime.current = Date.now();
           // Convert frontend cart structure to backend structure
           const backendCart = cart.filter(item => item.id !== 'after_hours').map(item => ({
@@ -280,6 +312,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     console.log('🛒 Cart state cleared, now clearing from backend...');
     // Also clear cart from backend immediately
     try {
+      // Check if user is authenticated before clearing
+      const token = await AsyncStorage.getItem('userToken');
+      if (!token) {
+        console.log('🔑 No token found, skipping cart clear from backend');
+        isClearingCart.current = false;
+        return;
+      }
+      
       await apiService.saveCart([]);
       console.log('✅ Cart cleared from backend successfully');
     } catch (error) {

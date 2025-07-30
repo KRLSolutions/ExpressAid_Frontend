@@ -54,6 +54,20 @@ export default function ProfileSetupScreen({ navigation, route }: ProfileSetupSc
 
     setLoading(true);
     try {
+      // Debug: Check if token exists before making request
+      const token = await AsyncStorage.getItem('userToken');
+      console.log('🔍 Token before profile save:', token ? `${token.substring(0, 20)}...` : 'null');
+      
+      // Test authentication first
+      try {
+        await api.testAuth();
+        console.log('✅ Authentication test passed');
+      } catch (authError) {
+        console.error('❌ Authentication test failed:', authError);
+        Alert.alert('Authentication Error', 'Please login again');
+        return;
+      }
+      
       const response = await api.request('/auth/profile', {
         method: 'PUT',
         body: JSON.stringify({
@@ -67,13 +81,23 @@ export default function ProfileSetupScreen({ navigation, route }: ProfileSetupSc
       if (response.success) {
         // Save updated user data
         await AsyncStorage.setItem('userData', JSON.stringify(response.user));
-        if (response.token) await AsyncStorage.setItem('userToken', response.token);
-        if (response.user && response.user.userId) await AsyncStorage.setItem('userId', response.user.userId);
+        if (response.token) {
+          await AsyncStorage.setItem('userToken', response.token);
+          console.log('💾 Updated token saved');
+        }
+        if (response.user && response.user.userId) {
+          await AsyncStorage.setItem('userId', response.user.userId);
+          console.log('💾 Updated userId saved');
+        }
         // Call onLogin to complete the authentication flow
         onLogin(response.user);
       }
     } catch (error: any) {
-      console.error('Profile save error:', error);
+      console.error('🚨 Profile save error:', error);
+      console.error('Error details:', {
+        message: error.message,
+        endpoint: '/auth/profile'
+      });
       Alert.alert('Error', error.message || 'Failed to save profile');
     } finally {
       setLoading(false);
