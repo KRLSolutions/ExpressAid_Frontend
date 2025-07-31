@@ -1,1 +1,1 @@
-export const url = 'http://192.168.0.8:5000/api'
+export const url = 'https://expressaid-p533i5eoca-uc.a.run.app/api'
