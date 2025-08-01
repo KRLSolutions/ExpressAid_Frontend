@@ -456,7 +456,7 @@ class ApiService {
     try {
       console.log('🤖 Sending message to Gemini:', message);
       
-      const response = await fetch(`${this.baseURL}/gemini-chat`, {
+      const response = await fetch(`${this.baseURL}/gemini/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
