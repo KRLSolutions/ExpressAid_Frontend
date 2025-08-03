@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, Image, TextInput as RNTextInput, ImageBackground, Dimensions, Alert } from 'react-native';
+import { View, StyleSheet, Text, Image, TextInput as RNTextInput, ImageBackground, Dimensions, Alert, TouchableOpacity, Linking } from 'react-native';
 import { Button } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
@@ -16,6 +16,14 @@ const PhoneInputScreen: React.FC<{
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const { onLogin } = route.params;
+
+  const handleTermsPress = () => {
+    Linking.openURL('https://www.expressaid.in/terms-and-conditions');
+  };
+
+  const handlePrivacyPress = () => {
+    Linking.openURL('https://www.expressaid.in/privacy-policy');
+  };
 
   const handleNext = async () => {
     if (phone.length >= 10) {
@@ -77,7 +85,17 @@ const PhoneInputScreen: React.FC<{
         >
           Send OTP
         </Button>
-        <Text style={styles.terms}>By proceeding, you accept Terms and Conditions. Read the Privacy policy here.</Text>
+        <View style={styles.termsContainer}>
+          <Text style={styles.terms}>
+            By proceeding, you accept{' '}
+            <TouchableOpacity onPress={handleTermsPress}>
+              <Text style={styles.termsLink}>Terms and Conditions</Text>
+            </TouchableOpacity>. Read the{' '}
+            <TouchableOpacity onPress={handlePrivacyPress}>
+              <Text style={styles.termsLink}>Privacy policy</Text>
+            </TouchableOpacity> here.
+          </Text>
+        </View>
       </View>
     </ImageBackground>
   );
@@ -164,14 +182,25 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 18,
   },
+  termsContainer: {
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginTop: 26,
+    marginBottom: 16,
+  },
   terms: {
     color: '#fff',
-    fontSize: 12,
-    marginTop: 16,
-    marginBottom: 16,
+    fontSize: 13,
     textAlign: 'center',
-    width: '100%',
+    lineHeight: 20,
     fontWeight: '400',
+    flexWrap: 'wrap',
+  },
+  termsLink: {
+    color: '#7c3aed',
+    fontWeight: '600',
+    textDecorationLine: 'underline',
+    fontSize: 13,
   },
 });
 

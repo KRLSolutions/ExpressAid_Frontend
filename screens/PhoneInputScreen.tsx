@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, Image, TextInput as RNTextInput, Dimensions, Alert, ScrollView, TouchableOpacity, Animated, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, StyleSheet, Text, Image, TextInput as RNTextInput, Dimensions, Alert, ScrollView, TouchableOpacity, Animated, KeyboardAvoidingView, Platform, Linking } from 'react-native';
 import { Button } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
@@ -17,6 +17,14 @@ const PhoneInputScreen: React.FC<{
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const { onLogin } = route.params;
+
+  const handleTermsPress = () => {
+    Linking.openURL('https://www.expressaid.in/terms-and-conditions');
+  };
+
+  const handlePrivacyPress = () => {
+    Linking.openURL('https://www.expressaid.in/privacy-policy');
+  };
 
   // Animation values for bouncing icons in blue area
   const icon1Anim = new Animated.ValueXY({ x: 30, y: 100 });
@@ -236,11 +244,18 @@ const PhoneInputScreen: React.FC<{
               )}
             </TouchableOpacity>
 
-            <Text style={styles.terms}>
-              By continuing, you agree to our{' '}
-              <Text style={styles.termsLink}>Terms of Service</Text> and{' '}
-              <Text style={styles.termsLink}>Privacy Policy</Text>
-            </Text>
+            <View style={styles.termsContainer}>
+              <Text style={styles.terms}>
+                By continuing, you agree to our{' '}
+                <TouchableOpacity onPress={handleTermsPress}>
+                  <Text style={styles.termsLink}>Terms of Service</Text>
+                </TouchableOpacity>{' '}
+                                    {'   '}
+                <TouchableOpacity onPress={handlePrivacyPress}>
+                  <Text style={styles.termsLink}>Privacy Policy</Text>
+                </TouchableOpacity>
+              </Text>
+            </View>
           </View>
         </LinearGradient>
       </ScrollView>
@@ -403,15 +418,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 18,
   },
+  termsContainer: {
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginTop: 10,
+  },
   terms: {
     color: '#64748b',
-    fontSize: 12,
+    fontSize: 13,
     textAlign: 'center',
-    lineHeight: 18,
+    lineHeight: 20,
+    flexWrap: 'wrap',
   },
   termsLink: {
     color: '#3b82f6',
     fontWeight: '600',
+    marginTop: 25,
+    fontSize: 13,
   },
 });
 
