@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, StyleSheet, Dimensions, TouchableOpacity, Animated, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
-import { MaterialIcons } from '@expo/vector-icons';
 import Svg, { Circle, Rect, Path, G, Defs, LinearGradient, Stop, Ellipse, Polygon, Text as SvgText } from 'react-native-svg';
 import { LinearGradient as ExpoLinearGradient } from 'expo-linear-gradient';
 
@@ -466,16 +465,12 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ navigation }) => {
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}
     >
-      {/* Header with time and skip button */}
+      {/* Header with skip button only */}
       <View style={styles.header}>
-        <Text style={styles.timeText}>9:41</Text>
-        <View style={styles.headerRight}>
-          <MaterialIcons name="wifi" size={16} color="#fff" style={styles.headerIcon} />
-          <MaterialIcons name="battery-full" size={16} color="#fff" style={styles.headerIcon} />
-          <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
-            <Text style={styles.skipText}>Skip</Text>
-          </TouchableOpacity>
-        </View>
+        <View style={styles.headerLeft} />
+        <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
+          <Text style={styles.skipText}>Skip</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Pagination dots */}
@@ -581,25 +576,21 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingBottom: 10,
   },
-  timeText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  headerIcon: {
-    marginLeft: 8,
+  headerLeft: {
+    width: 40, // Placeholder for left side
   },
   skipButton: {
-    marginLeft: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   skipText: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#fff',
-    fontWeight: '500',
+    fontWeight: '600',
   },
   paginationContainer: {
     flexDirection: 'row',

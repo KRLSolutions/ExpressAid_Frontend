@@ -7,11 +7,10 @@ import { AuthStackParamList } from '../navigation/AuthStack';
 import apiService from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useSMSAutoFill } from '../hooks/useSMSAutoFill';
 
 const { width, height } = Dimensions.get('window');
 const OTP_LENGTH = 6;
-const RESEND_TIME = 10;
+const RESEND_TIME = 300; // Changed from 10 to 300 seconds (5 minutes)
 
 const OTPScreen: React.FC<{
   navigation: StackNavigationProp<AuthStackParamList, 'OTP'>;
@@ -33,15 +32,6 @@ const OTPScreen: React.FC<{
   const icon7Anim = new Animated.ValueXY({ x: 120, y: 90 });
   const icon8Anim = new Animated.ValueXY({ x: width - 60, y: 220 });
 
-  // SMS Auto-fill hook
-  const { smsPermission, isListening, startListening, stopListening } = useSMSAutoFill({
-    onOTPReceived: (receivedOtp) => {
-      console.log('Auto-filling OTP:', receivedOtp);
-      setOtp(receivedOtp);
-    },
-    phoneNumber,
-  });
-
   // Auto-fill OTP in development mode
   useEffect(() => {
     if (devOtp) {
@@ -49,22 +39,18 @@ const OTPScreen: React.FC<{
     }
   }, [devOtp]);
 
-  // Start listening for SMS when component mounts
-  useEffect(() => {
-    startListening();
-    
-    // Cleanup when component unmounts
-    return () => {
-      stopListening();
-    };
-  }, []);
-
   // Add focus listener to handle input focus issues
   useEffect(() => {
     const handleFocus = () => {
       // Ensure input is properly focused when screen gains focus
       if (inputRef.current) {
         inputRef.current.setNativeProps({ editable: true });
+        // Focus with a slight delay to ensure it works
+        setTimeout(() => {
+          if (inputRef.current) {
+            inputRef.current.focus();
+          }
+        }, 100);
       }
     };
 
@@ -74,6 +60,9 @@ const OTPScreen: React.FC<{
         handleFocus();
       }
     });
+
+    // Initial focus
+    handleFocus();
 
     return () => {
       subscription?.remove();
@@ -261,6 +250,13 @@ const OTPScreen: React.FC<{
     return boxes;
   };
 
+  // Format timer for display (MM:SS format)
+  const formatTimer = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
   return (
     <KeyboardAvoidingView 
       style={styles.container} 
@@ -349,7 +345,7 @@ const OTPScreen: React.FC<{
               </TouchableOpacity>
 
               <Text style={styles.otpTimer}>
-                OTP valid till 00:{timer.toString().padStart(2, '0')}
+                OTP valid till {formatTimer(timer)}
               </Text>
             </View>
 
@@ -381,27 +377,10 @@ const OTPScreen: React.FC<{
                 activeOpacity={0.8}
               >
                 <Text style={[styles.resendText, timer > 0 && styles.resendTextDisabled]}>
-                  {timer > 0 ? `Resend SMS in ${timer}s` : 'Resend SMS'}
+                  {timer > 0 ? `Resend SMS in ${formatTimer(timer)}` : 'Resend SMS'}
                 </Text>
               </TouchableOpacity>
             </View>
-
-            {/* Auto-fill status */}
-            {Platform.OS === 'android' && (
-              <View style={styles.autoFillSection}>
-                <Text style={styles.autoFillText}>
-                  {smsPermission 
-                    ? '💡 SMS auto-fill enabled' 
-                    : '💡 Enable SMS permissions for auto-fill OTP'
-                  }
-                </Text>
-                {isListening && (
-                  <Text style={styles.listeningText}>
-                    Listening for SMS...
-                  </Text>
-                )}
-              </View>
-            )}
           </View>
         </LinearGradient>
       </ScrollView>
@@ -593,22 +572,6 @@ const styles = StyleSheet.create({
   },
   resendTextDisabled: {
     color: '#94a3b8',
-  },
-  autoFillSection: {
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  autoFillText: {
-    fontSize: 12,
-    color: '#64748b',
-    textAlign: 'center',
-    fontStyle: 'italic',
-  },
-  listeningText: {
-    fontSize: 10,
-    color: '#3b82f6',
-    textAlign: 'center',
-    marginTop: 4,
   },
 });
 
