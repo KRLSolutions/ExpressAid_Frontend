@@ -41,12 +41,13 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
   const [mapRegion, setMapRegion] = useState<Region>({
     latitude: 12.9716,
     longitude: 77.5946,
-    latitudeDelta: 0.5,
-    longitudeDelta: 0.5,
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01,
   });
   
   const searchInputRef = useRef<TextInput>(null);
   const mapRef = useRef<MapView>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [showDetailsSheet, setShowDetailsSheet] = useState(false);
   const [extraDetails, setExtraDetails] = useState({
@@ -65,12 +66,20 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
 
   const [loadingMap, setLoadingMap] = useState(false);
+  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
     if (visible) {
       fetchAddresses();
       requestLocationPermission();
     }
+    
+    // Cleanup function to clear timeout
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
   }, [visible]);
 
   // Function to request location permission and get current location
@@ -178,8 +187,10 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
   // Use backend proxy for Places API
   const getPlacesSuggestions = async (query: string): Promise<Suggestion[]> => {
     if (query.length < 2) return [];
+    
     const url = `${BACKEND_BASE_URL}/places/autocomplete?input=${encodeURIComponent(query)}`;
     console.log('[Autocomplete] Fetching:', url);
+    
     try {
       const response = await fetch(url, {
         method: 'GET',
@@ -187,14 +198,22 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
           'Content-Type': 'application/json',
         },
       });
+      
       console.log('[Autocomplete] Status:', response.status);
+      console.log('[Autocomplete] Response headers:', response.headers);
+      
       if (!response.ok) {
         console.log('[Autocomplete] Response not ok:', response.statusText);
+        const errorText = await response.text();
+        console.log('[Autocomplete] Error response:', errorText);
         return [];
       }
+      
       const data = await response.json();
+      console.log('[Autocomplete] Full response:', data);
       console.log('[Autocomplete] Response status:', data.status);
       console.log('[Autocomplete] Predictions count:', data.predictions ? data.predictions.length : 0);
+      
       if (data.status !== 'OK') {
         console.log('[Autocomplete] Status not OK:', data.status);
         if (data.error_message) {
@@ -202,14 +221,17 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
         }
         return [];
       }
+      
       if (!data.predictions || data.predictions.length === 0) {
         console.log('[Autocomplete] No predictions found');
         return [];
       }
+      
       const mapped = data.predictions.map((item: any) => ({
         place_id: item.place_id,
         description: item.description,
       }));
+      
       console.log('[Autocomplete] Mapped suggestions:', mapped);
       return mapped;
     } catch (err) {
@@ -242,17 +264,36 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
   const handleSearchTextChange = async (text: string) => {
     console.log('[UI] Search text changed:', text, 'length:', text.length);
     setSearchText(text);
+    
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    
     if (text.length >= 2) {
       console.log('[UI] Text length >= 2, showing suggestions');
       setShowSuggestions(true);
-      const suggestions = await getPlacesSuggestions(text);
-      console.log('[UI] Got suggestions from API:', suggestions.length);
-      setSuggestions(suggestions);
-      console.log('[UI] Set suggestions in state:', suggestions);
+      
+      // Debounce the API call
+      searchTimeoutRef.current = setTimeout(async () => {
+        try {
+          setSearching(true);
+          const suggestions = await getPlacesSuggestions(text);
+          console.log('[UI] Got suggestions from API:', suggestions.length);
+          setSuggestions(suggestions);
+          console.log('[UI] Set suggestions in state:', suggestions);
+        } catch (error) {
+          console.error('[UI] Error getting suggestions:', error);
+          setSuggestions([]);
+        } finally {
+          setSearching(false);
+        }
+      }, 500); // Increased to 500ms for better debouncing
     } else {
       console.log('[UI] Text length < 2, hiding suggestions');
       setSuggestions([]);
       setShowSuggestions(false);
+      setSearching(false);
     }
   };
 
@@ -275,7 +316,16 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
   };
 
   const handleMapRegionChange = (region: Region) => {
-    setMapRegion(region);
+    // Only update if the change is significant to prevent fluctuations
+    const latDiff = Math.abs(region.latitude - mapRegion.latitude);
+    const lngDiff = Math.abs(region.longitude - mapRegion.longitude);
+    
+    if (latDiff > 0.001 || lngDiff > 0.001) {
+      setMapRegion(region);
+    }
+  };
+
+  const handleMapRegionChangeComplete = (region: Region) => {
     // Reverse geocoding to get address from coordinates
     const getAddressFromCoordinates = async () => {
       try {
@@ -484,13 +534,20 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
                   value={searchText}
                   onChangeText={(text) => {
                     setSearchText(text);
-                    setCurrentAddress(text);
                     handleSearchTextChange(text);
                   }}
                   onFocus={() => {
                     if (searchText.length >= 2) {
                       setShowSuggestions(true);
                     }
+                  }}
+                  onBlur={() => {
+                    // Keep suggestions visible for a moment to allow selection
+                    setTimeout(() => {
+                      if (!searchText || searchText.length < 2) {
+                        setShowSuggestions(false);
+                      }
+                    }, 200);
                   }}
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -508,7 +565,12 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
               {/* Suggestions */}
               {showSuggestions && (
                 <>
-                  {suggestions.length > 0 ? (
+                  {searching ? (
+                    <View style={styles.noResultsContainer}>
+                      <ActivityIndicator size="small" color="#2563eb" />
+                      <Text style={styles.noResultsText}>Searching for addresses...</Text>
+                    </View>
+                  ) : suggestions.length > 0 ? (
                     <FlatList
                       data={suggestions}
                       key={`suggestions-${suggestions.length}`}
@@ -527,7 +589,8 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
                     />
                   ) : searchText.length >= 2 ? (
                     <View style={styles.noResultsContainer}>
-                      <Text style={styles.noResultsText}>No addresses found</Text>
+                      <Text style={styles.noResultsText}>No addresses found for "{searchText}"</Text>
+                      <Text style={[styles.noResultsText, { fontSize: 14, marginTop: 4 }]}>Try a different search term</Text>
                     </View>
                   ) : null}
                 </>
@@ -541,9 +604,16 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
                   ref={mapRef}
                   style={styles.map}
                   region={mapRegion}
-                  onRegionChangeComplete={handleMapRegionChange}
+                  onRegionChange={handleMapRegionChange}
+                  onRegionChangeComplete={handleMapRegionChangeComplete}
                   showsUserLocation={true}
-                  showsMyLocationButton={true}
+                  showsMyLocationButton={false}
+                  showsCompass={true}
+                  showsScale={true}
+                  showsBuildings={true}
+                  showsTraffic={false}
+                  showsIndoors={true}
+                  mapType="standard"
                 >
                   <Marker coordinate={mapRegion} />
                   {userLocation && (
@@ -942,11 +1012,22 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#ffffff',
     borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     marginBottom: 8,
+    position: 'relative',
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   searchInput: {
     flex: 1,
@@ -970,31 +1051,36 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   suggestionsList: {
-    maxHeight: 150,
+    maxHeight: 200,
     backgroundColor: '#fff',
-    borderRadius: 8,
+    borderRadius: 12,
     marginBottom: 8,
+    position: 'absolute',
+    top: '100%',
+    left: 0,
+    right: 0,
     zIndex: 1000,
-    elevation: 5,
+    elevation: 8,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: '#e5e7eb',
   },
   suggestionItem: {
-    padding: 12,
+    padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#f1f5f9',
     backgroundColor: '#fff',
   },
   suggestionText: {
-    fontSize: 16,
-    color: '#333',
+    fontSize: 15,
+    color: '#374151',
+    lineHeight: 20,
   },
   noResultsContainer: {
     padding: 20,
@@ -1017,7 +1103,8 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1,
-    minHeight: 200,
+    minHeight: 300,
+    borderRadius: 12,
   },
   zoomControls: {
     position: 'absolute',
