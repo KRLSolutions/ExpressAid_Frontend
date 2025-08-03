@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, FlatList, Dimensions, Pressable, Animated, Modal, StatusBar, Platform, SafeAreaView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { Ionicons } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { AppDrawerParamList } from '../navigation/AppStack';
 import { useCart } from '../CartContext';
+import ServiceAreaRestrictionModal from '../components/ServiceAreaRestrictionModal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SYMPTOMS = [
   { id: '1', emoji: '🌡️', title: 'Fever Check', price: 499, originalPrice: 899, subtitle: 'Vitals, doctor call if needed', color: '#FFE4E1', iconColor: '#FF6B6B' },
@@ -40,6 +43,8 @@ interface ServiceItem {
   iconColor: string;
 }
 
+const SERVICE_AREA_MODAL_KEY = 'serviceAreaModalDismissed';
+
 const SymptomEntryScreen: React.FC = () => {
   const navigation = useNavigation<DrawerNavigationProp<AppDrawerParamList>>();
   const { cart, addItem, removeItem, updateQty } = useCart();
@@ -49,6 +54,40 @@ const SymptomEntryScreen: React.FC = () => {
   const flyValue = useRef(new Animated.Value(0)).current;
   const cartBarRef = useRef<View>(null);
   const [cartBarPos, setCartBarPos] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
+
+  // Service area restriction modal state
+  const [showServiceAreaModal, setShowServiceAreaModal] = useState(false);
+  const [modalChecked, setModalChecked] = useState(false); // To avoid showing modal before check
+
+  // Reset modal when screen loses focus
+  useFocusEffect(
+    React.useCallback(() => {
+      // This runs when the screen is focused
+      return () => {
+        // This runs when the screen is unfocused
+        setShowServiceAreaModal(false);
+      };
+    }, [])
+  );
+
+  // On mount, check if modal was dismissed before
+  useEffect(() => {
+    (async () => {
+      const dismissed = await AsyncStorage.getItem(SERVICE_AREA_MODAL_KEY);
+      if (!dismissed) {
+        // Only show modal if not dismissed before
+        setTimeout(() => {
+          showLocationRestrictionModal();
+        }, 1000);
+      }
+      setModalChecked(true);
+    })();
+  }, []);
+
+  // Monitor modal state changes
+  useEffect(() => {
+    console.log('🔍 SymptomEntryScreen: showServiceAreaModal state changed to:', showServiceAreaModal);
+  }, [showServiceAreaModal]);
 
   // Get cart bar position after layout
   useEffect(() => {
@@ -60,7 +99,7 @@ const SymptomEntryScreen: React.FC = () => {
   }, [cart.length]);
 
   const goToCart = () => {
-    navigation.navigate('Cart');
+    navigation.navigate('Cart' as any);
   };
 
   const getTotal = () => cart.reduce((sum, item) => sum + item.price * item.qty, 0);
@@ -77,44 +116,48 @@ const SymptomEntryScreen: React.FC = () => {
       })
     )).start();
     
-    // Show location restriction alert once when screen opens
-    showLocationRestrictionAlert();
+    // Show location restriction modal once when screen opens
+    // Add a small delay to ensure the screen is fully loaded
+    const timer = setTimeout(() => {
+      console.log('Showing service area restriction modal');
+      showLocationRestrictionModal();
+    }, 1000);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedService, setSelectedService] = useState<ServiceItem | null>(null);
 
-  // Function to show location restriction alert
-  const showLocationRestrictionAlert = () => {
-    Alert.alert(
-      'Service Area Restriction',
-      'Our services are currently available only in Bangalore and its outskirts. We will notify you when we expand to your area.',
-      [
-        {
-          text: 'OK',
-          style: 'default',
-        }
-      ]
-    );
+  // Function to show location restriction modal
+  const showLocationRestrictionModal = () => {
+    console.log('🔍 showLocationRestrictionModal called - setting modal to true');
+    console.log('📍 Current screen: SymptomEntryScreen');
+    setShowServiceAreaModal(true);
+  };
+
+  // When user closes modal, set flag in AsyncStorage
+  const handleModalClose = async () => {
+    await AsyncStorage.setItem(SERVICE_AREA_MODAL_KEY, 'true');
+    setShowServiceAreaModal(false);
+  };
+
+  // Handle notify me when available
+  const handleNotifyMe = () => {
+    // Here you can implement the notification logic
+    // For example, save to local storage or send to backend
+    console.log('User wants to be notified when service is available');
+    // You can show a success message or implement actual notification logic
   };
 
   // Service details text mapping
   const SERVICE_DETAILS: { [key: string]: string } = {
-    '1': 'Fever Check: Includes vitals check and doctor call if needed.',
-    '2': 'Injection at Home: IM/IV injection with doctor prescription.',
-    '3': 'Vitals Monitoring: BP, Pulse, Temperature monitoring at home.',
-    '4': 'Elderly Care: Bedridden, hygiene, and mobility support.',
-    '5': 'Wound Dressing: Surgical or injury dressing by a nurse.',
-    '6': 'IV Drip Setup: IV setup at home with doctor\'s prescription.',
-    '7': 'Blood Sample Collection: Home collection, partnered with labs.',
-    '8': 'Family Wellness Packages: Annual health check-up visits for all family members. Health education & lifestyle coaching.',
-    '9': 'Physiotherapy: At-home physiotherapy sessions for pain relief, mobility, and recovery.',
-    '10': 'Catheter Change: Male/female catheter handling by a nurse.',
-    '11': 'Bedsore Care: Cleaning, dressing, and turn support for bedsores.',
-    '12': 'Post-Surgery Recovery: Daily care, dressing, and vitals monitoring after surgery.',
-    '13': 'Pregnancy Injection: Iron, TT, B12 injections as prescribed.',
-    '14': 'Newborn Check-Up: Infant vitals, hygiene, and bath support.',
-    '15': 'Emergency First Response: Non-ICU emergency prep until ambulance arrives.',
+    '1': 'Professional nurse will arrive at your doorstep within 10 minutes. Includes basic health checkup, vitals monitoring, and immediate medical assistance.',
+    '2': 'Comprehensive health assessment including blood pressure, temperature, oxygen levels, and heart rate monitoring with detailed health report.',
+    '3': 'Expert wound care, dressing changes, and post-operative care with sterile equipment and professional nursing standards.',
+    '4': 'Specialized care for elderly patients including medication management, mobility assistance, and health monitoring.',
+    '5': 'Professional IV therapy and injection services with certified nurses and sterile equipment.',
+    '6': 'Comprehensive health screening including blood tests, diabetes monitoring, and preventive health assessments.',
   };
 
   return (
@@ -265,6 +308,15 @@ const SymptomEntryScreen: React.FC = () => {
                  }}>
           <Text style={{ fontSize: 38 }}>{flyAnim.emoji}</Text>
         </Animated.View>
+      )}
+
+      {/* Service Area Restriction Modal */}
+      {modalChecked && (
+        <ServiceAreaRestrictionModal
+          visible={showServiceAreaModal}
+          onClose={handleModalClose}
+          onNotifyMe={handleNotifyMe}
+        />
       )}
     </SafeAreaView>
   );
