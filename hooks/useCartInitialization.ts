@@ -1,6 +1,6 @@
 import api from '../services/api';
 
-export const fetchAndSetCart = async (setCart: (cart: any[]) => void) => {
+export const fetchAndSetCart = async (setCart: (cart: any[]) => void, currentCart: any[] = []) => {
   try {
     console.log('🔄 Initializing cart from backend...');
     const res = await api.getCart();
@@ -17,8 +17,15 @@ export const fetchAndSetCart = async (setCart: (cart: any[]) => void) => {
       console.log('✅ Setting cart from backend:', frontendCart);
       setCart(frontendCart);
     } else {
-      console.log('📭 No cart data from backend, setting empty cart');
-      setCart([]);
+      // Only set empty cart if local cart is also empty
+      // This prevents clearing a local cart when backend returns empty
+      if (currentCart.length === 0) {
+        console.log('📭 No cart data from backend and local cart is empty, setting empty cart');
+        setCart([]);
+      } else {
+        console.log('⚠️ Backend returned empty cart but local cart has items, preserving local cart');
+        // Don't set cart to empty, keep the local cart
+      }
     }
   } catch (error) {
     console.error('❌ Error initializing cart:', error);

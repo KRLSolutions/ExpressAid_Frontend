@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, Modal, StyleSheet, FlatList, ActivityIndicator, Alert, TextInput, KeyboardAvoidingView, Platform, ScrollView, Linking } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, StyleSheet, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, Linking, TextInput, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import api from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -33,10 +33,7 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
   const [showMapPicker, setShowMapPicker] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<any>(null);
   
-  // Map and search states
-  const [searchText, setSearchText] = useState('');
-  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  // Map states
   const [currentAddress, setCurrentAddress] = useState('');
   const [mapRegion, setMapRegion] = useState<Region>({
     latitude: 12.9716,
@@ -261,59 +258,7 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
     }
   };
 
-  const handleSearchTextChange = async (text: string) => {
-    console.log('[UI] Search text changed:', text, 'length:', text.length);
-    setSearchText(text);
-    
-    // Clear previous timeout
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
-    }
-    
-    if (text.length >= 2) {
-      console.log('[UI] Text length >= 2, showing suggestions');
-      setShowSuggestions(true);
-      
-      // Debounce the API call
-      searchTimeoutRef.current = setTimeout(async () => {
-        try {
-          setSearching(true);
-          const suggestions = await getPlacesSuggestions(text);
-          console.log('[UI] Got suggestions from API:', suggestions.length);
-          setSuggestions(suggestions);
-          console.log('[UI] Set suggestions in state:', suggestions);
-        } catch (error) {
-          console.error('[UI] Error getting suggestions:', error);
-          setSuggestions([]);
-        } finally {
-          setSearching(false);
-        }
-      }, 500); // Increased to 500ms for better debouncing
-    } else {
-      console.log('[UI] Text length < 2, hiding suggestions');
-      setSuggestions([]);
-      setShowSuggestions(false);
-      setSearching(false);
-    }
-  };
 
-  const handleSuggestionSelect = async (suggestion: Suggestion) => {
-    setShowSuggestions(false);
-    setSearchText(suggestion.description);
-    console.log('[UI] Suggestion selected:', suggestion);
-    
-    // All suggestions should be from API now
-    
-    const locationData = await getLatLongFromPlaceId(suggestion.place_id);
-    if (!locationData) return;
-    setMapRegion({
-      latitude: locationData.latitude,
-      longitude: locationData.longitude,
-      latitudeDelta: 0.01,
-      longitudeDelta: 0.01,
-    });
-    setCurrentAddress(locationData.address || suggestion.description);
-  };
 
   const handleMapRegionChange = (region: Region) => {
     // Only update if the change is significant to prevent fluctuations
@@ -357,16 +302,13 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
       // Add to addresses list
       setAddresses(prev => [...prev, newAddress]);
       setShowMapPicker(false);
-      setSearchText('');
       setCurrentAddress('');
-      setSuggestions([]);
     }
   };
 
   const handleChangeAddress = () => {
-    setSearchText('');
-    setShowSuggestions(true);
-    searchInputRef.current?.focus();
+    // Reset to current location
+    requestLocationPermission();
   };
 
   const handleZoomIn = () => {
@@ -416,7 +358,7 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
       };
       // Validation: address and houseNumber must not be empty
       if (!addressPayload.address || !addressPayload.houseNumber) {
-        Alert.alert('Missing Info', 'Please enter a valid address and house number.');
+        Alert.alert('Missing Info', 'Please enter a valid address and floor & house number.');
         setLoading(false);
         return;
       }
@@ -523,78 +465,19 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
             </View>
           ) : (
             <>
-              {/* Search Bar */}
-              <View style={styles.searchContainer}>
-                <Ionicons name="search-outline" size={16} color="#777" />
-                <TextInput
-                  ref={searchInputRef}
-                  style={styles.searchInput}
-                  placeholder="Search address or enter manually"
-                  placeholderTextColor="#aaa"
-                  value={searchText}
-                  onChangeText={(text) => {
-                    setSearchText(text);
-                    handleSearchTextChange(text);
-                  }}
-                  onFocus={() => {
-                    if (searchText.length >= 2) {
-                      setShowSuggestions(true);
-                    }
-                  }}
-                  onBlur={() => {
-                    // Keep suggestions visible for a moment to allow selection
-                    setTimeout(() => {
-                      if (!searchText || searchText.length < 2) {
-                        setShowSuggestions(false);
-                      }
-                    }, 200);
-                  }}
-                  autoCorrect={false}
-                  autoCapitalize="none"
-                  returnKeyType="search"
-                />
-                <TouchableOpacity
-                  style={styles.useCurrentLocationButton}
+              {/* Use Current Location Button */}
+              <View style={styles.useCurrentContainer}>
+                <TouchableOpacity 
+                  style={styles.useCurrentButton} 
                   onPress={requestLocationPermission}
+                  disabled={loading}
                 >
-                  <Ionicons name="location" size={20} color="#2563eb" />
-                  <Text style={styles.useCurrentLocationText}>Use Current</Text>
+                  <Ionicons name="locate" size={24} color="#fff" style={{ marginRight: 8 }} />
+                  <Text style={styles.useCurrentButtonText}>
+                    {loading ? 'Getting Location...' : 'Use Current Location'}
+                  </Text>
                 </TouchableOpacity>
               </View>
-
-              {/* Suggestions */}
-              {showSuggestions && (
-                <>
-                  {searching ? (
-                    <View style={styles.noResultsContainer}>
-                      <ActivityIndicator size="small" color="#2563eb" />
-                      <Text style={styles.noResultsText}>Searching for addresses...</Text>
-                    </View>
-                  ) : suggestions.length > 0 ? (
-                    <FlatList
-                      data={suggestions}
-                      key={`suggestions-${suggestions.length}`}
-                      keyExtractor={(item) => item.place_id}
-                      renderItem={({ item }) => (
-                        <TouchableOpacity
-                          style={styles.suggestionItem}
-                          onPress={() => handleSuggestionSelect(item)}
-                          activeOpacity={0.7}
-                        >
-                          <Text style={styles.suggestionText}>{item.description}</Text>
-                        </TouchableOpacity>
-                      )}
-                      style={styles.suggestionsList}
-                      showsVerticalScrollIndicator={false}
-                    />
-                  ) : searchText.length >= 2 ? (
-                    <View style={styles.noResultsContainer}>
-                      <Text style={styles.noResultsText}>No addresses found for "{searchText}"</Text>
-                      <Text style={[styles.noResultsText, { fontSize: 14, marginTop: 4 }]}>Try a different search term</Text>
-                    </View>
-                  ) : null}
-                </>
-              )}
               
 
 
@@ -652,10 +535,11 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
                     <TouchableOpacity
                       style={[styles.button, { backgroundColor: '#22c55e' }]}
                       onPress={() => {
-                        setCurrentAddress(searchText);
+                        // Use current address from map
+                        handleSetAddress();
                       }}
                     >
-                      <Text style={styles.buttonText}>Use Entered Address</Text>
+                      <Text style={styles.buttonText}>Use Current Location</Text>
                     </TouchableOpacity>
                   )}
                 </View>
@@ -825,14 +709,14 @@ const ChooseAddressModal: React.FC<ChooseAddressModalProps> = ({ visible, onClos
                 <Text style={styles.enhancedSectionTitle}>Address Details</Text>
                 <TextInput
                   style={styles.enhancedInput}
-                  placeholder="House number *"
+                  placeholder="Complete Address *"
                   placeholderTextColor="#9ca3af"
                   value={extraDetails.houseNumber}
                   onChangeText={t => setExtraDetails({ ...extraDetails, houseNumber: t })}
                 />
                 <TextInput
                   style={styles.enhancedInput}
-                  placeholder="Floor *"
+                  placeholder="Floor & House number *"
                   placeholderTextColor="#9ca3af"
                   value={extraDetails.floor}
                   onChangeText={t => setExtraDetails({ ...extraDetails, floor: t })}
@@ -1009,25 +893,25 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     marginBottom: 8,
   },
-  searchContainer: {
+  useCurrentContainer: {
+    padding: 16,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+  },
+  useCurrentButton: {
+    backgroundColor: '#2563eb',
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    paddingHorizontal: 16,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
     paddingVertical: 12,
-    marginBottom: 8,
-    position: 'relative',
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    borderRadius: 12,
+    minWidth: 200,
+  },
+  useCurrentButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
   searchInput: {
     flex: 1,

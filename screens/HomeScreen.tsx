@@ -47,7 +47,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
   
   // Optimize cart polling with better state management
   const setCartRef = React.useRef(setCart);
+  const cartRef = React.useRef(cart);
   setCartRef.current = setCart;
+  cartRef.current = cart;
   
   // Debounced cart fetching to prevent excessive API calls
   const debouncedFetchCart = React.useCallback(
@@ -57,7 +59,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
         clearTimeout(timeoutId);
         timeoutId = setTimeout(() => {
           console.log('🔄 Debounced cart fetch triggered');
-          fetchAndSetCart(setCartRef.current);
+          fetchAndSetCart(setCartRef.current, cartRef.current);
         }, 1000); // 1 second debounce
       };
     }, []),
@@ -67,12 +69,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ userData }) => {
   React.useEffect(() => {
     console.log('🔄 HomeScreen useEffect running - setting up optimized cart polling');
     // Fetch cart immediately on mount
-    fetchAndSetCart(setCartRef.current);
+    fetchAndSetCart(setCartRef.current, cartRef.current);
     
     // Set up polling every 2 minutes instead of 1 minute to reduce server load
     const interval = setInterval(() => {
       console.log('⏰ Cart polling interval triggered (2 min)');
-      fetchAndSetCart(setCartRef.current);
+      fetchAndSetCart(setCartRef.current, cartRef.current);
     }, 120000); // 2 minutes instead of 1 minute
     
     return () => {

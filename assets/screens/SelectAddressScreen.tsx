@@ -1,26 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform, Alert, TextInput, FlatList, Modal } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform, Alert } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
-interface LocationItem {
-  place_id: string;
-  description: string;
-  structured_formatting: {
-    main_text: string;
-    secondary_text: string;
-  };
-}
-
 const SelectAddressScreen = ({ navigation, route }: any) => {
   const [location, setLocation] = useState<Region | null>(null);
   const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<LocationItem[]>([]);
-  const [showSearchResults, setShowSearchResults] = useState(false);
   const mapRef = useRef<MapView>(null);
 
   useEffect(() => {
@@ -66,55 +54,14 @@ const SelectAddressScreen = ({ navigation, route }: any) => {
     }
   };
 
-  const searchPlaces = async (query: string) => {
-    if (query.length < 3) {
-      setSearchResults([]);
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(query)}&types=geocode&key=AIzaSyBt6vwj4W_smVmNXDPwHQLdFBVpHQgM78c`
-      );
-      const data = await response.json();
-      if (data.predictions) {
-        setSearchResults(data.predictions);
-      }
-    } catch (error) {
-      console.error('Error searching places:', error);
-    }
-  };
-
   const onRegionChangeComplete = (region: Region) => {
     setLocation(region);
     fetchAddress(region.latitude, region.longitude);
   };
 
-  const selectSearchResult = async (item: LocationItem) => {
-    try {
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${item.place_id}&fields=geometry&key=AIzaSyBt6vwj4W_smVmNXDPwHQLdFBVpHQgM78c`
-      );
-      const data = await response.json();
-      
-      if (data.result && data.result.geometry) {
-        const { lat, lng } = data.result.geometry.location;
-        const region = {
-          latitude: lat,
-          longitude: lng,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        };
-        setLocation(region);
-        mapRef.current?.animateToRegion(region, 1000);
-        setAddress(item.description);
-        setSearchQuery('');
-        setSearchResults([]);
-        setShowSearchResults(false);
-      }
-    } catch (error) {
-      console.error('Error getting place details:', error);
-    }
+  const handleUseCurrentLocation = async () => {
+    setLoading(true);
+    await getCurrentLocation();
   };
 
   const handleConfirm = () => {
@@ -134,19 +81,6 @@ const SelectAddressScreen = ({ navigation, route }: any) => {
     // You can also pass this data back through route params or a callback
   };
 
-  const renderSearchResult = ({ item }: { item: LocationItem }) => (
-    <TouchableOpacity
-      style={styles.searchResultItem}
-      onPress={() => selectSearchResult(item)}
-    >
-      <Ionicons name="location-outline" size={20} color="#666" style={{ marginRight: 10 }} />
-      <View style={{ flex: 1 }}>
-        <Text style={styles.searchResultMainText}>{item.structured_formatting.main_text}</Text>
-        <Text style={styles.searchResultSecondaryText}>{item.structured_formatting.secondary_text}</Text>
-      </View>
-    </TouchableOpacity>
-  );
-
   return (
     <View style={{ flex: 1 }}>
       {/* Header */}
@@ -160,42 +94,19 @@ const SelectAddressScreen = ({ navigation, route }: any) => {
         </TouchableOpacity>
       </View>
 
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color="#666" style={{ marginRight: 10 }} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search for an address..."
-          value={searchQuery}
-          onChangeText={(text) => {
-            setSearchQuery(text);
-            searchPlaces(text);
-            setShowSearchResults(text.length > 0);
-          }}
-          onFocus={() => setShowSearchResults(searchQuery.length > 0)}
-        />
-        {searchQuery.length > 0 && (
-          <TouchableOpacity onPress={() => {
-            setSearchQuery('');
-            setSearchResults([]);
-            setShowSearchResults(false);
-          }}>
-            <Ionicons name="close" size={20} color="#666" />
-          </TouchableOpacity>
-        )}
+      {/* Use Current Location Button */}
+      <View style={styles.useCurrentContainer}>
+        <TouchableOpacity 
+          style={styles.useCurrentButton} 
+          onPress={handleUseCurrentLocation}
+          disabled={loading}
+        >
+          <Ionicons name="locate" size={24} color="#fff" style={{ marginRight: 8 }} />
+          <Text style={styles.useCurrentButtonText}>
+            {loading ? 'Getting Location...' : 'Use Current Location'}
+          </Text>
+        </TouchableOpacity>
       </View>
-
-      {/* Search Results */}
-      {showSearchResults && (
-        <View style={styles.searchResultsContainer}>
-          <FlatList
-            data={searchResults}
-            renderItem={renderSearchResult}
-            keyExtractor={(item) => item.place_id}
-            style={styles.searchResultsList}
-          />
-        </View>
-      )}
 
       {/* Map */}
       <View style={{ flex: 1 }}>
@@ -218,16 +129,11 @@ const SelectAddressScreen = ({ navigation, route }: any) => {
         )}
       </View>
 
-      {/* Current Location Button */}
-      <TouchableOpacity style={styles.currentLocationButton} onPress={getCurrentLocation}>
-        <Ionicons name="locate" size={24} color="#2563eb" />
-      </TouchableOpacity>
-
       {/* Selected Address Display */}
       <View style={styles.addressBox}>
         <Ionicons name="location-sharp" size={22} color="#2563eb" style={{ marginRight: 8 }} />
         <Text style={styles.addressText} numberOfLines={2}>
-          {address || 'Move the map or search to select an address'}
+          {address || 'Move the map or use current location to select an address'}
         </Text>
       </View>
     </View>
@@ -264,78 +170,30 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
-  searchContainer: {
+  useCurrentContainer: {
+    padding: 16,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+  },
+  useCurrentButton: {
+    backgroundColor: '#2563eb',
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    margin: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
+    minWidth: 200,
   },
-  searchInput: {
-    flex: 1,
+  useCurrentButtonText: {
+    color: '#fff',
     fontSize: 16,
-    color: '#222',
-    marginLeft: 8,
-  },
-  searchResultsContainer: {
-    position: 'absolute',
-    top: 120,
-    left: 16,
-    right: 16,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    maxHeight: 200,
-    zIndex: 1000,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  searchResultsList: {
-    borderRadius: 12,
-  },
-  searchResultItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
-  },
-  searchResultMainText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#222',
-  },
-  searchResultSecondaryText: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 2,
+    fontWeight: '600',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  currentLocationButton: {
-    position: 'absolute',
-    bottom: 120,
-    right: 16,
-    backgroundColor: '#fff',
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
   },
   addressBox: {
     flexDirection: 'row',

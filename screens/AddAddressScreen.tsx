@@ -303,7 +303,7 @@ const AddAddressScreen = ({ navigation }: any) => {
                 <TouchableOpacity style={addressType === 'Hotel' ? styles.detailsSaveAsBtnActiveGreen : styles.detailsSaveAsBtnOutline} onPress={() => setAddressType('Hotel')}><Text style={addressType === 'Hotel' ? styles.detailsSaveAsTextActiveGreen : styles.detailsSaveAsText}>🏨 Hotel</Text></TouchableOpacity>
                 <TouchableOpacity style={addressType === 'Other' ? styles.detailsSaveAsBtnActiveGreen : styles.detailsSaveAsBtnOutline} onPress={() => setAddressType('Other')}><Text style={addressType === 'Other' ? styles.detailsSaveAsTextActiveGreen : styles.detailsSaveAsText}>📍 Other</Text></TouchableOpacity>
               </View>
-              <TextInput style={styles.detailsInputModern} placeholder="House number *" value={houseNumber} onChangeText={setHouseNumber} />
+              <TextInput style={styles.detailsInputModern} placeholder="Complete Address *" value={houseNumber} onChangeText={setHouseNumber} />
               <TextInput style={styles.detailsInputModern} placeholder="Floor *" value={floor} onChangeText={setFloor} />
               <TextInput style={styles.detailsInputModern} placeholder="Tower / Block (optional)" value={tower} onChangeText={setTower} />
               <TextInput style={styles.detailsInputModern} placeholder="Nearby landmark (optional)" value={landmark} onChangeText={setLandmark} />
