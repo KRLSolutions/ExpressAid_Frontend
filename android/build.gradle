@@ -1,5 +1,10 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
+def nodeExecutable = System.getenv("NODE_BINARY")
+if (!nodeExecutable) {
+  nodeExecutable = new File("/opt/homebrew/bin/node").exists() ? "/opt/homebrew/bin/node" : "node"
+}
+
 buildscript {
   repositories {
     google()
@@ -15,7 +20,7 @@ buildscript {
 def reactNativeAndroidDir = new File(
   providers.exec {
     workingDir(rootDir)
-    commandLine("node", "--print", "require.resolve('react-native/package.json')")
+    commandLine(nodeExecutable, "--print", "require.resolve('react-native/package.json')")
   }.standardOutput.asText.get().trim(),
   "../android"
 )
