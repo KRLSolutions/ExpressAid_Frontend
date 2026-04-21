@@ -35,6 +35,15 @@ set APP_HOME=%DIRNAME%
 @rem Resolve any "." and ".." in APP_HOME to make it shorter.
 for %%i in ("%APP_HOME%") do set APP_HOME=%%~fi
 
+@rem Ensure Node is discoverable when Gradle runs from GUI tools.
+if not defined NODE_BINARY (
+  if exist "C:\Program Files\nodejs\node.exe" set NODE_BINARY=C:\Program Files\nodejs\node.exe
+)
+if defined NODE_BINARY (
+  for %%i in ("%NODE_BINARY%") do set NODE_DIR=%%~dpi
+  set PATH=%NODE_DIR%;%PATH%
+)
+
 @rem Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
 set DEFAULT_JVM_OPTS="-Xmx64m" "-Xms64m"
 
